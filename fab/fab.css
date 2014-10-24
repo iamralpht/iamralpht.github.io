@@ -1,0 +1,37 @@
+.fab-menu {
+    position: absolute;
+    width: 320px;
+    height: 400px;
+    top: 80px;
+    left: 10px;
+}
+.fab-menu-item {
+    position: absolute;
+    height: 80px;
+    width: 320px;
+    bottom: 0px;
+    right: 0px;
+}
+.fab-icon {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    right: 0;
+    top: 10px;
+    border-radius: 30px;
+    background-color: red;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    background-size: cover;
+    background-position: center;
+}
+.fab-label {
+    position: absolute;
+    left: 0;
+    right: 70px;
+    height: 80px;
+    line-height: 80px;
+    text-align: right;
+    font-family: sans-serif;
+    font-size: 22px;
+    overflow: hidden;
+}
