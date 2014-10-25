@@ -60,6 +60,11 @@ body {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
     background-size: cover;
     background-position: center;
+
+    overflow: hidden;
+    line-height: 60px;
+    font-size: 30px;
+    color: white;
 }
 .fab-label {
     position: absolute;

@@ -149,6 +149,7 @@ function FloatingActionButton(title, image, items) {
 
     this._cursor = new MenuItem(title, image);
     this._container.appendChild(this._cursor.element());
+    this._cursor.icon().textContent = '+';
 
     this._items = [];
     for (var i = 0; i < items.length; i++) {
@@ -161,52 +162,70 @@ function FloatingActionButton(title, image, items) {
 
     var isOpen = false;
     var self = this;
+    var touchInfo = { trackingID: -1, maxDy: 0 };
 
-    var touchInfo = { trackingID: -1, lastDy: 0 };
-    this._cursor.element().addEventListener('touchstart', function(e) {
+    function touchStart(e) {
         if (touchInfo.trackingID != -1) return;
         e.preventDefault();
-        touchInfo.trackingID = e.changedTouches[0].identifier;
-        touchInfo.x = e.changedTouches[0].pageX;
-        touchInfo.y = e.changedTouches[0].pageY;
-        touchInfo.lastDy = 0;
+        if (e.type == 'touchstart') {
+            touchInfo.trackingID = e.changedTouches[0].identifier;
+            touchInfo.x = e.changedTouches[0].pageX;
+            touchInfo.y = e.changedTouches[0].pageY;
+        } else {
+            if (e.target != self._cursor.icon()) return;
+            touchInfo.trackingID = 'mouse';
+            touchInfo.x = e.screenX;
+            touchInfo.y = e.screenY;
+        }
+        touchInfo.maxDy = 0;
         touchInfo.wasOpen = isOpen;
         isOpen = true;
         self._openSpring.setEnd(1);
         self._maskSpring.setEnd(2);
-        //self._mask.style.webkitTransform = 'scale(2)';
-    }, false);
-    this._cursor.element().addEventListener('touchmove', function(e) {
+    }
+
+    function findDy(e) {
+        if (e.type == 'touchmove' || e.type == 'touchend') {
+            for (var i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier == touchInfo.trackingID) {
+                    return e.changedTouches[i].pageY - touchInfo.y;
+                }
+            }
+        } else {
+            return e.screenY - touchInfo.y;
+        }
+        return false;
+    }
+
+    function touchMove(e) {
         if (touchInfo.trackingID == -1) return;
         e.preventDefault();
-        var dy = 0;
-        var found = false;
-        for (var i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier == touchInfo.trackingID) {
-                dy = e.changedTouches[i].pageY - touchInfo.y;
-                found = true;
-                break;
-            }
-        }
-        if (!found) return;
+        var dy = findDy(e);
+        if (dy === false) return;
         self._updateCursor(dy, true);
-        touchInfo.lastDy = dy;
-    }, false);
-    this._cursor.element().addEventListener('touchend', function(e) {
+        touchInfo.maxDy = Math.max(touchInfo.maxDy, Math.abs(dy));
+    }
+    function touchEnd(e) {
         if (touchInfo.trackingID == -1) return;
         e.preventDefault();
-        for (var i = 0; i < e.changedTouches.length; i++) {
-            if (e.changedTouches[i].identifier == touchInfo.trackingID) {
-                touchInfo.trackingID = -1;
-                if (touchInfo.lastDy == 0 && !touchInfo.wasOpen) return;
-                self._updateCursor(0, false);
-                isOpen = false;
-                self._openSpring.setEnd(0);
-                self._maskSpring.setEnd(0);
-                return;
-            }
-        }
-    }, false);
+        var dy = findDy(e);
+        if (dy === false) return;
+
+        touchInfo.trackingID = -1;
+        if (touchInfo.maxDy == 0 && !touchInfo.wasOpen) return;
+        self._updateCursor(0, false);
+        isOpen = false;
+        self._openSpring.setEnd(0);
+        self._maskSpring.setEnd(0);
+    }
+
+    this._cursor.element().addEventListener('touchstart', touchStart, false);
+    this._cursor.element().addEventListener('touchmove', touchMove, false);
+    this._cursor.element().addEventListener('touchend', touchEnd, false);
+    
+    document.body.addEventListener('mousedown', touchStart, false);
+    document.body.addEventListener('mousemove', touchMove, false);
+    document.body.addEventListener('mouseup', touchEnd, false);
 
     this._cursorPosition = 0;
 
