@@ -117,13 +117,17 @@ function MenuItem(title, image) {
     this._container.appendChild(this._label);
     this._icon = document.createElement('div');
     this._icon.className = 'fab-icon';
-    this._icon.style.backgroundImage = 'url(' + image + ')';
+    if (image) {
+        this._icon.style.backgroundImage = 'url(' + image + ')';
+        this._icon.style.backgroundColor = 'transparent';
+    }
     this._container.appendChild(this._icon);
     // We need a spring to tell us how far away we should be from the cursor.
     this._spring = new Spring(1, 400, 30); // 400 / 30 is slightly underdamped, so there will be a slight overbounce.
 }
 MenuItem.prototype.element = function() { return this._container; }
 MenuItem.prototype.icon = function() { return this._icon; }
+MenuItem.prototype.label = function() { return this._label; }
 MenuItem.prototype.setCursorIsClose = function(isCursorClose) { this._spring.setEnd(isCursorClose ? 1 : 0); }
 MenuItem.prototype.cursorAttraction = function() { return this._spring.x(); }
 
@@ -153,11 +157,7 @@ function FloatingActionButton(title, image, items) {
 
     var isOpen = false;
     var self = this;
-    /*
-    this._cursor.element().addEventListener('click', function() {
-        isOpen = !isOpen; self._openSpring.setEnd(isOpen ? 1 : 0); },
-        false);
-    */
+
     var touchInfo = { trackingID: -1 };
     this._cursor.element().addEventListener('touchstart', function(e) {
         if (touchInfo.trackingID != -1) return;
@@ -218,15 +218,20 @@ FloatingActionButton.prototype._layout = function() {
 
         item.element().style.webkitTransform = 'translate3D(0, ' + computedPosition + 'px, 0)';
         item.element().style.opacity = clamp(openAmount * 1.3 - 0.1, 0, 1);
-        item.icon().style.webkitTransform = 'scale(' + (1 + cursorAttraction * 0.2) + ') translateZ(0)';
+        item.icon().style.webkitTransform = 'scale(' + (0.8 + cursorAttraction * 0.4) + ') translateZ(0)';
     }
     this._cursor.icon().style.webkitTransform = 'translate3D(0, ' + cursorPosition + 'px, 0)';
+    this._cursor.label().style.opacity = openAmount;
+    this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
 
     requestAnimationFrame(this._layout.bind(this));
 }
 FloatingActionButton.prototype._updateCursor = function(position, isActive) {
     if (!isActive) {
         this._cursorSpring.setEnd(0);
+        for (var i = 0; i < this._items.length; i++) {
+            this._items[i].setCursorIsClose(false);
+        }
         return;
     }
     this._cursorPosition = position;
@@ -244,7 +249,7 @@ FloatingActionButton.prototype._updateCursor = function(position, isActive) {
  * Actually create the menu.
  */
 var testMenu = new FloatingActionButton(
-    'Compose', 'img/compose.png', 
+    'Compose', null,//'img/compose.png', 
     [
         { title: 'Paul Krugman', image: 'img/krugman.png' },
         { title: 'Sophocles', image: 'img/greek.jpg' },
