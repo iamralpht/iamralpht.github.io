@@ -17,7 +17,7 @@ body {
     top: 50%;
     -webkit-transform: translateY(-50%);
 
-    background-image: url(img/inbox.webp);
+    background-image: url(img/inbox.png);
     background-size: cover;
     width: 100%;
     height: 100%;
