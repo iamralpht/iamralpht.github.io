@@ -162,13 +162,15 @@ function FloatingActionButton(title, image, items) {
     var isOpen = false;
     var self = this;
 
-    var touchInfo = { trackingID: -1 };
+    var touchInfo = { trackingID: -1, lastDy: 0 };
     this._cursor.element().addEventListener('touchstart', function(e) {
         if (touchInfo.trackingID != -1) return;
         e.preventDefault();
         touchInfo.trackingID = e.changedTouches[0].identifier;
         touchInfo.x = e.changedTouches[0].pageX;
         touchInfo.y = e.changedTouches[0].pageY;
+        touchInfo.lastDy = 0;
+        touchInfo.wasOpen = isOpen;
         isOpen = true;
         self._openSpring.setEnd(1);
         self._maskSpring.setEnd(2);
@@ -188,6 +190,7 @@ function FloatingActionButton(title, image, items) {
         }
         if (!found) return;
         self._updateCursor(dy, true);
+        touchInfo.lastDy = dy;
     }, false);
     this._cursor.element().addEventListener('touchend', function(e) {
         if (touchInfo.trackingID == -1) return;
@@ -195,10 +198,10 @@ function FloatingActionButton(title, image, items) {
         for (var i = 0; i < e.changedTouches.length; i++) {
             if (e.changedTouches[i].identifier == touchInfo.trackingID) {
                 touchInfo.trackingID = -1;
+                if (touchInfo.lastDy == 0 && !touchInfo.wasOpen) return;
                 self._updateCursor(0, false);
                 isOpen = false;
                 self._openSpring.setEnd(0);
-                //self._mask.style.webkitTransform = 'scale(0.01)';
                 self._maskSpring.setEnd(0);
                 return;
             }
