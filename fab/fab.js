@@ -30,8 +30,18 @@ Spring.prototype._solve = function(initial, velocity) {
     var k = this._k;
     // Solve the quadratic equation; root = (-c +/- sqrt(c^2 - 4mk)) / 2m.
     var cmk = c * c - 4 * m * k;
-    if (cmk >= 0) {
-        // The spring is overdamped or critically damped; no bounces.
+    if (cmk == 0) {
+        // The spring is critically damped.
+        // x = (c1 + c2*t) * e ^(-c/2m)*t
+        var r = -c / (2 * m);
+        var c1 = initial;
+        var c2 = velocity / (r * initial);
+        return {
+            x: function(t) { return (c1 + c2 * t) * Math.pow(Math.E, r * t); },
+            dx: function(t) { var pow = Math.pow(Math.E, r * t); return r * (c1 + c2 * t) * pow + c2 * pow; }
+        };
+    } else if (cmk > 0) {
+        // The spring is overdamped; no bounces.
         // x = c1*e^(r1*t) + c2*e^(r2t)
         // Need to find r1 and r2, the roots, then solve c1 and c2.
         var r1 = (-c - Math.sqrt(cmk)) / (2 * m);
@@ -184,36 +194,36 @@ function FloatingActionButton(title, image, items) {
         self._maskSpring.setEnd(2);
     }
 
-    function findDy(e) {
+    function findDelta(e) {
         if (e.type == 'touchmove' || e.type == 'touchend') {
             for (var i = 0; i < e.changedTouches.length; i++) {
                 if (e.changedTouches[i].identifier == touchInfo.trackingID) {
-                    return e.changedTouches[i].pageY - touchInfo.y;
+                    return {x: e.changedTouches[i].pageX - touchInfo.x, y: e.changedTouches[i].pageY - touchInfo.y};
                 }
             }
         } else {
-            return e.screenY - touchInfo.y;
+            return {x: e.screenX - touchInfo.x, y: e.screenY - touchInfo.y};
         }
-        return false;
+        return null;
     }
 
     function touchMove(e) {
         if (touchInfo.trackingID == -1) return;
         e.preventDefault();
-        var dy = findDy(e);
-        if (dy === false) return;
-        self._updateCursor(dy, true);
-        touchInfo.maxDy = Math.max(touchInfo.maxDy, Math.abs(dy));
+        var delta = findDelta(e);
+        if (!delta) return;
+        self._updateCursor(delta.y, delta.x, true);
+        touchInfo.maxDy = Math.max(touchInfo.maxDy, Math.abs(delta.y));
     }
     function touchEnd(e) {
         if (touchInfo.trackingID == -1) return;
         e.preventDefault();
-        var dy = findDy(e);
-        if (dy === false) return;
+        var delta = findDelta(e);
+        if (!delta) return;
 
         touchInfo.trackingID = -1;
         if (touchInfo.maxDy == 0 && !touchInfo.wasOpen) return;
-        self._updateCursor(0, false);
+        self._updateCursor(0, 0, false);
         isOpen = false;
         self._openSpring.setEnd(0);
         self._maskSpring.setEnd(0);
@@ -247,26 +257,29 @@ FloatingActionButton.prototype._layout = function() {
         var cursorAttraction = item.cursorAttraction();
         // The actual position is somewhere between the natural position (which is the layout
         var computedPosition = naturalPosition * (1 - cursorAttraction) + cursorPosition * cursorAttraction;
+        var x = this._cursorX * cursorAttraction;
 
         item.element().style.webkitTransform = 'translate3D(0, ' + computedPosition + 'px, 0)';
         item.element().style.opacity = clamp(openAmount * 1.3 - 0.1, 0, 1);
-        item.icon().style.webkitTransform = 'scale(' + (0.8 + cursorAttraction * 0.4) + ') translateZ(0)';
+        item.icon().style.webkitTransform = id.translate(x, 0).scale(0.8 + cursorAttraction * 0.4) + ' translateZ(0)';
     }
-    this._cursor.icon().style.webkitTransform = id.translate(0, cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
+    this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
     this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
     this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ') translateZ(0)';
 
     requestAnimationFrame(this._layout.bind(this));
 }
-FloatingActionButton.prototype._updateCursor = function(position, isActive) {
+FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
     if (!isActive) {
         this._cursorSpring.setEnd(0);
+        this._selected = 0;
         for (var i = 0; i < this._items.length; i++) {
             this._items[i].setCursorIsClose(false);
         }
         return;
     }
+    this._cursorX = x;
     this._cursorPosition = position;
     this._cursorSpring.snap(1);
     // Which menu item are we closest to?
