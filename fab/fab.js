@@ -142,6 +142,9 @@ function FloatingActionButton(title, image, items) {
     this._cursorSpring = new Spring(1, 300, 20);
     this._container = document.createElement('div');
     this._container.className = 'fab-menu';
+    this._mask = document.createElement('div');
+    this._mask.className = 'fab-mask';
+    this._container.appendChild(this._mask);
 
     this._cursor = new MenuItem(title, image);
     this._container.appendChild(this._cursor.element());
@@ -167,6 +170,7 @@ function FloatingActionButton(title, image, items) {
         touchInfo.y = e.changedTouches[0].pageY;
         isOpen = true;
         self._openSpring.setEnd(1);
+        self._mask.style.webkitTransform = 'scale(2)';
     }, false);
     this._cursor.element().addEventListener('touchmove', function(e) {
         if (touchInfo.trackingID == -1) return;
@@ -192,6 +196,7 @@ function FloatingActionButton(title, image, items) {
                 self._updateCursor(0, false);
                 isOpen = false;
                 self._openSpring.setEnd(0);
+                self._mask.style.webkitTransform = 'scale(0.01)';
                 return;
             }
         }
@@ -255,5 +260,10 @@ var testMenu = new FloatingActionButton(
         { title: 'Sophocles', image: 'img/greek.jpg' },
         { title: 'Ralph Thomas', image: 'img/ralpht.jpg' },
     ]);
-document.body.appendChild(testMenu.element());
+
+var phone = document.createElement('div');
+phone.className = 'phone';
+phone.appendChild(testMenu.element());
+
+document.body.appendChild(phone);
 })();
