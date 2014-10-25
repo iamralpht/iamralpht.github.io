@@ -209,6 +209,8 @@ function FloatingActionButton(title, image, items) {
 
     this._layout();
 }
+var id = new WebKitCSSMatrix();
+
 FloatingActionButton.prototype.element = function() { return this._container; }
 FloatingActionButton.prototype._layout = function() {
     function clamp(x, min, max) { return (x < min ? min : (x > max ? max : x)); }
@@ -228,7 +230,7 @@ FloatingActionButton.prototype._layout = function() {
         item.element().style.opacity = clamp(openAmount * 1.3 - 0.1, 0, 1);
         item.icon().style.webkitTransform = 'scale(' + (0.8 + cursorAttraction * 0.4) + ') translateZ(0)';
     }
-    this._cursor.icon().style.webkitTransform = 'translate3D(0, ' + cursorPosition + 'px, 0)';
+    this._cursor.icon().style.webkitTransform = id.translate(0, cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
     this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
     this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ') translateZ(0)';
