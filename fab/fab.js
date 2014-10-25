@@ -140,6 +140,7 @@ function FloatingActionButton(title, image, items) {
     // The spring that opens the menu.
     this._openSpring = new Spring(1, 400, 20);
     this._cursorSpring = new Spring(1, 300, 20);
+    this._maskSpring = new Spring(1, 800, 60);
     this._container = document.createElement('div');
     this._container.className = 'fab-menu';
     this._mask = document.createElement('div');
@@ -170,7 +171,8 @@ function FloatingActionButton(title, image, items) {
         touchInfo.y = e.changedTouches[0].pageY;
         isOpen = true;
         self._openSpring.setEnd(1);
-        self._mask.style.webkitTransform = 'scale(2)';
+        self._maskSpring.setEnd(2);
+        //self._mask.style.webkitTransform = 'scale(2)';
     }, false);
     this._cursor.element().addEventListener('touchmove', function(e) {
         if (touchInfo.trackingID == -1) return;
@@ -196,7 +198,8 @@ function FloatingActionButton(title, image, items) {
                 self._updateCursor(0, false);
                 isOpen = false;
                 self._openSpring.setEnd(0);
-                self._mask.style.webkitTransform = 'scale(0.01)';
+                //self._mask.style.webkitTransform = 'scale(0.01)';
+                self._maskSpring.setEnd(0);
                 return;
             }
         }
@@ -228,6 +231,7 @@ FloatingActionButton.prototype._layout = function() {
     this._cursor.icon().style.webkitTransform = 'translate3D(0, ' + cursorPosition + 'px, 0)';
     this._cursor.label().style.opacity = openAmount;
     this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
+    this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ') translateZ(0)';
 
     requestAnimationFrame(this._layout.bind(this));
 }

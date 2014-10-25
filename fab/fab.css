@@ -48,7 +48,6 @@ body {
     border-radius: 50%;
     background-color: rgba(255,255,255,0.7);
     -webkit-transform: scale(0.01);
-    -webkit-transition: -webkit-transform 0.3s;
 }
 .fab-icon {
     position: absolute;
