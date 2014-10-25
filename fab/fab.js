@@ -142,13 +142,19 @@ MenuItem.prototype.setCursorIsClose = function(isCursorClose) { this._spring.set
 MenuItem.prototype.cursorAttraction = function() { return this._spring.x(); }
 
 /*
+ * Magic numbers for the FloatingActionButton.
+ */
+var ITEM_SIZE = 80; // The height of an item, including padding.
+var STICKINESS = 20; // How "sticky" an item is as you start to track left.
+
+/*
  * This is the menu itself. It creates an item for the cursor, and then a bunch of items for each option.
  * It lays them out in a vertical stack. It listens for touch events to open the stack and to move the
  * cursor item around. The cursor is the main button.
  */
 function FloatingActionButton(title, image, items) {
     // The spring that opens the menu.
-    this._openSpring = new Spring(1, 400, 20);
+    this._openSpring = new Spring(1, 400, 25);
     this._cursorSpring = new Spring(1, 300, 20);
     this._maskSpring = new Spring(1, 800, 60);
     this._container = document.createElement('div');
@@ -238,6 +244,7 @@ function FloatingActionButton(title, image, items) {
     document.body.addEventListener('mouseup', touchEnd, false);
 
     this._cursorPosition = 0;
+    this._selected = 0;
 
     this._layout();
 }
@@ -252,7 +259,7 @@ FloatingActionButton.prototype._layout = function() {
     var y = 0;
     for (var i = 0; i < this._items.length; i++) {
         var item = this._items[i];
-        y -= 80;
+        y -= ITEM_SIZE;
         var naturalPosition = y * openAmount;
         var cursorAttraction = item.cursorAttraction();
         // The actual position is somewhere between the natural position (which is the layout
@@ -262,6 +269,7 @@ FloatingActionButton.prototype._layout = function() {
         item.element().style.webkitTransform = 'translate3D(0, ' + computedPosition + 'px, 0)';
         item.element().style.opacity = clamp(openAmount * 1.3 - 0.1, 0, 1);
         item.icon().style.webkitTransform = id.translate(x, 0).scale(0.8 + cursorAttraction * 0.4) + ' translateZ(0)';
+        item.label().style.opacity = clamp(1 + x / 50, 0, 1);
     }
     this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
@@ -279,11 +287,20 @@ FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
         }
         return;
     }
+    if (x > 0) x /= 4;
     this._cursorX = x;
-    this._cursorPosition = position;
     this._cursorSpring.snap(1);
-    // Which menu item are we closest to?
-    var selected = ~~Math.round(-position / 80);
+
+    // Manipulate the position so that when you track to the left, you get more stuck on that item.
+    var stickiness = Math.max(Math.abs(x / STICKINESS), 1);
+    var snap = -this._selected * ITEM_SIZE;
+    position = (position - snap) / stickiness + snap;
+
+    this._cursorPosition = position;
+
+    // Figure out which item should be selected.
+    var selected = ~~Math.round(-position / ITEM_SIZE);
+    this._selected = selected;
     for (var i = 0; i < this._items.length; i++) {
         var item = this._items[i];
         var selectionIndex = i + 1;
