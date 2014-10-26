@@ -160,7 +160,7 @@ function FloatingActionButton(title, image, items) {
     // The spring that opens the menu.
     this._openSpring = new Spring(1, 400, 25);
     this._cursorSpring = new Spring(1, 300, 20);
-    this._maskSpring = new Spring(1, 800, 60);
+    this._maskSpring = new Spring(1, 800, 80);
     this._container = document.createElement('div');
     this._container.className = 'fab-menu';
     this._mask = document.createElement('div');
@@ -299,10 +299,11 @@ FloatingActionButton.prototype._layout = function() {
         item.launch().style.webkitTransform = id.translate(launchOffset, 0);
         setCircleClipPath(item.launch(), maskSize);
     }
-    this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
+    this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2).rotate(45 * openAmount) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
     this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
     this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ') translateZ(0)';
+    this._mask.style.opacity = clamp(this._maskSpring.x() * 0.5, 0, 1);
 
     requestAnimationFrame(this._layout.bind(this));
 }
@@ -343,7 +344,7 @@ FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
  * Actually create the menu.
  */
 var testMenu = new FloatingActionButton(
-    'Compose', null,//'img/compose.png', 
+    'Cancel', null,//'img/compose.png', 
     [
         { title: 'Paul Krugman', image: 'img/krugman.png' },
         { title: 'Sophocles', image: 'img/greek.jpg' },
