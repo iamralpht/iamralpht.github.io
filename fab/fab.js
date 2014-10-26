@@ -121,6 +121,9 @@ function MenuItem(title, image) {
     // Build the DOM.
     this._container = document.createElement('div');
     this._container.className = 'fab-menu-item';
+    this._launch = document.createElement('div');
+    this._launch.className = 'fab-launch';
+    this._container.appendChild(this._launch);
     this._label = document.createElement('div');
     this._label.className = 'fab-label';
     this._label.innerText = title;
@@ -138,6 +141,7 @@ function MenuItem(title, image) {
 MenuItem.prototype.element = function() { return this._container; }
 MenuItem.prototype.icon = function() { return this._icon; }
 MenuItem.prototype.label = function() { return this._label; }
+MenuItem.prototype.launch = function() { return this._launch; }
 MenuItem.prototype.setCursorIsClose = function(isCursorClose) { this._spring.setEnd(isCursorClose ? 1 : 0); }
 MenuItem.prototype.cursorAttraction = function() { return this._spring.x(); }
 
@@ -163,9 +167,6 @@ function FloatingActionButton(title, image, items) {
     this._mask.className = 'fab-mask';
     this._container.appendChild(this._mask);
 
-    this._cursor = new MenuItem(title, image);
-    this._container.appendChild(this._cursor.element());
-    this._cursor.icon().textContent = '+';
 
     this._items = [];
     for (var i = 0; i < items.length; i++) {
@@ -175,6 +176,9 @@ function FloatingActionButton(title, image, items) {
         this._container.appendChild(mi.element());
     }
 
+    this._cursor = new MenuItem(title, image);
+    this._container.appendChild(this._cursor.element());
+    this._cursor.icon().textContent = '+';
 
     var isOpen = false;
     var self = this;
@@ -266,10 +270,25 @@ FloatingActionButton.prototype._layout = function() {
         var computedPosition = naturalPosition * (1 - cursorAttraction) + cursorPosition * cursorAttraction;
         var x = this._cursorX * cursorAttraction;
 
+        if (almostZero(x, 0.1)) x = 0;
+        if (almostZero(computedPosition, 0.1)) computedPosition = 0;
+        if (almostZero(cursorAttraction, 0.01)) cursorAttraction = 0;
+
         item.element().style.webkitTransform = 'translate3D(0, ' + computedPosition + 'px, 0)';
         item.element().style.opacity = clamp(openAmount * 1.3 - 0.1, 0, 1);
         item.icon().style.webkitTransform = id.translate(x, 0).scale(0.8 + cursorAttraction * 0.4) + ' translateZ(0)';
         item.label().style.opacity = clamp(1 + x / 50, 0, 1);
+
+        var maskSize = Math.abs(x);
+        var launchOffset = 0;
+
+        if (maskSize > 160) {
+            launchOffset = -(maskSize - 160);
+            maskSize = 160;
+        }
+
+        item.launch().style.webkitTransform = id.translate(launchOffset, 0);
+        item.launch().style.webkitClipPath = 'circle(' + maskSize + 'px)';
     }
     this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
@@ -278,6 +297,7 @@ FloatingActionButton.prototype._layout = function() {
 
     requestAnimationFrame(this._layout.bind(this));
 }
+var zIndex = 1;
 FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
     if (!isActive) {
         this._cursorSpring.setEnd(0);
@@ -300,12 +320,14 @@ FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
 
     // Figure out which item should be selected.
     var selected = ~~Math.round(-position / ITEM_SIZE);
-    this._selected = selected;
     for (var i = 0; i < this._items.length; i++) {
         var item = this._items[i];
         var selectionIndex = i + 1;
         item.setCursorIsClose(selectionIndex == selected);
+        if (selected != this._selected && selectionIndex == selected)
+            item.element().style.zIndex = (++zIndex);
     }
+    this._selected = selected;
 }
 
 /*

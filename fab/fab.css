@@ -49,6 +49,9 @@ body {
     background-color: rgba(255,255,255,0.7);
     -webkit-transform: scale(0.01);
 }
+/* The app we're launching. It should be centered underneath the icon, but doesn't move horizontally with
+ * the icon...
+ */
 .fab-icon {
     position: absolute;
     width: 60px;
@@ -75,4 +78,17 @@ body {
     text-align: right;
     font-size: 18px;
     overflow: hidden;
+}
+.fab-launch {
+    position: absolute;
+    width: 320px;
+    height: 400px;
+    right: -130px;
+    top: -160px;
+
+    background-image: url(img/compose.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    -webkit-clip-path: circle(0px);
 }
