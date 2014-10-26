@@ -293,12 +293,11 @@ FloatingActionButton.prototype._layout = function() {
 
         if (maskSize > 160) {
             launchOffset = -(maskSize - 160);
-            maskSize = 160;
+            // Don't clamp the mask size here, it doesn't look good.
         }
 
         item.launch().style.webkitTransform = id.translate(launchOffset, 0);
         setCircleClipPath(item.launch(), maskSize);
-        //item.launch().style.webkitClipPath = 'circle(50%, 50%, ' + maskSize + 'px)';
     }
     this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
