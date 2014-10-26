@@ -357,7 +357,7 @@ phone.appendChild(testMenu.element());
 
 var hint = document.createElement('span');
 hint.className = 'hint';
-hint.innerText = 'drag upwards on the red floating action button and then (without letting go) track sideways on an item.\nOnly works in Chrome and Safari.';
+hint.innerText = 'Drag upwards on the red floating action button and then (without letting go) track sideways on an item';
 
 document.body.appendChild(phone);
 document.body.appendChild(hint);

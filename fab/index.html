@@ -1,10 +1,69 @@
 <html>
 <head>
-<meta name="viewport" content="width=device-width"/>
-<title>Tactile Floating Action Button</title>
-<link rel="stylesheet" href="fab.css"/>
+<title>Fluid-Touch Design</title>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700' rel='stylesheet' type='text/css'>
+<style>
+body {
+    font-family: 'Source Sans Pro', sans-serif;
+    margin: 40px 10%;
+    font-size: 22px;
+}
+div {
+    margin-bottom: 20px;
+}
+.title {
+    font-weight: bold;
+    font-size: 48;
+    margin-bottom: 20px;
+}
+.subtitle {
+    font-size: 18px;
+}
+.embed {
+    padding-top: 10px;
+    height: 550px;
+}
+img {
+    display: inline-block;
+    max-width: 25vw;
+}
+li {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+iframe {
+    position: absolute;
+    width: 100%;
+    height: 550px;
+    left: 0;
+    border: none;
+}
+</style>
 </head>
 <body>
-<script src="fab.js"></script>
+<div class="title">Fluid-Touch Design</div>
+<div class="subtitle"><a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>26 October 2014</div>
+<div class="content">
+<ul>
+ <li>Last week, I tried out <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.inbox">Inbox by GMail</a> and it is the first "brand new" <a href="http://www.google.com/design/spec/material-design/introduction.html">Material Design</a> app that I've used.</li>
+ <li>I love how Material Design looks statically. It's obvious where you can touch and what's going to happen (except that the "delete" button really means "back").</li>
+ <li>However, once you actually start touching the UI the design's weaknesses emerge. I fall into a pattern of tapping, waiting for an animation and then tapping again on the next thing.</li>
+ <li>We can do better. We can tighten and augment the relationship between the human's input and the computer's reaction to make a much more responsive interface. Inspired by the menu system in Facebook Home, I took a stab at designing a more reactive Floating Action Button that understands a larger touch vocabulary. While similar to a nested pop-up menu, it's much more immediately and thus fluidly responsive to a fingertip drag.</li>
+</ul>
+Here's a prototype I put together yesterday for a Fluid-Touch Floating Action Button. It works in Chrome and Safari, better on fast computers:
+<div class="embed">
+<iframe src="demo/index.html"></iframe>
+</div>
+Here's why my Fluid-Touch Floating Action Button is better than Inbox by GMail's:
+<ul>
+ <li><b>No waiting!</b> You can start dragging the button upwards and immediately select your target without feeling that you've got to wait for the expand animation to finish.</li>
+ <li><b>Eliminates a tap.</b> You can select a contact in one smooth gesture. If you want to tap twice then that still works, too.</li>
+ <li><b>Previews the consequence of the action.</b> As you track to the left (while dragging, a non prototype implementation would support mixing tapping and dragging), the next screen is revealed. You know exactly what you're getting into.</li>
+ <li><b>Fluidly cancellable.</b> If you change your mind while dragging, it's OK, you can just drag back to the right and not open that view. This also supports the idea that screens come from the right and that backwards is to the left (which is the direction the back button points on Android).</li>
+ <li><b>More playful.</b> Material Design itself is playful through its use of saturated color. I dialed my springs to be underdamped to support that.</li>
+</ul>
+<p>The spring implementation that the demo uses is based on the algebraic integration of the standard damped spring equation&mdash;this means it's about as fast as any of the standard Android animation curves (as compared to something like Facebook Rebound, which uses expensive numerical integration to compute the spring's position every frame).</p>
+<p>I originally wrote the spring for my recent game <a href="https://play.google.com/store/apps/details?id=com.infinite_imagination.letterplex">Letterplex</a> and transliterated it to JavaScript for this prototype. I've released the source to all of the physics simulations that Letterplex uses as <a href="https://github.com/iamralpht/gravitas">Gravitas</a>. As I'm sure you'll agree, UI that incorporates physical simulations has Gravitas.
+</div>
 </body>
 </html>
