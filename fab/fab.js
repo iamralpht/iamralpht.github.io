@@ -254,6 +254,15 @@ function FloatingActionButton(title, image, items) {
 }
 var id = new WebKitCSSMatrix();
 
+function setCircleClipPath(element, size) {
+    // Chrome supports the new syntax, iOS 7 only manages the old syntax.
+    var oldSyntax = 'circle(50%, 50%, ' + size + 'px)';
+    var newSyntax = 'circle(' + size + 'px)';
+    element.style.webkitClipPath = newSyntax;
+    if (element.style.webkitClipPath != newSyntax)
+        element.style.webkitClipPath = oldSyntax;
+}
+
 FloatingActionButton.prototype.element = function() { return this._container; }
 FloatingActionButton.prototype._layout = function() {
     function clamp(x, min, max) { return (x < min ? min : (x > max ? max : x)); }
@@ -288,7 +297,8 @@ FloatingActionButton.prototype._layout = function() {
         }
 
         item.launch().style.webkitTransform = id.translate(launchOffset, 0);
-        item.launch().style.webkitClipPath = 'circle(50%, 50%, ' + maskSize + 'px)';
+        setCircleClipPath(item.launch(), maskSize);
+        //item.launch().style.webkitClipPath = 'circle(50%, 50%, ' + maskSize + 'px)';
     }
     this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
