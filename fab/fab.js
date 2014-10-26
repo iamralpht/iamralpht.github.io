@@ -355,5 +355,10 @@ var phone = document.createElement('div');
 phone.className = 'phone';
 phone.appendChild(testMenu.element());
 
+var hint = document.createElement('span');
+hint.className = 'hint';
+hint.innerText = 'in one movement, drag upwards on the red floating action button and then drag sideways on an item.\nOnly works in Chrome and Safari.';
+
 document.body.appendChild(phone);
+document.body.appendChild(hint);
 })();

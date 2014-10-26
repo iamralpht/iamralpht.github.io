@@ -25,6 +25,15 @@ body {
     max-height: 420px;
     overflow: hidden;
 }
+.hint {
+    display: inline-block;
+    position: absolute;
+
+    top: -webkit-calc(50% + 220px);
+    left: 10%;
+    right: 10%;
+    color: white;
+}
 .fab-menu {
     position: absolute;
     top: 0; left: 0;
