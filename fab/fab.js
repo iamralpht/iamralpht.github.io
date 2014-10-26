@@ -288,7 +288,7 @@ FloatingActionButton.prototype._layout = function() {
         }
 
         item.launch().style.webkitTransform = id.translate(launchOffset, 0);
-        item.launch().style.webkitClipPath = 'circle(' + maskSize + 'px)';
+        item.launch().style.webkitClipPath = 'circle(50%, 50%, ' + maskSize + 'px)';
     }
     this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;

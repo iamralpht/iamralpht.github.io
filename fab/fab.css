@@ -90,5 +90,5 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
 
-    -webkit-clip-path: circle(0px);
+    -webkit-clip-path: circle(50%, 50%, 0px);
 }
