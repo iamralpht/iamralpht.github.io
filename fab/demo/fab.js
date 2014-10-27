@@ -302,7 +302,7 @@ FloatingActionButton.prototype._layout = function() {
     this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2).rotate(135 * openAmount) + ' translateZ(0)';
     this._cursor.label().style.opacity = openAmount;
     this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
-    this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ') translateZ(0)';
+    this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ')';
     this._mask.style.opacity = clamp(this._maskSpring.x() * 0.5, 0, 1);
 
     requestAnimationFrame(this._layout.bind(this));
