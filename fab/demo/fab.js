@@ -253,11 +253,14 @@ function FloatingActionButton(title, image, items) {
     this._layout();
 }
 var id = new WebKitCSSMatrix();
+function round(amount, quanta) {
+    return (Math.round(amount / quanta) * quanta);
+}
 
 function setCircleClipPath(element, size) {
     // Chrome supports the new syntax, iOS 7 only manages the old syntax.
-    var oldSyntax = 'circle(50%, 50%, ' + size + 'px)';
-    var newSyntax = 'circle(' + size + 'px)';
+    var oldSyntax = 'circle(50%, 50%, ' + round(size, 1) + 'px)';
+    var newSyntax = 'circle(' + round(size, 1) + 'px)';
     element.style.webkitClipPath = newSyntax;
     if (element.style.webkitClipPath != newSyntax)
         element.style.webkitClipPath = oldSyntax;
@@ -279,9 +282,13 @@ FloatingActionButton.prototype._layout = function() {
         var computedPosition = naturalPosition * (1 - cursorAttraction) + cursorPosition * cursorAttraction;
         var x = this._cursorX * cursorAttraction;
 
-        if (almostZero(x, 0.1)) x = 0;
-        if (almostZero(computedPosition, 0.1)) computedPosition = 0;
-        if (almostZero(cursorAttraction, 0.01)) cursorAttraction = 0;
+        x = round(x, 0.1);
+        computedPosition = round(computedPosition, 0.1);
+        cursorAttraction = round(cursorAttraction, 0.01);
+
+        //if (almostZero(x, 0.1)) x = 0;
+        //if (almostZero(computedPosition, 0.1)) computedPosition = 0;
+        //if (almostZero(cursorAttraction, 0.01)) cursorAttraction = 0;
 
         item.element().style.webkitTransform = 'translate3D(0, ' + computedPosition + 'px, 0)';
         item.element().style.opacity = clamp(openAmount * 1.3 - 0.1, 0, 1);
@@ -292,18 +299,18 @@ FloatingActionButton.prototype._layout = function() {
         var launchOffset = 0;
 
         if (maskSize > 160) {
-            launchOffset = -(maskSize - 160);
+            launchOffset = round(-(maskSize - 160), 1);
             // Don't clamp the mask size here, it doesn't look good.
         }
 
         item.launch().style.webkitTransform = id.translate(launchOffset, 0);
         setCircleClipPath(item.launch(), maskSize);
     }
-    this._cursor.icon().style.webkitTransform = id.translate(this._cursorX * this._cursorSpring.x(), cursorPosition).scale(1 - openAmount * 0.2).rotate(135 * openAmount) + ' translateZ(0)';
-    this._cursor.label().style.opacity = openAmount;
-    this._cursor.label().style.webkitTransform = 'translate3D(' + (30 + openAmount * -30) + 'px, 0, 0)';
-    this._mask.style.webkitTransform = 'scale(' + this._maskSpring.x() + ')';
-    this._mask.style.opacity = clamp(this._maskSpring.x() * 0.5, 0, 1);
+    this._cursor.icon().style.webkitTransform = id.translate(round(this._cursorX * this._cursorSpring.x(), 1), cursorPosition).scale(1 - openAmount * 0.2).rotate(135 * round(openAmount, 0.01)) + ' translateZ(0)';
+    this._cursor.label().style.opacity = round(openAmount, 0.001);
+    this._cursor.label().style.webkitTransform = 'translate3D(' + round(30 + openAmount * -30, 1) + 'px, 0, 0)';
+    this._mask.style.webkitTransform = 'scale(' + round(this._maskSpring.x(), 0.001) + ')';
+    this._mask.style.opacity = round(clamp(this._maskSpring.x() * 0.5, 0, 1), 0.001);
 
     requestAnimationFrame(this._layout.bind(this));
 }
