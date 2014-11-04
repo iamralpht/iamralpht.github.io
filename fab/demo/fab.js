@@ -18,6 +18,8 @@ limitations under the License.
 
 (function() {
 
+var overdamp = window.location.href.indexOf('overdamp') != -1;
+
 var epsilon = 0.001;
 function almostEqual(a, b, epsilon) { return (a > (b - epsilon)) && (a < (b + epsilon)); }
 function almostZero(a, epsilon) { return almostEqual(a, 0, epsilon); }
@@ -150,7 +152,7 @@ function MenuItem(title, image) {
     }
     this._container.appendChild(this._icon);
     // We need a spring to tell us how far away we should be from the cursor.
-    this._spring = new Spring(1, 400, 30); // 400 / 30 is slightly underdamped, so there will be a slight overbounce.
+    this._spring = new Spring(1, 400, overdamp ? 45 : 30); // 400 / 30 is slightly underdamped, so there will be a slight overbounce.
 }
 MenuItem.prototype.element = function() { return this._container; }
 MenuItem.prototype.icon = function() { return this._icon; }
@@ -172,8 +174,8 @@ var STICKINESS = 20; // How "sticky" an item is as you start to track left.
  */
 function FloatingActionButton(title, image, items) {
     // The spring that opens the menu.
-    this._openSpring = new Spring(1, 400, 25);
-    this._cursorSpring = new Spring(1, 300, 20);
+    this._openSpring = new Spring(1, 400, overdamp ? 40 : 25);
+    this._cursorSpring = new Spring(1, 300, overdamp ? 30 : 20);
     this._maskSpring = new Spring(1, 800, 80);
     this._container = document.createElement('div');
     this._container.className = 'fab-menu';
