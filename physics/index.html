@@ -49,10 +49,11 @@ li {
 <body>
 <div class="content">
 <div class="title">Creating Animations and Interactions with Physical Models</div>
-<div class="subtitle"><a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>8 November 2014</div>
+<div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>8 November 2014</div>
 <!-- introduction -->
-<p>Physics-based animations and interactions are becoming more common in UI and this page describes what I've learned building various animations and interactions with physical models. Scrolling on iOS is an excellent example of a physics-based interaction. When scrolling the content tracks under your finger, but <i>when you let go</i> all of the physics magic happens: the content continues tracking with the same momentum and slows down under the influence of friction. If you hit the end of the content, then the momentum goes into an overdamped spring which absorbs the momentum and returns you to the end of the content.</p>
-<p>Everyone is familiar with scrolling, and all of the touch-based operating systems implement it because it feels so natural to use. But lets start with something a bit simpler: here are two buttons which get smaller when you push down on them. One of them uses an underdamped spring to control its size while the other uses more traditional CSS transitions.</p>
+<p>Physics-based animations and interactions are becoming more common in UI. This page describes what I've learned building various animations and interactions with physical models.</p>
+<p>Scrolling on iOS is an excellent example of a physics-based interaction. When you drag your finger across the screen, the content tracks along with it, thereby scrolling, but <i>when you lift your finger</i> all of the physics magic happens: the content continues tracking with the same momentum and slows down under the influence of (virtual) friction. If you hit the end of the content, then the momentum goes into an overdamped spring which absorbs the momentum and returns you to the end of the content.</p>
+<p>Everyone is familiar with scrolling, and all of the touch-based operating systems implement it because it feels so natural to use. But lets start with something a bit simpler: here are two buttons which get a bit smaller when you push down on them (to give visible feedback indicating that the UI has received your touch input). One of these buttons uses an underdamped spring to control its size, while the other uses more traditional CSS transitions.</p>
 </div>
 
 <div class="example">
@@ -61,36 +62,36 @@ BUTTON ONE<br><br>BUTTON TWO<br>
 <div class="content">
 <ul>
  <li>Push on each button periodically. How much energy can you build up by pressing and releasing at opportune moments when the spring is underdamped?</li>
- <li>Which one is more fun to press? How does the feeling of the button change if you toggle the damping?</li>
+ <li>Which button is more fun to press? How does the feeling of the button change if you toggle the damping?</li>
 </ul>
 <!-- importance of conserving momentum -->
 <p><b>Conserving Momentum</b></p>
-<p>In the example above the user input is a binary press (the button is either being pressed or not). In most of the other examples on this page we'll instead be seeding the physics simulation with the current momentum and position of an object. As a simplification I always use a mass of 1, which means that velocity and momentum are the same number.</p>
+<p>In the button example above, the user input is a binary press (the button is either being pressed or not). In most of the other examples on this page, we'll instead seed the physics simulation with the current momentum and position of an object. To simplify the code, I always use a mass of 1, which means that velocity and momentum are the same number and thus interchangeable.</p>
 <p>Why is it important to conserve momentum, though? What happens if we create animations that ignore the momentum that the user imparted to the UI?</p>
-<p>This example is the UI for navigating back in Android Wear: you drag from the left to the right and release. One version ignores your momentum and just runs the same animation every time. The other example rolls the momentum into an overdamped spring.</p>
+<p>This example is the UI for navigating back in <a href="http://www.android.com/wear/">Android Wear</a>: you drag from the left to the right and release. One version ignores your momentum and just runs the same animation every time. The other example rolls the momentum into an overdamped spring.</p>
 </div>
 
 <div class="example">
-Android wear back vs physics-based back.
+Android Wear back vs physics-based back.
 </div>
 <div class="content">
 <ul>
- <li>How does it feel when the menu continues moving with the momentum that you gave it? How about when it was just using the canned transition?</li>
- <li><a href="http://munews.missouri.edu/news-releases/2012/0124-babies-are-born-with-%E2%80%9Cintuitive-physics%E2%80%9D-knowledge-says-mu-researcher/">Recent research suggests we have an understanding of conservation of momentum from birth.</a> I believe that UI which upholds these strongly held expectations is more pleasing than UI that ignores them.</li>
+ <li>How does it feel when the menu continues moving with the momentum that you gave it? How about when it just uses the canned transition?</li>
 </ul>
+<p><a href="http://munews.missouri.edu/news-releases/2012/0124-babies-are-born-with-%E2%80%9Cintuitive-physics%E2%80%9D-knowledge-says-mu-researcher/">Recent research suggests we have an understanding of conservation of momentum from birth</a>. I believe that UI which upholds these strongly held expectations is more pleasing than UI that ignores them.</p>
 
 <!-- different simulations -->
 <p><b>Different Simulations</b></p>
-<p>So far we've played with overdamped and underdamped springs. We're also going to experiment with Gravity (or more properly constant acceleration) and Friction. These sound pretty boring, but combined with touch we can come up with some good interactions.</p>
-<p>In this example we're using gravity to create a lock screen like Windows 8. When you drag up on the image and release, it keeps its momentum but is pulled down by a constant acceleration. If you don't give it enough momentum then it falls back down and the machine stays locked. This is a physics-based variant of slide-to-unlock.</p>
+<p>So far we've played with overdamped and underdamped springs. We're also going to experiment with gravity (or, more properly, constant acceleration) and friction. These sound pretty boring, but combined with touch we can come up with some good interactions.</p>
+<p>In this example we're using gravity to create a lock screen like the one in Windows 8. When you drag up on the image and release, it keeps its momentum but is pulled down by a constant acceleration. If you don't give it enough momentum, then it falls back down and the machine stays locked. This is a physics-based variant of slide-to-unlock.</p>
 </div>
 <div class="example">
 <br>
 Windows 8 unlock screen example.<br>
 </div>
 <div class="content">
-<p>I've only managed to use friction usefully for scrolling and pagers. It's useful property is that it decelerates gracefully, unlike gravity/acceleration which decelerates far too abrupty for scrolling (fun side note, before I learned this I used the acceleration simulation for scrolling for a few years and always wondered why everyone else's felt better than mine!).</p>
-<p>In this example you can see the difference between deceleration and friction. Give each of the roundrects a good fling and see how they slow down.</p>
+<p>In my experience, friction has been useful only for scrolling. Its useful property is that the content decelerates gracefully, unlike with gravity/acceleration which decelerates the content far too abruptly for scrolling. (Fun side note: Before I learned this, I used the acceleration simulation for scrolling. For a few years I wondered why everyone else's scrolling felt better than mine!)</p>
+<p>In this example you can see the difference between deceleration and friction. Give each of the roundrects a good fling and watch how they slow down.</p>
 </div>
 <div class="example">
 Deceleration vs Friction
@@ -98,11 +99,11 @@ Deceleration vs Friction
 <div class="content">
 <!-- combining simulations: fall, scroll -->
 <p><b>Combining Simulations</b></p>
-<p>So far we've used individual simulations (spring, gravity and friction) to create various interactions and animations. We can actually combine them to create even more interesting systems! In my recent game, <a href="https://play.google.com/store/apps/details?id=com.infinite_imagination.letterplex">Letterplex</a> I made the dialogs fall from the top of the screen and land in the middle (as the iOS inspiration <a href="http://www.atebits.com/letterpress/">Letterpress</a> also does). When they reach the middle of the screen, they bounce slightly as if landing on a cloud (or an overdamped spring).</p>
-<p>In this example you can see how the combination of gravity and a spring makes a nice feeling animation. Try throwing the dialog back in the air to see how it lands with different momentums.</p>
+<p>So far we've used individual simulations (spring, gravity and friction) to create various interactions and animations. We can actually combine them to create even more interesting systems. In my recent game for Android, <a href="https://play.google.com/store/apps/details?id=com.infinite_imagination.letterplex">Letterplex</a>, I made the dialogs fall from the top of the screen and land in the middle (as they do in the iOS inspiration <a href="http://www.atebits.com/letterpress/">Letterpress</a>). However when they reach the middle of the screen, they bounce slightly as if landing on a cloud (or an overdamped spring).</p>
+<p>In this example you can see how the combination of gravity and a spring makes a nice feeling animation. Try tossing the dialog up (drag the dialog then release your finger while your finger is still moving), like tossing a ball in the air, to see how the dialog lands with different momentums.</p>
 </div>
 <div class="example">
-Gravity + Spring example.
+Gravity + Spring example
 </div>
 <div class="content">
 <p>Perhaps the most significant combination is friction with a spring to create scrolling. You've certainly seen this before, but try changing the coefficient of friction and the spring constants to better understand the kinds of systems you can create with these simple primitives.</p>
@@ -111,8 +112,8 @@ Gravity + Spring example.
 Scrolling
 </div>
 <div class="content">
-<p>Once you understand how something like scrolling is constructed, it's easy to make things like the "infinite" linear scroller in iTunes Radio on iOS 7. Here we have a constant velocity giving us a linear animation. Sidenote: if you think you might ever drop a frame, <b>don't</b> use linear translation animations! Humans are amazing at tracking linear motion so dropped frames are very jarring. Humans seem bad at tracking things zooming in or out, so you can drop all kinds of frames in a zoom animation and most people don't notice.</p>
-<p>This example uses a tweaked friction simulation that has a constant velocity which can be temporarily overcome by flicking left or right. Notice what happens when your imparted momentum is consumed and the scroller resumes its previous motion. It's smooth and seamless</p>
+<p>Once you understand how something like scrolling is constructed, it's easy to make things like the "infinite" linear scroller in iTunes Radio on iOS 7. Here we have a constant velocity giving us a linear animation. Note: If you think you might ever drop a frame, <i>don't</i> use linear translation animations. Humans are amazing at tracking linear motion, so dropped frames will be perceived as very jarring. In contrast, humans seem bad at tracking things zooming in or out, so you can drop all kinds of frames in a zoom animation and most people won't notice.</p>
+<p>This example uses a tweaked friction simulation that has a constant velocity which can be temporarily overcome by flicking left or right. Notice what happens when your imparted momentum is consumed and the scroller resumes its previous motion. It's smooth and seamless.</p>
 </div>
 <div class="example">
 iTunes Radio linear scroller.
@@ -120,22 +121,23 @@ iTunes Radio linear scroller.
 <div class="content">
 <!-- mapping inputs and outputs: gyro controlled gravity, proximity triggered spring that follows you, squishy bounce -->
 <p><b>Mapping inputs and outputs</b></p>
-<p>So far we've used press and velocity as inputs, and we've mapped the output of the physics simulation to either the translation or scale of the object. Our devices have a bunch of sensors and we can control more than just the initial velocity. Here's an example where (on mobile only) we use the gyroscope to control the direction of gravity to pan around in a photo. This is similar to Facebook Paper's photo viewer, <a href="http://subjc.com/facebook-paper-photo-panner/">but they use a direct relationship between the gyro and the scroll position</a>.</p>
+<p>So far we've used press and velocity as inputs, and we've mapped the output of the physics simulation to either the translation or scale of the object. Our devices have a bunch of sensors and we can control more than just the initial velocity.</p>
+<p>Here's an example where (on mobile only) we use the gyroscope to control the direction of gravity to pan around in a photo. This is similar to Facebook Paper's photo viewer, <a href="http://subjc.com/facebook-paper-photo-panner/">but Facebook Paper uses a direct relationship between the gyro and the scroll position</a>.</p>
 </div>
 <div class="example">
 Scrolling photos using gravity controlled by the gyroscope. Mobile only.
 </div>
 <div class="content">
-<p>We can also trigger springs based on proximity. <a href="/fab">I wrote up this example previously.</a> Each face circle has a spring which is triggered when the cursor gets close. The motion of the face is then controlled by both the spring and the cursor position: the spring controls how far the face should be between it's natural home position and where the cursor currently is.</p>
+<p>We can also trigger springs based on proximity. <a href="/fab">I wrote up this example previously</a>. Each face circle has a spring which is triggered when the cursor gets close. The motion of the face is then controlled by both the spring and the cursor position: the spring controls how far the face should be between its natural home position and where the cursor currently is.</p>
 </div>
 <div class="example">
-Fluid Floating Action Button.
+Fluid Floating Action Button
 </div>
 <div class="content">
 <p>Phew! Here's an example of mapping the output of a physics system differently. It's the "falling dialog" example from above, except that instead of translating the dialog downwards when it hits the ground, we squish it. Non-uniform scales don't usually look very pleasing, so it's hard to find any examples like this in real products.</p>
 </div>
 <div class="example">
-Squishy falling dialogs.
+Squishy falling dialogs
 </div>
 <!-- adding extra non-physical effects: rotation on fall -->
 <div class="content">
@@ -143,19 +145,19 @@ Squishy falling dialogs.
 <p>Sometimes you've got a good looking animation or interaction, but you want to add something extra to it that is non-physical. Here's an example of adding a rotation to the falling dialog to make it look less one-dimensional. The question and answer app <a href="https://jelly.co/">Jelly</a> uses this to good effect when animating the question cards.</p>
 </div>
 <div class="example">
-Falling with rotation.
+Falling with rotation
 </div>
 <div class="content">
 <!-- conclusion -->
 <p><b>Conclusion</b></p>
 <p>What did we learn?</p>
 <ul>
- <li>Physical Models let us easily create rich animations and interactions that feel more natural by conforming to our innate expectations of how things should move and respond.</li>
- <li>Physical Models give us enough flexibility to create a wide variety of interactions and animations.</li>
- <li>Physical Models can be combined to create more complex and dynamic systems.</li>
- <li>We can use all kinds of inputs to Physical Models, and map their results differently to create the effects we want.</li>
+ <li>Physical models let us easily create rich animations and interactions that feel more natural by conforming to our innate expectations of how things should move and respond.</li>
+ <li>Physical models give us enough flexibility to create a wide variety of interactions and animations.</li>
+ <li>Physical models can be combined to create more complex and dynamic systems.</li>
+ <li>We can use all kinds of inputs to physical models, and map their results differently to create the effects we want.</li>
 </ul>
-<p>The commented source code to all of the examples is available <a href="https://github.com/iamralpht/Gravitas">in Gravitas' examples</a>. Gravitas is a super efficient physics engine I wrote just for building things like this.</p>
+<p>The commented source code to all of the above examples is available <a href="https://github.com/iamralpht/Gravitas">in Gravitas's examples</a>. Gravitas is a super-efficient physics engine that I wrote just for building UIs like this.</p>
 </div>
 </body>
 </html>
