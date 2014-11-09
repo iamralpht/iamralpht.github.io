@@ -134,3 +134,12 @@ Spring.prototype.reconfigure = function(mass, springConstant, damping) {
 }
 Spring.prototype.springConstant = function() { return this._k; }
 Spring.prototype.damping = function() { return this._c; }
+
+Spring.prototype.configuration = function() {
+    function setSpringConstant(s, c) { s.reconfigure(1, c, s.damping()); };
+    function setSpringDamping(s, d) { s.reconfigure(1, s.springConstant(), d); }
+    return [
+        { label: 'Spring Constant', read: this.springConstant.bind(this), write: setSpringConstant.bind(this, this), min: 100, max: 1000 },
+        { label: 'Damping', read: this.damping.bind(this), write: setSpringDamping.bind(this, this), min: 1, max: 500 }
+    ];
+}

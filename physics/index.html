@@ -5,9 +5,12 @@
 <script src="animate.js"></script>
 <script src="controls.js"></script>
 <script src="spring.js"></script>
+<script src="gravity.js"></script>
 <script src="touch.js"></script>
 <script src="buttons.js"></script>
 <link href="buttons.css" rel="stylesheet"></link>
+<script src="windows8lock.js"></script>
+<link href="windows8lock.css" rel="stylesheet"></link>
 <link href="controls.css" rel="stylesheet"></link>
 <style>
 body {
@@ -91,11 +94,12 @@ Android Wear back vs physics-based back.
 <p>So far we've played with overdamped and underdamped springs. We're also going to experiment with gravity (or, more properly, constant acceleration) and friction. These sound pretty boring, but combined with touch we can come up with some good interactions.</p>
 <p>In this example we're using gravity to create a lock screen like the one in Windows 8. When you drag up on the image and release, it keeps its momentum but is pulled down by a constant acceleration. If you don't give it enough momentum, then it falls back down and the machine stays locked. This is a physics-based variant of slide-to-unlock.</p>
 </div>
-<div class="example">
-<br>
-Windows 8 unlock screen example.<br>
-</div>
+<div class="example" id="lockScreenExample"></div>
 <div class="content">
+<ul>
+ <li>Try slamming the lock screen into the ground!</li>
+ <li>What happens when you set the Rebound to 1.0? What about 1.1?</li>
+</ul>
 <p>In my experience, friction has been useful only for scrolling. Its useful property is that the content decelerates gracefully, unlike with gravity/acceleration which decelerates the content far too abruptly for scrolling. (Fun side note: Before I learned this, I used the acceleration simulation for scrolling. For a few years I wondered why everyone else's scrolling felt better than mine!)</p>
 <p>In this example you can see the difference between deceleration and friction. Give each of the roundrects a good fling and watch how they slow down.</p>
 </div>

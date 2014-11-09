@@ -13,6 +13,12 @@
 .controls div {
     margin-bottom: 10px;
 }
+.controls>.reset-control {
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    padding: 5px;
+    margin: 0 5px;
+}
 .slider-control-row {
     position: relative;
     height: 25px;

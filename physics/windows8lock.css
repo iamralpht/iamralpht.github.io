@@ -1,0 +1,23 @@
+.w8-lock>.screen {
+    position: relative;
+    overflow: hidden;
+    width: 450px;
+    height: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: black;
+}
+.w8-lock>.screen>div {
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    margin-bottom: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.w8-lock>.screen>.desktop {
+    background-image: url('win8-home.png');
+}
+.w8-lock>.screen>.lock {
+    background-image: url('lockscreen.jpg');
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.5);
+}

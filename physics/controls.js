@@ -32,43 +32,49 @@ function addText(parent, text) {
     d.className = 'label-control-row';
     d.innerText = text;
     parent.appendChild(d);
+    return d;
 }
 
-function addSlider(parent, text, min, max, current, callback) {
+function addSlider(parent, config) {
     var d = document.createElement('div');
     d.className = 'slider-control-row';
     var label = document.createElement('span');
     label.className = 'label';
-    label.innerText = text;
+    label.innerText = config.label;
     d.appendChild(label);
     var slider = document.createElement('input');
     slider.type = 'range';
-    slider.min = min;
-    slider.max = max;
-    slider.step = 1;
-    slider.value = current;
+    slider.min = config.min;
+    slider.max = config.max;
+    slider.step = config.step || 1;
+    slider.value = config.read();
     d.appendChild(slider);
     var output = document.createElement('span');
     output.className = 'output';
-    output.innerText = current;
+    output.innerText = slider.value;
     d.appendChild(output);
 
     slider.addEventListener('change',
         function() {
             output.innerText = slider.value;
-            if (callback) callback(slider.value);
+            config.write(slider.value);
         }, false);
     parent.appendChild(d);
 }
 
-Controls.prototype.addSpring = function(spring, name) {
-    function updateConstant(s, c) { s.reconfigure(1, c, s.damping()); }
-    function updateDamping(s, d) { s.reconfigure(1, s.springConstant(), d); }
-
+Controls.prototype.addModel = function(spring, name) {
     var springSection = document.createElement('div');
     if (name) addText(this._element, name);
-    addSlider(this._element, 'Spring Constant', 100, 800, spring.springConstant(), updateConstant.bind(null, spring));
-    addSlider(this._element, 'Damping', 1, 100, spring.damping(), updateDamping.bind(null, spring));
+    var config = spring.configuration();
+
+    for (var i = 0; i < config.length; i++) {
+        addSlider(this._element, config[i]);
+    }
+}
+Controls.prototype.addResetButton = function(callback) {
+    var d = addText(this._element, 'Reset Position');
+    d.className = 'reset-control';
+    d.onclick = callback;
 }
 
 window.Controls = Controls;

@@ -50,7 +50,7 @@ function ButtonDemo(element) {
 
     // Add some controls so that the user can play with the spring values.
     var controls = new Controls();
-    controls.addSpring(this._spring, 'Button Spring Controls');
+    controls.addModel(this._spring, 'Button Spring Controls');
     this._element.appendChild(controls.element());
 }
 ButtonDemo.prototype.onTouchStart = function() {
