@@ -2,6 +2,11 @@
 <head>
 <title>Creating Animations and Interactions with Physical Models</title>
 <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<script src="animate.js"></script>
+<script src="spring.js"></script>
+<script src="touch.js"></script>
+<script src="buttons.js"></script>
+<link href="buttons.css" rel="stylesheet"></link>
 <style>
 body {
     font-family: 'Source Sans Pro', sans-serif;
@@ -56,9 +61,8 @@ li {
 <p>Everyone is familiar with scrolling, and all of the touch-based operating systems implement it because it feels so natural to use. But lets start with something a bit simpler: here are two buttons which get a bit smaller when you push down on them (to give visible feedback indicating that the UI has received your touch input). One of these buttons uses an underdamped spring to control its size, while the other uses more traditional CSS transitions.</p>
 </div>
 
-<div class="example">
-BUTTON ONE<br><br>BUTTON TWO<br>
-</div>
+<div class="example" id="buttonExample"></div>
+
 <div class="content">
 <ul>
  <li>Push on each button periodically. How much energy can you build up by pressing and releasing at opportune moments when the spring is underdamped?</li>

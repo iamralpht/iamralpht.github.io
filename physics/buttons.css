@@ -1,0 +1,28 @@
+.buttondemo {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.buttondemo .button {
+    display: inline-block;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 10px;
+    min-width: 20%;
+    background-color: blue;
+}
+.buttondemo .spring-button {
+    background-color: green;
+}
+/*
+ * We can actually make the CSS button do everything declaratively. Even though the end result
+ * doesn't feel very good to use, it's nice not having to write any JavaScript for this effect!
+ */
+.buttondemo .css-button {
+    -webkit-transition: -webkit-transform 300ms;
+    transition: transform 300ms;
+}
+.buttondemo .css-button:active {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+}
