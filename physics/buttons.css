@@ -19,8 +19,8 @@
  * doesn't feel very good to use, it's nice not having to write any JavaScript for this effect!
  */
 .buttondemo .css-button {
-    -webkit-transition: -webkit-transform 300ms;
-    transition: transform 300ms;
+    -webkit-transition: -webkit-transform 180ms;
+    transition: transform 180ms;
 }
 .buttondemo .css-button:active {
     -webkit-transform: scale(0.8);

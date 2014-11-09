@@ -33,7 +33,7 @@ function ButtonDemo(element) {
 
     // Create the spring that will control the scale of the spring button. 400 is the spring constant
     // and 20 is the damping. This will be an underdamped spring.
-    this._spring = new Spring(1, 400, 40);
+    this._spring = new Spring(1, 400, 20);
     // Snap the spring's end-point to 1. This is where we want it to start and it corresponds to a
     // full scale button.
     this._spring.snap(1);
@@ -47,6 +47,11 @@ function ButtonDemo(element) {
     // Listen for touch/mouse events on the spring button. We'll get called back on our onTouchXYZ
     // methods.
     addTouchOrMouseListener(this._springButton, this);
+
+    // Add some controls so that the user can play with the spring values.
+    var controls = new Controls();
+    controls.addSpring(this._spring, 'Button Spring Controls');
+    this._element.appendChild(controls.element());
 }
 ButtonDemo.prototype.onTouchStart = function() {
     // Set the end-point of the spring to 0. This means the spring will start moving toward that

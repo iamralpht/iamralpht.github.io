@@ -1,0 +1,36 @@
+.controls {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 400px;
+    padding: 10px;
+    font-size: 18px;
+    text-align: center;
+    box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.3), 0px 3px 10px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;
+}
+.controls div {
+    margin-bottom: 10px;
+}
+.slider-control-row {
+    position: relative;
+    height: 25px;
+}
+.slider-control-row>.label {
+    position: absolute;
+    width: 120px;
+    left: 0;
+    font-size: 16px;
+    text-align: right;
+}
+.slider-control-row>input {
+    position: absolute;
+    left: 125px;
+    width: 230px;
+}
+.slider-control-row>.output {
+    position: absolute;
+    right: 0px;
+    width: 40px;
+}

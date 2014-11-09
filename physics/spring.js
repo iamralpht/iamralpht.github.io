@@ -123,3 +123,14 @@ Spring.prototype.done = function(t) {
     if (!t) t = (new Date()).getTime();
     return almostEqual(this.x(), this._endPosition, epsilon) && almostZero(this.dx(), epsilon);
 }
+Spring.prototype.reconfigure = function(mass, springConstant, damping) {
+    this._m = mass;
+    this._k = springConstant;
+    this._c = damping;
+
+    if (this.done()) return;
+    this._solution = this._solve(this.x() - this._endPosition, this.dx());
+    this._startTime = (new Date()).getTime();
+}
+Spring.prototype.springConstant = function() { return this._k; }
+Spring.prototype.damping = function() { return this._c; }
