@@ -2,15 +2,26 @@
 <head>
 <title>Creating Animations and Interactions with Physical Models</title>
 <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<!-- utilities -->
 <script src="animate.js"></script>
 <script src="controls.js"></script>
 <script src="spring.js"></script>
 <script src="gravity.js"></script>
 <script src="touch.js"></script>
+
+<!-- springy buttons demo -->
 <script src="buttons.js"></script>
 <link href="buttons.css" rel="stylesheet"></link>
+
+<!-- android wear back demo -->
+<script src="androidwear.js"></script>
+<link href="androidwear.css" rel="stylesheet"></link>
+
+<!-- windows 8 lock screen demo -->
 <script src="windows8lock.js"></script>
 <link href="windows8lock.css" rel="stylesheet"></link>
+
+
 <link href="controls.css" rel="stylesheet"></link>
 <style>
 body {
@@ -70,8 +81,8 @@ li {
 
 <div class="content">
 <ul>
- <li>Push on each button periodically. How much energy can you build up by pressing and releasing at opportune moments when the spring is underdamped?</li>
- <li>Which button is more fun to press? How does the feeling of the button change if you toggle the damping?</li>
+ <li>Push on each button periodically. How much energy can you build up by pressing and releasing at opportune moments when the spring has a low damping?</li>
+ <li>How does the spring constant relate to the speed of motion? How are damping and the spring constant related?</li>
 </ul>
 <!-- importance of conserving momentum -->
 <p><b>Conserving Momentum</b></p>
@@ -80,8 +91,7 @@ li {
 <p>This example is the UI for navigating back in <a href="http://www.android.com/wear/">Android Wear</a>: you drag from the left to the right and release. One version ignores your momentum and just runs the same animation every time. The other example rolls the momentum into an overdamped spring.</p>
 </div>
 
-<div class="example">
-Android Wear back vs physics-based back.
+<div class="example" id="androidWearExample">
 </div>
 <div class="content">
 <ul>
