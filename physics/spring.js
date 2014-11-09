@@ -93,13 +93,15 @@ Spring.prototype.dx = function(t) {
     if (!t) t = (new Date()).getTime();
     return this._solution ? this._solution.dx((t - this._startTime) / 1000.0) : 0;
 }
-Spring.prototype.setEnd = function(x, t) {
+Spring.prototype.setEnd = function(x, velocity, t) {
     if (!t) t = (new Date()).getTime();
     if (x == this._endPosition) return;
-    var velocity = 0;
+    velocity = velocity || 0;
     var position = this._endPosition;
     if (this._solution) {
-        velocity = this._solution.dx((t - this._startTime) / 1000.0);
+        // Don't whack incoming velocity.
+        if (almostZero(velocity, epsilon))
+            velocity = this._solution.dx((t - this._startTime) / 1000.0);
         position = this._solution.x((t - this._startTime) / 1000.0);
         if (almostZero(velocity, epsilon)) velocity = 0;
         if (almostZero(position, epsilon)) position = 0;

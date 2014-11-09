@@ -62,10 +62,12 @@ function addSlider(parent, config) {
     parent.appendChild(d);
 }
 
+Controls.prototype.addText = function(text) { addText(this._element, text); }
+
 Controls.prototype.addModel = function(spring, name) {
     var springSection = document.createElement('div');
     if (name) addText(this._element, name);
-    var config = spring.configuration();
+    var config = Array.isArray(spring) ? spring : spring.configuration();
 
     for (var i = 0; i < config.length; i++) {
         addSlider(this._element, config[i]);
