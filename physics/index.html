@@ -22,6 +22,9 @@
 <script src="windows8lock.js"></script>
 <link href="windows8lock.css" rel="stylesheet"></link>
 
+<!-- friction and gravity sliders demo -->
+<script src="sliders.js"></script>
+<link href="sliders.css" rel="stylesheet"></link>
 
 <link href="controls.css" rel="stylesheet"></link>
 <style>
@@ -112,12 +115,14 @@ li {
  <li>What happens when you set the Rebound to 1.0? What about 1.1?</li>
 </ul>
 <p>In my experience, friction has been useful only for scrolling. Its useful property is that the content decelerates gracefully, unlike with gravity/acceleration which decelerates the content far too abruptly for scrolling. (Fun side note: Before I learned this, I used the acceleration simulation for scrolling. For a few years I wondered why everyone else's scrolling felt better than mine!)</p>
-<p>In this example you can see the difference between deceleration and friction. Give each of the roundrects a good fling and watch how they slow down.</p>
+<p>In this example you can see the difference between deceleration and friction. Give each of the sliders a good fling and watch how they slow down.</p>
 </div>
-<div class="example">
-Deceleration vs Friction
-</div>
+<div class="example" id="slidersExample"></div>
 <div class="content">
+<ul>
+ <li>Notice how the Decelerate slider (which is using a constant deceleration) doesn't feel good. Either it goes too far or stops too abruptly. Gravity was the perfect simulation for the lock screen (and the dialogs below) but friction creates a much more natural feel.</li>
+ <li>What happens when the thumb hits the end of the slider? What can we do so that we're not throwing away all of the thumb's momentum? We could drag the whole control, we could let the thumb go over the end slightly, or we could even squish the thumb a bit!</li>
+</ul>
 <!-- combining simulations: fall, scroll -->
 <p><b>Combining Simulations</b></p>
 <p>So far we've used individual simulations (spring, gravity and friction) to create various interactions and animations. We can actually combine them to create even more interesting systems. In my recent game for Android, <a href="https://play.google.com/store/apps/details?id=com.infinite_imagination.letterplex">Letterplex</a>, I made the dialogs fall from the top of the screen and land in the middle (as they do in the iOS inspiration <a href="http://www.atebits.com/letterpress/">Letterpress</a>). However when they reach the middle of the screen, they bounce slightly as if landing on a cloud (or an overdamped spring).</p>

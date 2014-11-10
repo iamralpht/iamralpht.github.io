@@ -56,10 +56,10 @@ Friction.prototype.configuration = function() {
         {
             label: 'Friction',
             read: function() { return self._drag; },
-            write: function(drag) { self._reconfigure(drag); },
-            min: 0.1,
-            max: 1.0,
-            step: 0.1
+            write: function(drag) { self.reconfigure(drag); },
+            min: 0.001,
+            max: 0.1,
+            step: 0.001
         }
     ];
 }
