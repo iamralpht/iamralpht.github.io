@@ -10,6 +10,9 @@
     color: black;
     border-radius: 10px;
     box-shadow: 0 2px 4px black;
+}
+.dialog.squishy {
+    -webkit-transform-origin: 50% 100%;
     transform-origin: 50% 100%;
 }
 .dialog>div {

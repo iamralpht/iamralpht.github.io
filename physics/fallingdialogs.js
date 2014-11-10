@@ -40,9 +40,9 @@ function Dialog(position, ground, squish, rotate) {
     this._squishy = squish;
     this._rotate = rotate;
 
-    // Reset the transform origin if we want to rotate with it.
-    if (rotate)
-        this._element.style.transformOrigin = '50% 50%';
+    // Move the transform origin if the dialog is squishy.
+    if (squish)
+        this._element.classList.add('squishy');
 
     this._animation = animation(this._fall, this._update.bind(this));
 }
