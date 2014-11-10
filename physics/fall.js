@@ -31,15 +31,18 @@ limitations under the License.
  * reaches a certain position, so I'm showing the (cheesy but) generic method
  * here.
  */
-function Fall(ground) {
+function Fall(ground, gravity, springC, springD) {
+    gravity = gravity || 5000;
+    springC = springC || 180;
+    springD = springD || 20;
     this._ground = ground;
-    this._gravity = new Gravity();
-    this._spring = new Spring(1, 180, 20);
+    this._gravity = new Gravity(gravity, 1000);
+    this._spring = new Spring(1, springC, springD);
     this._springing = false;
 }
 Fall.prototype.set = function(x, v) {
     this._gravity.set(x, v);
-    if (x > this._ground) {
+    if (x >= this._ground) {
         this._springing = true;
         this._spring.snap(x);
         this._spring.setEnd(this._ground);
@@ -49,11 +52,13 @@ Fall.prototype.set = function(x, v) {
 }
 Fall.prototype.x = function() {
     // Use the spring if we already hit the ground.
-    if (this._springing) return this._spring.x();
+    if (this._springing) {
+        return this._spring.x();
+    }
     // Otherwise use gravity...
     var x = this._gravity.x();
     // Did we go through the ground?
-    if (x > this._ground) {
+    if (x >= this._ground) {
         // Yeah, switch to using the spring.
         this._springing = true;
         this._spring.snap(this._ground);
@@ -73,4 +78,10 @@ Fall.prototype.done = function() {
     if (this._springing) return this._spring.done();
     return this._gravity.done();
 }
-
+Fall.prototype.configuration = function() {
+    var config = this._gravity.configuration();
+    config[0].min = 1;
+    config[0].max = 6000;
+    config.push.apply(config, this._spring.configuration());
+    return config;
+}

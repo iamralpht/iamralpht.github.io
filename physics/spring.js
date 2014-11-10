@@ -95,7 +95,7 @@ Spring.prototype.dx = function(t) {
 }
 Spring.prototype.setEnd = function(x, velocity, t) {
     if (!t) t = (new Date()).getTime();
-    if (x == this._endPosition) return;
+    if (x == this._endPosition && almostZero(velocity, epsilon)) return;
     velocity = velocity || 0;
     var position = this._endPosition;
     if (this._solution) {
@@ -107,8 +107,9 @@ Spring.prototype.setEnd = function(x, velocity, t) {
         if (almostZero(position, epsilon)) position = 0;
         position += this._endPosition;
     }
-    if (this._solution && almostZero(position - x, epsilon) && almostZero(velocity, epsilon))
+    if (this._solution && almostZero(position - x, epsilon) && almostZero(velocity, epsilon)) {
         return;
+    }
     this._endPosition = x;
     this._solution = this._solve(position - this._endPosition, velocity);
     this._startTime = t;

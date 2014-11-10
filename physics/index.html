@@ -8,6 +8,7 @@
 <script src="spring.js"></script>
 <script src="gravity.js"></script>
 <script src="friction.js"></script>
+<script src="fall.js"></script>
 <script src="touch.js"></script>
 
 <!-- springy buttons demo -->
@@ -25,6 +26,10 @@
 <!-- friction and gravity sliders demo -->
 <script src="sliders.js"></script>
 <link href="sliders.css" rel="stylesheet"></link>
+
+<!-- various falling dialogs demos -->
+<script src="fallingdialogs.js"></script>
+<link href="fallingdialogs.css" rel="stylesheet"></script>
 
 <link href="controls.css" rel="stylesheet"></link>
 <style>
@@ -120,18 +125,20 @@ li {
 <div class="example" id="slidersExample"></div>
 <div class="content">
 <ul>
- <li>Notice how the Decelerating Slider (which is using a constant deceleration) doesn't feel good. Either it goes too far or stops too abruptly. Gravity was the perfect simulation for the lock screen (and the dialogs below) but friction creates a much more natural feel.</li>
+ <li>Notice how the Decelerating Slider (which is using a constant deceleration) doesn't feel good. Either it goes too far or stops too abruptly. Gravity was the perfect simulation for the lock screen (and the dialogs below) but friction creates a much more natural feel for these sliders and for scrolling.</li>
  <li>What happens when the thumb hits the end of the slider? What can we do so that we're not throwing away all of the thumb's momentum? We could drag the whole control, we could let the thumb go over the end slightly, or we could even squish the thumb a bit!</li>
 </ul>
 <!-- combining simulations: fall, scroll -->
 <p><b>Combining Simulations</b></p>
 <p>So far we've used individual simulations (spring, gravity and friction) to create various interactions and animations. We can actually combine them to create even more interesting systems. In my recent game for Android, <a href="https://play.google.com/store/apps/details?id=com.infinite_imagination.letterplex">Letterplex</a>, I made the dialogs fall from the top of the screen and land in the middle (as they do in the iOS inspiration <a href="http://www.atebits.com/letterpress/">Letterpress</a>). However when they reach the middle of the screen, they bounce slightly as if landing on a cloud (or an overdamped spring).</p>
-<p>In this example you can see how the combination of gravity and a spring makes a nice feeling animation. Try tossing the dialog up (drag the dialog then release your finger while your finger is still moving), like tossing a ball in the air, to see how the dialog lands with different momentums.</p>
+<p>In this non-interactive example you can see how the combination of gravity and a spring makes a nice feeling animation. Hit "Reset Position" to start the animation over.</p>
 </div>
-<div class="example">
-Gravity + Spring example
-</div>
+<div class="example" id="fallingDialogsExample"></div>
 <div class="content">
+<ul>
+ <li>Notice how this combination is very sensitive to the damping value&mdash;try setting it to 1. Even though momentum is conserved we get something that feels distinctly weird, like a fly falling into a spider's web.</li>
+ <li>Play with the acceleration and spring constant to get a feel for how the gravity and spring constants interact. A high spring constant gives us something like NeXT's "head shaking" log in dialog, only vertically.</li>
+</ul>
 <p>Perhaps the most significant combination is friction with a spring to create scrolling. You've certainly seen this before, but try changing the coefficient of friction and the spring constants to better understand the kinds of systems you can create with these simple primitives.</p>
 </div>
 <div class="example">
@@ -162,17 +169,13 @@ Fluid Floating Action Button
 <div class="content">
 <p>Phew! Here's an example of mapping the output of a physics system differently. It's the "falling dialog" example from above, except that instead of translating the dialog downwards when it hits the ground, we squish it. Non-uniform scales don't usually look very pleasing, so it's hard to find any examples like this in real products.</p>
 </div>
-<div class="example">
-Squishy falling dialogs
-</div>
+<div class="example" id="squishyDialogsExample"></div>
 <!-- adding extra non-physical effects: rotation on fall -->
 <div class="content">
 <p><b>Adding extra effects</b></p>
 <p>Sometimes you've got a good looking animation or interaction, but you want to add something extra to it that is non-physical. Here's an example of adding a rotation to the falling dialog to make it look less one-dimensional. The question and answer app <a href="https://jelly.co/">Jelly</a> uses this to good effect when animating the question cards.</p>
 </div>
-<div class="example">
-Falling with rotation
-</div>
+<div class="example" id="rotatingDialogsExample"></div>
 <div class="content">
 <!-- conclusion -->
 <p><b>Conclusion</b></p>

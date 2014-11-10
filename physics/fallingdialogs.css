@@ -1,0 +1,27 @@
+.dialogs {
+    overflow: hidden;
+}
+
+.dialog {
+    display: inline-block;
+    margin: 10px;
+    width: 300px;
+    background-color: white;
+    color: black;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px black;
+    transform-origin: 50% 100%;
+}
+.dialog>div {
+    margin: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.dialog>.dialog-button {
+    border: 2px solid black;
+    border-radius: 50px;
+}
+.dialog>.dialog-button:active {
+    background-color: black;
+    color: white;
+}
