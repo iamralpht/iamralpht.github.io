@@ -81,7 +81,7 @@ li {
 <div class="title">Creating Animations and Interactions with Physical Models</div>
 <div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>8 November 2014</div>
 <!-- introduction -->
-<p>Physics-based animations and interactions are becoming more common in UI. This page describes what I've learned building various animations and interactions with physical models.</p>
+<p>Physics-based animations and interactions are becoming more common in UI. This page goes through some basic physical models and the kinds of interactions and animations that can be constructed from them.</p>
 <p>Scrolling on iOS is an excellent example of a physics-based interaction. When you drag your finger across the screen, the content tracks along with it, thereby scrolling, but <i>when you lift your finger</i> all of the physics magic happens: the content continues tracking with the same momentum and slows down under the influence of (virtual) friction. If you hit the end of the content, then the momentum goes into an overdamped spring which absorbs the momentum and returns you to the end of the content.</p>
 <p>Everyone is familiar with scrolling, and all of the touch-based operating systems implement it because it feels so natural to use. But lets start with something a bit simpler: here are two buttons which get a bit smaller when you push down on them (to give visible feedback indicating that the UI has received your touch input). One of these buttons uses an underdamped spring to control its size, while the other uses more traditional CSS transitions.</p>
 </div>
