@@ -81,7 +81,8 @@ GravityWithBounce.prototype.x = function() {
         if (this._reboundedLast) return 0;
         this._reboundedLast = true;
         var v = this._gravity.dx();
-        this._gravity.set(0, -v * this._absorb);
+        if (Math.abs(v * this._absorb) > Math.abs(this._gravity._a * 2) / 60)
+            this._gravity.set(0, -v * this._absorb);
         return 0;
     }
     this._reboundedLast = false;
