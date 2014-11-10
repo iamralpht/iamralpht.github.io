@@ -90,8 +90,8 @@ function SlidersDemo(element) {
     function sign(x) { return (x > 0) ? 1 : ((x < 0) ? -1 : 0); }
     decelerate.set = function(x, v) {
         this._direction = sign(v);
-        //this.reconfigure(Math.abs(this._a) * this._direction * -1);
-        this._a = Math.abs(this._a) * this._direction * -1;
+        if (this._direction != 0)
+            this._a = Math.abs(this._a) * this._direction * -1;
         Gravity.prototype.set.call(this, x, v);
     }
     decelerate.done = function() {

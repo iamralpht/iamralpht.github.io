@@ -114,13 +114,13 @@ li {
  <li>Try slamming the lock screen into the ground!</li>
  <li>What happens when you set the Rebound to 1.0? What about 1.1?</li>
 </ul>
-<p>In my experience, friction has been useful only for scrolling. Its useful property is that the content decelerates gracefully, unlike with gravity/acceleration which decelerates the content far too abruptly for scrolling. (Fun side note: Before I learned this, I used the acceleration simulation for scrolling. For a few years I wondered why everyone else's scrolling felt better than mine!)</p>
-<p>In this example you can see the difference between deceleration and friction. Give each of the sliders a good fling and watch how they slow down.</p>
+<p>Now we're going to compare constant deceleration (which is almost the same as the gravity example above; it just means the acceleration constant is negative) with friction. When I first started learning about physics simulations I wrote the constant deceleration simulation and used it for everything, including scrolling. The result was terrible! My scrolling content would stop too abruptly and have a bad feel compared to everyone else's. For scrolling, as well as sliders, friction is a much better feeling simulation.</p>
+<p>In this example you can see the difference between constant deceleration and friction. Give each of the sliders a fling and watch how they slow down.</p>
 </div>
 <div class="example" id="slidersExample"></div>
 <div class="content">
 <ul>
- <li>Notice how the Decelerate slider (which is using a constant deceleration) doesn't feel good. Either it goes too far or stops too abruptly. Gravity was the perfect simulation for the lock screen (and the dialogs below) but friction creates a much more natural feel.</li>
+ <li>Notice how the Decelerating Slider (which is using a constant deceleration) doesn't feel good. Either it goes too far or stops too abruptly. Gravity was the perfect simulation for the lock screen (and the dialogs below) but friction creates a much more natural feel.</li>
  <li>What happens when the thumb hits the end of the slider? What can we do so that we're not throwing away all of the thumb's momentum? We could drag the whole control, we could let the thumb go over the end slightly, or we could even squish the thumb a bit!</li>
 </ul>
 <!-- combining simulations: fall, scroll -->
