@@ -35,6 +35,7 @@ function AndroidWearDemo(element) {
         this._element.appendChild(watch);
         // XXX: Work around a bug in Chrome; it doesn't render the second watch's
         //      wallpaper if the first watch has been opened.
+        watch.style.webkitTransform = 'translateZ(0)';
         watch.style.transform = 'translateZ(0)';
         this._useCSS = useCSS;
 
@@ -69,6 +70,7 @@ function AndroidWearDemo(element) {
             self._position = 0;
             self._startPosition = 0;
             self._menu.style.transition = 'none';
+            self._menu.style.webkitTransform = 'translateX(0) translateZ(0)';
             self._menu.style.transform = 'translateX(0) translateZ(0)';
         });
         this._element.appendChild(controls.element());
@@ -96,6 +98,7 @@ function AndroidWearDemo(element) {
         if (this._position < 0) this._position /= 3;
 
         var transform = 'translateX(' + this._position + 'px) translateZ(0)';
+        this._menu.style.webkitTransform = transform;
         this._menu.style.transform = transform;
     }
     Watch.prototype.onTouchEnd = function(dx, dy, velocity) {
@@ -112,6 +115,7 @@ function AndroidWearDemo(element) {
             this._position = end;
             var transform = 'translateX(' + this._position + 'px) translateZ(0)';
             this._menu.style.transition = 'transform ' + this._transitionDuration + 'ms';
+            this._menu.style.webkitTransform = transform;
             this._menu.style.transform = transform;
             return;
         }
@@ -128,6 +132,7 @@ function AndroidWearDemo(element) {
     Watch.prototype._update = function() {
         this._position = this._spring.x() * 240;
         var transform = 'translateX(' +  this._position + 'px) translateZ(0)';
+        this._menu.style.webkitTransform = transform;
         this._menu.style.transform = transform;
     }
 
