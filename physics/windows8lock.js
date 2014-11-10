@@ -36,8 +36,10 @@ function Windows8LockScreenDemo(element) {
     this._lock.className = 'lock';
     this._screen.appendChild(this._lock);
 
-    // Create our gravity simulation. We use a gravitational acceleration of roughly 9.8m/s
-    // (assuming 100dpi and 40 inches in a metre).
+    // Create our gravity simulation. This looks like some meaningful constant because
+    // 9.8m/s^2 is the constant acceleration of gravity on earth, it's actually just a
+    // made up number. I started with something that related the gravitational constant
+    // to pixels, but it didn't look good, so we have this number instead...
     this._gravity = new GravityWithBounce(9.8 * 200, 0.4);
 
     // Remember the position of the lock screen so that when the finger goes down we can
