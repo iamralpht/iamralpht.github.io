@@ -86,6 +86,7 @@ Dialog.prototype._update = function() {
         var angle = -15 * amount;
         transform += ' rotateZ(' + angle + 'deg)';
     }
+    this._element.style.webkitTransform = transform;
     this._element.style.transform = transform;
 }
 Dialog.prototype.reset = function() {

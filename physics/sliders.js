@@ -68,6 +68,7 @@ function SlidersDemo(element) {
 
         // Apply the position as a transform.
         var transform = 'translateX(' + this._position + 'px) translateZ(0)';
+        this._thumb.style.webkitTransform = transform;
         this._thumb.style.transform = transform;
     }
     Slider.prototype.onTouchEnd = function(dx, dy, velocity) {
@@ -80,6 +81,7 @@ function SlidersDemo(element) {
         // value so the extra momentum is completely lost.
         this._position = clamp(this._model.x(), 0, 250);
         var transform = 'translateX(' + this._position + 'px) translateZ(0)';
+        this._thumb.style.webkitTransform = transform;
         this._thumb.style.transform = transform;
     }
 

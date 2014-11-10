@@ -57,6 +57,7 @@ function Windows8LockScreenDemo(element) {
         self._position = 0;
         self._startPosition = 0;
         var transform = 'translateY(0px) translateZ(0)';
+        self._lock.style.webkitTransform = transform;
         self._lock.style.transform = transform;
     });
     this._element.appendChild(controls.element());
@@ -77,6 +78,7 @@ Windows8LockScreenDemo.prototype.onTouchMove = function(dx, dy) {
     // lock screen can't move to that position...).
     if (this._position > 0) this._position = 0;
     var transform = 'translateY(' + this._position + 'px) translateZ(0)';
+    this._lock.style.webkitTransform = transform;
     this._lock.style.transform = transform;
 }
 Windows8LockScreenDemo.prototype.onTouchEnd = function(dx, dy, velocity) {
@@ -91,6 +93,7 @@ Windows8LockScreenDemo.prototype.onTouchEnd = function(dx, dy, velocity) {
 Windows8LockScreenDemo.prototype._update = function() {
     this._position = this._gravity.x();
     var transform = 'translateY(' + this._position + 'px) translateZ(0)';
+    this._lock.style.webkitTransform = transform;
     this._lock.style.transform = transform;
 }
 

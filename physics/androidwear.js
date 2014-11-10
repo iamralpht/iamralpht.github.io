@@ -114,6 +114,7 @@ function AndroidWearDemo(element) {
         if (this._useCSS) {
             this._position = end;
             var transform = 'translateX(' + this._position + 'px) translateZ(0)';
+            this._menu.style.webkitTransition = '-webkit-transform ' + this._transitionDuration + 'ms';
             this._menu.style.transition = 'transform ' + this._transitionDuration + 'ms';
             this._menu.style.webkitTransform = transform;
             this._menu.style.transform = transform;
