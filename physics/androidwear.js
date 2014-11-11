@@ -27,14 +27,16 @@ function AndroidWearDemo(element) {
     this._element.classList.add('androidwear');
 
     function Watch(useCSS) {
-        this._transitionDuration = 200;
+        this._transitionDuration = 600;
         this._element = document.createElement('div');
         this._element.className = 'watch-container';
         var watch = document.createElement('div');
         watch.className = 'watch';
         this._element.appendChild(watch);
         // XXX: Work around a bug in Chrome; it doesn't render the second watch's
-        //      wallpaper if the first watch has been opened.
+        //      wallpaper if the first watch has been opened. It's testing for
+        //      layer occlusion without considering the "overflow: hidden" masking
+        //      from a parent layer.
         watch.style.webkitTransform = 'translateZ(0)';
         watch.style.transform = 'translateZ(0)';
         this._useCSS = useCSS;
@@ -49,7 +51,11 @@ function AndroidWearDemo(element) {
         this._position = 0;
         this._startPosition = 0;
 
-        this._spring = new Spring(1, 200, 60);
+        //
+        // Use a different simulation depending on whether we're really going back or not.
+        //
+        this._acceptSimulation = new Gravity(1000, 280);
+        this._cancelSimulation = new Spring(1, 400, 40); // Critically damped cancellation spring.
 
         var self = this;
         var controls = new Controls();
@@ -63,7 +69,12 @@ function AndroidWearDemo(element) {
                     write: function(val) { self._transitionDuration = val; }
                 }]);
         } else {
-            controls.addModel(this._spring, 'Physics Watch Spring');
+            controls.addText('Physics Watch');
+            var acceptConfig = this._acceptSimulation.configuration();
+            acceptConfig[0].min = 1;
+            acceptConfig[0].max = 5000;
+            controls.addModel(acceptConfig, 'Accept Acceleration');
+            controls.addModel(this._cancelSimulation, 'Cancel Spring');
         }
         controls.addResetButton(function() {
             if (self._animation) self._animation.cancel();
@@ -74,8 +85,6 @@ function AndroidWearDemo(element) {
             self._menu.style.transform = 'translateX(0) translateZ(0)';
         });
         this._element.appendChild(controls.element());
-        // XXX: Add some controls to reset the menu once you've
-        //      dismissed it.
     }
     Watch.prototype.element = function() { return this._element; }
     Watch.prototype.onTouchStart = function() {
@@ -104,12 +113,10 @@ function AndroidWearDemo(element) {
     Watch.prototype.onTouchEnd = function(dx, dy, velocity) {
         var end = 0;
         // Determine if the velocity and position were enough to back out.
-        // I can't remember what Android wear actually does here. It always
-        // backs out if you're past half way, but I've forgotten the details
-        // of how it incorporates touch velocity. It does have some odd snaps
-        // around cancellation of going back, however.
-        // Better would be to use an equation like escape velocity.
-        if (dx > 240 / 2 || velocity.x > 500) end = 240;
+        // Android Wear just tests if the x position was over a threshold,
+        // they don't seem to examine velocity, so small flicks are ineffective
+        // unless you happen to make it over the threshold.
+        if ((dx > 240 / 2 && velocity.x >= 0) || velocity.x > 200) end = 240;
 
         if (this._useCSS) {
             this._position = end;
@@ -120,18 +127,27 @@ function AndroidWearDemo(element) {
             this._menu.style.transform = transform;
             return;
         }
-        // Use the spring instead; snap it to our current
-        // position then set the end point with our x velocity.
-        this._spring.snap(this._position / 240);
-        // What's going on here -- why am I multiplying the end position by 2?
-        // I want the screen to accelerate away which maps nicely to the first
-        // half of the spring curve.
-        this._spring.setEnd(end / 120, velocity.x / 240);
+        // If it was a cancel then use the cancel spring, otherwise use the
+        // accept spring.
+        if (end > 0) {
+            var vel = velocity.x;
+            this._acceptSimulation.set(this._position, velocity.x);
+            this._animation = animation(this._acceptSimulation, this._update.bind(this, 1, this._acceptSimulation));
+        }
+        else {
+            // Use the spring instead; snap it to our current
+            // position then set the end point with our x velocity.
+            // We keep the spring moving between 1 and 0 (or -1 and 0) since that's
+            // consistent with how springs are used in all of the other examples;
+            // you can use whatever unit system you like, though.
+            this._cancelSimulation.snap(this._position / 240);
+            this._cancelSimulation.setEnd(0, velocity.x / 240);
+            this._animation = animation(this._cancelSimulation, this._update.bind(this, 240, this._cancelSimulation));
+        }
 
-        this._animation = animation(this._spring, this._update.bind(this));
     }
-    Watch.prototype._update = function() {
-        this._position = this._spring.x() * 240;
+    Watch.prototype._update = function(multiplier, model) {
+        this._position = model.x() * multiplier;
         var transform = 'translateX(' +  this._position + 'px) translateZ(0)';
         this._menu.style.webkitTransform = transform;
         this._menu.style.transform = transform;

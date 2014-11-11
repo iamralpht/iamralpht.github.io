@@ -1,7 +1,17 @@
 .dialogs {
     overflow: hidden;
 }
-
+.dialogs>.controls {
+    /*
+     * The WebKit compositor will promote the controls to a composited layer when the dialog goes
+     * underneath them. This causes the controls to be redrawn and results in dropped frames. So
+     * just tell it to always make the controls be composited to avoid the frame loss. Note that
+     * even when WebKit/Blink automatically promote the controls, they still get the z-order
+     * wrong (maybe because the controls don't form a CSS stacking context without this?).
+     */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}
 .dialog {
     display: inline-block;
     margin: 10px;

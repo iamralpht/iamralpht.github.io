@@ -5,7 +5,7 @@
 .sliderdemo .slider {
     display: inline-block;
     position: relative;
-    width: 300px;
+    width: 400px;
     height: 50px;
 }
 .sliderdemo .slider::before {
@@ -13,7 +13,7 @@
     content: ' ';
 
     position: absolute;
-    width: 250px;
+    width: 350px;
     left: 25px;
     top: 20px;
     height: 10px;

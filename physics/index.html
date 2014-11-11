@@ -97,7 +97,7 @@ li {
 <p><b>Conserving Momentum</b></p>
 <p>In the button example above, the user input is a binary press (the button is either being pressed or not). In most of the other examples on this page, we'll instead seed the physics simulation with the current momentum and position of an object. To simplify the code, I always use a mass of 1, which means that velocity and momentum are the same number and thus interchangeable.</p>
 <p>Why is it important to conserve momentum, though? What happens if we create animations that ignore the momentum that the user imparted to the UI?</p>
-<p>This example is the UI for navigating back in <a href="http://www.android.com/wear/">Android Wear</a>: you drag from the left to the right and release. One version ignores your momentum and just runs the same animation every time. The other example rolls the momentum into an overdamped spring.</p>
+<p>This example is the UI for navigating back in <a href="http://www.android.com/wear/">Android Wear</a>: you drag from the left to the right and release. One version ignores your momentum and just runs the same animation every time. The other example rolls the momentum into an constant acceleration (gravity) simulation if you drag with enough velocity or beyond the half-way point. If you don't drag far enough or drag in the other direction then a spring is used to take the menu back to where it started.</p>
 </div>
 
 <div class="example" id="androidWearExample">
@@ -105,6 +105,7 @@ li {
 <div class="content">
 <ul>
  <li>How does it feel when the menu continues moving with the momentum that you gave it? How about when it just uses the canned transition?</li>
+ <li>I used two physical simulations here, picking one depending on the velocity and end position. I started out using a single spring to do everything. That didn't work because the cancel animation was too slow, so next I tried using two springs. I then decided that maybe constant acceleration would feel better, and that's what is in there now. One nice thing about modeling with physical objects is that you have a lot of choice over how to make things behave.</li>
 </ul>
 <p><a href="http://munews.missouri.edu/news-releases/2012/0124-babies-are-born-with-%E2%80%9Cintuitive-physics%E2%80%9D-knowledge-says-mu-researcher/">Recent research suggests we have an understanding of conservation of momentum from birth</a>. I believe that UI which upholds these strongly held expectations is more pleasing than UI that ignores them.</p>
 
@@ -120,13 +121,13 @@ li {
  <li>What happens when you set the Rebound to 1.0? What about 1.1?</li>
 </ul>
 <p>Now we're going to compare constant deceleration (which is almost the same as the gravity example above; it just means the acceleration constant is negative) with friction. When I first started learning about physics simulations I wrote the constant deceleration simulation and used it for everything, including scrolling. The result was terrible! My scrolling content would stop too abruptly and have a bad feel compared to everyone else's. For scrolling, as well as sliders, friction is a much better feeling simulation.</p>
-<p>In this example you can see the difference between constant deceleration and friction. Give each of the sliders a fling and watch how they slow down.</p>
+<p>In this example you can see the difference between constant deceleration and friction. Give each of the sliders a short, slow fling and watch how they slow down.</p>
 </div>
 <div class="example" id="slidersExample"></div>
 <div class="content">
 <ul>
  <li>Notice how the Decelerating Slider (which is using a constant deceleration) doesn't feel good. Either it goes too far or stops too abruptly. Gravity was the perfect simulation for the lock screen (and the dialogs below) but friction creates a much more natural feel for these sliders and for scrolling.</li>
- <li>What happens when the thumb hits the end of the slider? What can we do so that we're not throwing away all of the thumb's momentum? We could drag the whole control, we could let the thumb go over the end slightly, or we could even squish the thumb a bit!</li>
+ <li>When the thumb hits the end of the slider it just stops moving, and all momentum is immediately lost. What can we do so that we're not throwing away all of the thumb's momentum? We could drag the whole control, we could let the thumb go over the end slightly, or we could even squish the thumb a bit!</li>
 </ul>
 <!-- combining simulations: fall, scroll -->
 <p><b>Combining Simulations</b></p>

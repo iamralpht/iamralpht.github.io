@@ -23,6 +23,8 @@ function SlidersDemo(element) {
     this._element = element;
     this._element.classList.add('sliderdemo');
 
+    var SLIDER_LENGTH = 350;
+
     function Slider(model, name, color) {
         this._element = document.createElement('div');
         this._element.className = 'slider-container';
@@ -64,7 +66,7 @@ function SlidersDemo(element) {
 
     Slider.prototype.onTouchMove = function(dx, dy) {
         // Clamp the position of the thumb while dragging.
-        this._position = clamp(this._startPosition + dx, 0, 250);
+        this._position = clamp(this._startPosition + dx, 0, SLIDER_LENGTH);
 
         // Apply the position as a transform.
         var transform = 'translateX(' + this._position + 'px) translateZ(0)';
@@ -72,14 +74,14 @@ function SlidersDemo(element) {
         this._thumb.style.transform = transform;
     }
     Slider.prototype.onTouchEnd = function(dx, dy, velocity) {
-        this._position = clamp(this._startPosition + dx, 0, 250);
+        this._position = clamp(this._startPosition + dx, 0, SLIDER_LENGTH);
         this._model.set(this._position, velocity.x);
         this._animation = animation(this._model, this._update.bind(this));
     }
     Slider.prototype._update = function() {
         // This is a crummy feeling simulation at the ends. We just clamp the
         // value so the extra momentum is completely lost.
-        this._position = clamp(this._model.x(), 0, 250);
+        this._position = clamp(this._model.x(), 0, SLIDER_LENGTH);
         var transform = 'translateX(' + this._position + 'px) translateZ(0)';
         this._thumb.style.webkitTransform = transform;
         this._thumb.style.transform = transform;
