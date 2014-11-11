@@ -73,6 +73,10 @@ li {
     border: none;
     text-align: center;
     padding: 10px;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }
 </style>
 </head>
@@ -105,13 +109,13 @@ li {
 <div class="content">
 <ul>
  <li>How does it feel when the menu continues moving with the momentum that you gave it? How about when it just uses the canned transition?</li>
- <li>I used two physical simulations here, picking one depending on the velocity and end position. I started out using a single spring to do everything. That didn't work because the cancel animation was too slow, so next I tried using two springs. I then decided that maybe constant acceleration would feel better, and that's what is in there now. One nice thing about modeling with physical objects is that you have a lot of choice over how to make things behave.</li>
+ <li>I used two physical simulations here, picking one depending on the velocity and end position. I started out using a single spring to do everything. That didn't work out because the cancel animation was too slow, so next I tried using one spring for "back" and one spring for cancelling the gesture. I then decided that maybe constant acceleration would feel better, and that's what is in there now. One nice thing about modeling with physical objects is that you have a lot of choice over how to make things behave.</li>
 </ul>
 <p><a href="http://munews.missouri.edu/news-releases/2012/0124-babies-are-born-with-%E2%80%9Cintuitive-physics%E2%80%9D-knowledge-says-mu-researcher/">Recent research suggests we have an understanding of conservation of momentum from birth</a>. I believe that UI which upholds these strongly held expectations is more pleasing than UI that ignores them.</p>
 
 <!-- different simulations -->
 <p><b>Different Simulations</b></p>
-<p>So far we've played with overdamped and underdamped springs. We're also going to experiment with gravity (or, more properly, constant acceleration) and friction. These sound pretty boring, but combined with touch we can come up with some good interactions.</p>
+<p>We're going to look at three simple simulations: springs, constant acceleration (or gravity) and friction. These sound pretty boring, but combined with touch we can come up with some good interactions.</p>
 <p>In this example we're using gravity to create a lock screen like the one in Windows 8. When you drag up on the image and release, it keeps its momentum but is pulled down by a constant acceleration. If you don't give it enough momentum, then it falls back down and the machine stays locked. This is a physics-based variant of slide-to-unlock.</p>
 </div>
 <div class="example" id="lockScreenExample"></div>
