@@ -31,6 +31,10 @@
 <script src="fallingdialogs.js"></script>
 <link href="fallingdialogs.css" rel="stylesheet"></script>
 
+<!-- iTunes Radio continuous scrolling -->
+<script src="itunesradio.js"></script>
+<link href="itunesradio.css" rel="stylesheet"></link>
+
 <link href="controls.css" rel="stylesheet"></link>
 <style>
 body {
@@ -153,9 +157,7 @@ Scrolling
 <p>Once you understand how something like scrolling is constructed, it's easy to make things like the "infinite" linear scroller in iTunes Radio on iOS 7. Here we have a constant velocity giving us a linear animation. Note: If you think you might ever drop a frame, <i>don't</i> use linear translation animations. Humans are amazing at tracking linear motion, so dropped frames will be perceived as very jarring. In contrast, humans seem bad at tracking things zooming in or out, so you can drop all kinds of frames in a zoom animation and most people won't notice.</p>
 <p>This example uses a tweaked friction simulation that has a constant velocity which can be temporarily overcome by flicking left or right. Notice what happens when your imparted momentum is consumed and the scroller resumes its previous motion. It's smooth and seamless.</p>
 </div>
-<div class="example">
-iTunes Radio linear scroller.
-</div>
+<div class="example" id="iTunesRadioExample"></div>
 <div class="content">
 <!-- mapping inputs and outputs: gyro controlled gravity, proximity triggered spring that follows you, squishy bounce -->
 <p><b>Mapping inputs and outputs</b></p>

@@ -1,0 +1,73 @@
+.itunesradiodemo {
+    overflow: hidden;
+}
+
+.itunesradiodemo>.itunes-scroll {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+    -webkit-perspective: 1500;
+    perspective: 1500;
+    -webkit-perspective-origin: 50% -40%;
+    perspective-origin: 50% -40%;
+
+    position: relative;
+
+    margin: 10px;
+    width: 100%;
+    height: 160px;
+}
+.itunesradiodemo .stack {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    top: 10px;
+    left: 0px;
+    margin: 0;
+
+    pointer-events: none;
+}
+.itunesradiodemo .stack>.cover {
+    -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
+
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    top: 0; left: 0;
+    margin: 0;
+
+    background-repeat: repeat;
+}
+.itunesradiodemo .stack>.cover-1 {
+    background-position: -30px 30px;
+}
+.itunesradiodemo .stack>.cover-2 {
+    background-position: 30px 30px;
+}
+.itunesradiodemo .stack>.cover-3 {
+    background-position: 30px -30px;
+}
+.itunesradiodemo .stack>.cover-4 {
+    background-position: -30px -30px;
+}
+.itunesradiodemo .stack>.cover>.fog {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    top: 0; left: 0;
+    background-color: white;
+    margin: 0;
+}
+.itunesradiodemo .stack>.stack-label {
+    position: absolute;
+    top: 130px;
+    left: 0; right: 0;
+    font-size: 12px;
+}
+    
+
