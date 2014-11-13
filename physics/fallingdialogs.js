@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 function Dialog(position, ground, squish, rotate) {
+    this._rotateAngle = -15;
     this._element = document.createElement('div');
     this._element.className = 'dialog';
 
@@ -83,7 +84,7 @@ Dialog.prototype._update = function() {
         // hit the ground, so just map y like that. This is an example
         // of using a physics model to control a secondary attribute.
         var amount = -y / 500;
-        var angle = -15 * amount;
+        var angle = this._rotateAngle * amount;
         transform += ' rotateZ(' + angle + 'deg)';
     }
     this._element.style.webkitTransform = transform;
@@ -107,6 +108,16 @@ function FallingDialogsDemo(element, squishy, rotate) {
     var controls = new Controls();
     controls.addText(squishy ? 'Squishy Falling Dialog' : 'Falling Dialog');
     controls.addModel(dialog.model());
+    if (rotate) {
+        var rotateModel = {
+            label: 'Rotation',
+            min: -60,
+            max: 60,
+            read: function() { return dialog._rotateAngle; },
+            write: function(x) { dialog._rotateAngle = x; }
+        };
+        controls.addModel([rotateModel]);
+    }
     controls.addResetButton(dialog.reset.bind(dialog));
     this._element.appendChild(dialog.element());
     this._element.appendChild(controls.element());
