@@ -346,7 +346,6 @@ FloatingActionButton.prototype._layout = function() {
     var self = this;
     if (!done) {
         if (this._requestedFrame) return;
-        console.log('not done');
         this._requestedFrame = requestAnimationFrame(function() {
             self._requestedFrame = 0;
             self._layout();
