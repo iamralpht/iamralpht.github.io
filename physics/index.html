@@ -82,6 +82,11 @@ li {
     -moz-user-select: none;
     user-select: none;
 }
+#fab>iframe {
+    border: none;
+    width: 100%;
+    height: 500px;
+}
 </style>
 </head>
 <body>
@@ -170,8 +175,8 @@ Scrolling photos using gravity controlled by the gyroscope. Mobile only.
 <div class="content">
 <p>We can also trigger springs based on proximity. <a href="/fab">I wrote up this example previously</a>. Each face circle has a spring which is triggered when the cursor gets close. The motion of the face is then controlled by both the spring and the cursor position: the spring controls how far the face should be between its natural home position and where the cursor currently is.</p>
 </div>
-<div class="example">
-Fluid Floating Action Button
+<div class="example" id="fab">
+<iframe src="../fab/demo/index.html"></iframe>
 </div>
 <div class="content">
 <p>Phew! Here's an example of mapping the output of a physics system differently. It's the "falling dialog" example from above, except that instead of translating the dialog downwards when it hits the ground, we squish it. Non-uniform scales don't usually look very pleasing, so it's hard to find any examples like this in real products.</p>
