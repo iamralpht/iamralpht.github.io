@@ -132,9 +132,6 @@ function iTunesRadioDemo(element) {
     // delta by the velocity.
     this._constantVelocity = new ConstantVelocity(80);
     this._constantVelocity.start();
-    // We just leave this animation running all the time. It will also read the offset
-    // value from the friction animation.
-    animation(this._constantVelocity, this._update.bind(this));
 
     // Add some controls to twiddle with the settings.
     var controls = new Controls();
@@ -142,9 +139,21 @@ function iTunesRadioDemo(element) {
     controls.addModel(this._friction);
     element.appendChild(controls.element());
 
+    // Because this demo slows Chrome down significantly on Android, do some extra work
+    // to only run it when visible.
+    var self = this;
+    window.addEventListener('scroll', function() {
+        var rect = element.getBoundingClientRect();
+        var visible = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (!visible && self._animation) {
+            self._animation.cancel();
+            self._animation = null;
+        } else if (visible && !self._animation) {
+            self._animation = animation(self._constantVelocity, self._update.bind(self));
+        }
+    }, false);
 }
 iTunesRadioDemo.prototype._layout = function(x) {
-
     var STACK_WIDTH = 128;
     var PADDING = 10;
     var STACK_SIZE = STACK_WIDTH + PADDING;
