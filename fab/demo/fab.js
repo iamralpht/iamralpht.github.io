@@ -124,6 +124,10 @@ Spring.prototype.snap = function(x) {
         dx: function() { return 0; }
     };
 }
+Spring.prototype.done = function(t) {
+    if (!t) t = (new Date()).getTime();
+    return almostEqual(this.x(), this._endPosition, epsilon) && almostZero(this.dx(), epsilon);
+}
 
 /*
  * Now the interesting bit, a FAB menu item. The menu item has a spring which moves it from its natural layout
@@ -218,6 +222,7 @@ function FloatingActionButton(title, image, items) {
         isOpen = true;
         self._openSpring.setEnd(1);
         self._maskSpring.setEnd(2);
+        self._layout();
     }
 
     function findDelta(e) {
@@ -253,6 +258,7 @@ function FloatingActionButton(title, image, items) {
         isOpen = false;
         self._openSpring.setEnd(0);
         self._maskSpring.setEnd(0);
+        self._layout();
     }
 
     this._cursor.element().addEventListener('touchstart', touchStart, false);
@@ -269,6 +275,7 @@ function FloatingActionButton(title, image, items) {
     this._layout();
 }
 var id = new WebKitCSSMatrix();
+
 function round(amount, quanta) {
     return (Math.round(amount / quanta) * quanta);
 }
@@ -285,8 +292,14 @@ function setCircleClipPath(element, size) {
 FloatingActionButton.prototype.element = function() { return this._container; }
 FloatingActionButton.prototype._layout = function() {
     function clamp(x, min, max) { return (x < min ? min : (x > max ? max : x)); }
+
+    var done = true;
+
     var openAmount = this._openSpring.x();
     var cursorPosition = this._cursorPosition * this._cursorSpring.x();
+
+    done &= this._openSpring.done();
+    done &= this._cursorSpring.done();
     
     var y = 0;
     for (var i = 0; i < this._items.length; i++) {
@@ -328,7 +341,17 @@ FloatingActionButton.prototype._layout = function() {
     this._mask.style.webkitTransform = 'scale(' + round(this._maskSpring.x(), 0.001) + ')';
     this._mask.style.opacity = round(clamp(this._maskSpring.x() * 0.5, 0, 1), 0.001);
 
-    requestAnimationFrame(this._layout.bind(this));
+    done &= this._maskSpring.done();
+
+    var self = this;
+    if (!done) {
+        if (this._requestedFrame) return;
+        console.log('not done');
+        this._requestedFrame = requestAnimationFrame(function() {
+            self._requestedFrame = 0;
+            self._layout();
+        });
+    }
 }
 var zIndex = 1;
 FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
@@ -338,6 +361,7 @@ FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
         for (var i = 0; i < this._items.length; i++) {
             this._items[i].setCursorIsClose(false);
         }
+        this._layout();
         return;
     }
     if (x > 0) x /= 4;
@@ -361,6 +385,8 @@ FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
             item.element().style.zIndex = (++zIndex);
     }
     this._selected = selected;
+
+    this._layout();
 }
 
 /*
