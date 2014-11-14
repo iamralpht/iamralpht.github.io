@@ -164,6 +164,7 @@ MenuItem.prototype.label = function() { return this._label; }
 MenuItem.prototype.launch = function() { return this._launch; }
 MenuItem.prototype.setCursorIsClose = function(isCursorClose) { this._spring.setEnd(isCursorClose ? 1 : 0); }
 MenuItem.prototype.cursorAttraction = function() { return this._spring.x(); }
+MenuItem.prototype.done = function() { return this._spring.done(); }
 
 /*
  * Magic numbers for the FloatingActionButton.
@@ -304,6 +305,9 @@ FloatingActionButton.prototype._layout = function() {
     var y = 0;
     for (var i = 0; i < this._items.length; i++) {
         var item = this._items[i];
+
+        done &= item.done();
+
         y -= ITEM_SIZE;
         var naturalPosition = y * openAmount;
         var cursorAttraction = item.cursorAttraction();
