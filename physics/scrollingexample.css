@@ -1,7 +1,7 @@
 .scrollingdemo>.scrolling-outer {
     display: inline-block;
     width: 320px;
-    height: 480px;
+    height: 320px;
     background-color: white;
     text-align: left;
     color: black;
@@ -20,9 +20,23 @@
 }
 .scrollingdemo .scrolling-list-item {
     margin: 0;
-    padding: 20px;
+    height: 80px;
+    padding-left: 100px;
     border-bottom: 1px solid #e0e0e0;
+    position: relative;
 }
 .scrollingdemo .scrolling-list-item:last-child {
     border-bottom: none;
 }
+.scrollingdemo .scrolling-list-item>.scrolling-list-img {
+    position: absolute;
+    height: 80px;
+    width: 80px;
+    top: 0; left: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.scrollingdemo .scrolling-list-item>span {
+    line-height: 80px;
+}
+

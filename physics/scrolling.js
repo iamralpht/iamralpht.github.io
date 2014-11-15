@@ -34,10 +34,12 @@ Scroll.prototype.set = function(x, v) {
     // velocity because we don't want flicks that start in the overscroll to get consumed
     // by the spring.
     if (x > 0 && v >= 0) {
+        this._springOffset = 0;
         this._springing = true;
         this._spring.snap(x);
         this._spring.setEnd(0);
     } else if (x < -this._extent && v <= 0) {
+        this._springOffset = 0;
         this._springing = true;
         this._spring.snap(x);
         this._spring.setEnd(-this._extent);
@@ -56,10 +58,10 @@ Scroll.prototype.x = function(t) {
     var dx = this.dx(t);
     // If we've gone over the edge the roll the momentum into the spring.
     if ((x > 0 && dx >= 0) || (x < -this._extent && dx <= 0)) {
-        console.log('round into spring with velocity: ' + dx);
         this._springing = true;
         this._spring.setEnd(0, dx);
         if (x < -this._extent) this._springOffset = -this._extent;
+        else this._springOffset = 0;
         x = this._spring.x() + this._springOffset;
     }
     return x;
@@ -72,13 +74,19 @@ Scroll.prototype.done = function() {
     if (this._springing) return this._spring.done();
     else return this._friction.done();
 }
+Scroll.prototype.configuration = function() {
+    var config = this._friction.configuration();
+    config.push.apply(config, this._spring.configuration());
+    return config;
+}
 
 var UNDERSCROLL_TRACKING = 0.5;
 
 function ScrollHandler(element) {
     this._element = element;
     this._position = 0;
-    this._extent = this._element.offsetHeight - 480;
+    this._extent = this._element.offsetHeight - this._element.parentElement.offsetHeight;
+    this._scroll = new Scroll(this._extent);
 }
 ScrollHandler.prototype.onTouchStart = function() {
     this._startPosition = this._position;
@@ -92,6 +100,11 @@ ScrollHandler.prototype.onTouchStart = function() {
         this._startPosition = (this._startPosition + this._extent) / UNDERSCROLL_TRACKING - this._extent;
 
     if (this._animation) this._animation.cancel();
+
+    var pos = this._position;
+    var transform = 'translateY(' + pos + 'px)';
+    this._element.style.webkitTransform = transform;
+    this._element.style.transform = transform;
 }
 ScrollHandler.prototype.onTouchMove = function(dx, dy) {
     var pos = dy + this._startPosition;
@@ -105,13 +118,15 @@ ScrollHandler.prototype.onTouchMove = function(dx, dy) {
 }
 ScrollHandler.prototype.onTouchEnd = function(dx, dy, velocity) {
     var self = this;
-    var model = new Scroll(this._extent);
-    model.set(this._position, velocity.y);
-    this._animation = animation(model, function() {
-        var pos = model.x();
+    this._scroll.set(this._position, velocity.y);
+    this._animation = animation(this._scroll, function() {
+        var pos = self._scroll.x();
         self._position = pos;
         var transform = 'translateY(' + pos + 'px)';
         self._element.style.webkitTransform = transform;
         self._element.style.transform = transform;
     });
+}
+ScrollHandler.prototype.configuration = function() {
+    return this._scroll.configuration();
 }

@@ -73,8 +73,8 @@ Controls.prototype.addModel = function(spring, name) {
         addSlider(this._element, config[i]);
     }
 }
-Controls.prototype.addResetButton = function(callback) {
-    var d = addText(this._element, 'Reset Position');
+Controls.prototype.addResetButton = function(callback, label) {
+    var d = addText(this._element, label || 'Reset Position');
     d.className = 'reset-control';
     d.onclick = callback;
 }
