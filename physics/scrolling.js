@@ -112,7 +112,7 @@ ScrollHandler.prototype.onTouchMove = function(dx, dy) {
     else if (pos < -this._extent) pos = (pos + this._extent) * UNDERSCROLL_TRACKING - this._extent;
 
     this._position = pos;
-    var transform = 'translateY(' + pos + 'px)';
+    var transform = 'translateY(' + pos + 'px) translateZ(0)';
     this._element.style.webkitTransform = transform;
     this._element.style.transform = transform;
 }
