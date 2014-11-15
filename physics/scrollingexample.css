@@ -23,3 +23,6 @@
     padding: 20px;
     border-bottom: 1px solid #e0e0e0;
 }
+.scrollingdemo .scrolling-list-item:last-child {
+    border-bottom: none;
+}
