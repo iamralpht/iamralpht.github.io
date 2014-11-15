@@ -56,8 +56,9 @@ Scroll.prototype.x = function(t) {
     var dx = this.dx(t);
     // If we've gone over the edge the roll the momentum into the spring.
     if ((x > 0 && dx >= 0) || (x < -this._extent && dx <= 0)) {
+        console.log('round into spring with velocity: ' + dx);
         this._springing = true;
-        this._spring.set(0, dx);
+        this._spring.setEnd(0, dx);
         if (x < -this._extent) this._springOffset = -this._extent;
         x = this._spring.x() + this._springOffset;
     }
@@ -72,6 +73,45 @@ Scroll.prototype.done = function() {
     else return this._friction.done();
 }
 
-ScrollHandler = function(element) {
+var UNDERSCROLL_TRACKING = 0.5;
+
+function ScrollHandler(element) {
     this._element = element;
+    this._position = 0;
+    this._extent = this._element.offsetHeight - 480;
+}
+ScrollHandler.prototype.onTouchStart = function() {
+    this._startPosition = this._position;
+
+    // Ensure that we don't jump discontinuously when applying the underscroll
+    // tracking in onTouchMove if the view is currently outside of the valid
+    // scroll constraints.
+    if (this._startPosition > 0)
+        this._startPosition /= UNDERSCROLL_TRACKING;
+    else if (this._startPosition < -this._extent)
+        this._startPosition = (this._startPosition + this._extent) / UNDERSCROLL_TRACKING - this._extent;
+
+    if (this._animation) this._animation.cancel();
+}
+ScrollHandler.prototype.onTouchMove = function(dx, dy) {
+    var pos = dy + this._startPosition;
+    if (pos > 0) pos *= UNDERSCROLL_TRACKING;
+    else if (pos < -this._extent) pos = (pos + this._extent) * UNDERSCROLL_TRACKING - this._extent;
+
+    this._position = pos;
+    var transform = 'translateY(' + pos + 'px)';
+    this._element.style.webkitTransform = transform;
+    this._element.style.transform = transform;
+}
+ScrollHandler.prototype.onTouchEnd = function(dx, dy, velocity) {
+    var self = this;
+    var model = new Scroll(this._extent);
+    model.set(this._position, velocity.y);
+    this._animation = animation(model, function() {
+        var pos = model.x();
+        self._position = pos;
+        var transform = 'translateY(' + pos + 'px)';
+        self._element.style.webkitTransform = transform;
+        self._element.style.transform = transform;
+    });
 }
