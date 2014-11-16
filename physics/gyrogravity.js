@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-function GyroGravityDemo(element) {
+function GyroVelocityDemo(element) {
     element.classList.add('gyro-gravity');
 
     var clip = document.createElement('div');
@@ -49,47 +49,43 @@ function GyroGravityDemo(element) {
 
     element.appendChild(clip);
 
-    // Gravity (constant acceleration) simulation with a clamp on
-    // the distance.
-    function ClampedGravity(min, max, a) {
-        this._gravity = new Gravity(a);
+    // Velocity simulation; the velocity changes regularly from the gyro.
+    function ClampedVelocity(min, max) {
+        this._velocity = 0;
+        this._position = 0;
+        this._startTime = (new Date()).getTime();
         this._min = min;
         this._max = max;
-        this._gravity.set(0, 0);
     }
-    ClampedGravity.prototype.x = function() {
-        var p = this._gravity.x();
+    ClampedVelocity.prototype.x = function() {
+        var delta = ((new Date()).getTime() - this._startTime) / 1000.0;
+        var p = this._position - delta * this._velocity;
         if (p < this._min) p = this._min;
         if (p > this._max) p = this._max;
         return p;
     }
-    ClampedGravity.prototype.progress = function() {
+    ClampedVelocity.prototype.progress = function() {
         return 1 - (this.x() - this._min) / (this._max - this._min);
     }
-    ClampedGravity.prototype.dx = function() {
-        var p = this._gravity.x();
-        if (p < this._min || p > this._max) return 0;
-        return this._gravity.dx();
-    }
-    ClampedGravity.prototype.done = function() { return false; }
-    ClampedGravity.prototype.reconfigure = function(a) {
-        if (a == this._gravity._a) return;
-        this._gravity.set(this.x(), this.dx());
-        this._gravity._a = a;
+    ClampedVelocity.prototype.done = function() { return false; }
+    ClampedVelocity.prototype.reconfigure = function(v) {
+        if (v == this._velocity) return;
+        this._position = this.x();
+        this._startTime = (new Date()).getTime();
+        this._velocity = v;
     }
 
     var max = 1280 - 320;
     var progressMax = 300 - 80;
 
-    var self = this;
-    this._model = new ClampedGravity(-max, 0, 0);
+    var model = new ClampedVelocity(-max, 0);
 
-    this._animation = animation(this._model, function() {
-        var transform = 'translateX(' + self._model.x() + 'px) translateZ(0)';
+    this._animation = animation(model, function() {
+        var transform = 'translateX(' + model.x() + 'px) translateZ(0)';
         img.style.webkitTransform = transform;
         img.style.transform = transform;
 
-        var progressTransform = 'translateX(' + self._model.progress() * progressMax + 'px) translateZ(0)';
+        var progressTransform = 'translateX(' + model.progress() * progressMax + 'px) translateZ(0)';
         thumb.style.webkitTransform = progressTransform;
         thumb.style.transform = progressTransform;
     });
@@ -117,9 +113,9 @@ function GyroGravityDemo(element) {
     window.addEventListener('devicemotion',
         function(e) {
             var accel = getInterestingAcceleration(e);
-            self._model.reconfigure(accel * 500);
+            model.reconfigure(accel * 200);
         } ,
         true);
 }
 
-//window.addEventListener('load', function() { new GyroGravityDemo(document.getElementById('gyroGravityExample')); }, false);
+window.addEventListener('load', function() { new GyroVelocityDemo(document.getElementById('gyroVelocityExample')); }, false);

@@ -1,4 +1,4 @@
-.gyro-gravity { position: relative; }
+.gyro-gravity { position: relative; margin-bottom: 10px; }
 
 .gyro-gravity>.gyro-clip {
     display: inline-block;
@@ -8,6 +8,7 @@
 
     width: 320px;
     height: 480px;
+    margin: 0;
 }
 .gyro-gravity>.gyro-clip>.gyro-img {
     position: absolute;
