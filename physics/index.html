@@ -209,7 +209,13 @@ li {
  <li>Physical models can be combined to create more complex and dynamic systems.</li>
  <li>We can use all kinds of inputs to physical models, and map their results differently to create the effects we want.</li>
 </ul>
-<p>The commented source code to all of the above examples is available <a href="https://github.com/iamralpht/Gravitas">in Gravitas's examples</a>. Gravitas is a super-efficient physics engine that I wrote just for building UIs like this.</p>
+<p>I made a lot of mistakes and rewrote a couple of examples while writing this article (<a href="https://github.com/iamralpht/iamralpht.github.io/commits/master">read my mistakes in the commit log</a>). What did <b>I</b> learn?</p>
+<ul>
+ <li>The CSS transition version of the Android Wear back gesture actually works better than I expected, so the difference between the two versions is more subtle than I wanted. As I noted above, I also tried using a spring to model it at first, and later switched to acceleration which feels a lot better!</li>
+ <li>Chrome for Android falls apart with a lot of layers. The iTunes Radio example isn't very hard (it's a lot of composited layers, but only 20 of them get a new transform every frame), but Chrome for Android drops frames.</li>
+ <li>Don't map the gyroscope to acceleration for panning! It was obvious what I needed to do as soon as I saw it running, but it wasn't obvious to me before.</li>
+</ul>
+<p>The commented JavaScript source code to all of the above examples is available <a href="https://github.com/iamralpht/iamralpht.github.io/tree/master/physics">on github</a>. Also check out <a href="https://github.com/iamralpht/gravitas">Gravitas</a>, a Java library I wrote which contains many of the physical models used here.</p>
 </div>
 </body>
 </html>
