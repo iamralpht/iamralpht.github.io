@@ -113,7 +113,8 @@ function GyroVelocityDemo(element) {
     window.addEventListener('devicemotion',
         function(e) {
             var accel = getInterestingAcceleration(e);
-            model.reconfigure(accel * 200);
+            // 200 and -ve are made up constants that felt good on a few devices.
+            model.reconfigure(-accel * 200);
         } ,
         true);
 }
