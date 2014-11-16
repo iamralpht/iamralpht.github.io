@@ -122,4 +122,4 @@ function GyroGravityDemo(element) {
         true);
 }
 
-window.addEventListener('load', function() { new GyroGravityDemo(document.getElementById('gyroGravityExample')); }, false);
+//window.addEventListener('load', function() { new GyroGravityDemo(document.getElementById('gyroGravityExample')); }, false);
