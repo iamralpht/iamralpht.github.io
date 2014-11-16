@@ -1,6 +1,6 @@
-.gyro-gravity { position: relative; margin-bottom: 10px; }
+.gyro-velocity { position: relative; margin-bottom: 10px; }
 
-.gyro-gravity>.gyro-clip {
+.gyro-velocity>.gyro-clip {
     display: inline-block;
     position: relative;
 
@@ -10,7 +10,7 @@
     height: 480px;
     margin: 0;
 }
-.gyro-gravity>.gyro-clip>.gyro-img {
+.gyro-velocity>.gyro-clip>.gyro-img {
     position: absolute;
     width: 1280px;
     height: 480px;
@@ -18,18 +18,18 @@
     background-size: contain;
     background-repeat: no-repeat;
 }
-.gyro-gravity>.gyro-clip>.gyro-metadata {
+.gyro-velocity>.gyro-clip>.gyro-metadata {
     position: absolute;
     bottom: 0; left: 0; right: 0; height: 100px; margin: 0;
     background-image: linear-gradient(transparent, rgba(0,0,0,0.7));
 }
-.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-progress {
+.gyro-velocity>.gyro-clip>.gyro-metadata>.gyro-progress {
     position: absolute;
     left: 10px; right: 10px; height: 2px; bottom: 10px;
     background-color: rgba(255,255,255,0.3);
     margin: 0;
 }
-.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-progress>.gyro-thumb {
+.gyro-velocity>.gyro-clip>.gyro-metadata>.gyro-progress>.gyro-thumb {
     position: absolute;
     width: 80px;
     left: 0;
@@ -39,7 +39,7 @@
     background-color: rgba(255, 255, 255, 0.7);
 }
 
-.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-attribution {
+.gyro-velocity>.gyro-clip>.gyro-metadata>.gyro-attribution {
     position: absolute;
     font-size: 14px;
     text-align: left;
@@ -48,11 +48,11 @@
     right: 10px;
     margin: 0;
 }
-.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-attribution>a {
+.gyro-velocity>.gyro-clip>.gyro-metadata>.gyro-attribution>a {
     text-decoration: none;
     color: white;
 }
-.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-attribution>a:hover {
+.gyro-velocity>.gyro-clip>.gyro-metadata>.gyro-attribution>a:hover {
     text-decoration: underline;
 }
 

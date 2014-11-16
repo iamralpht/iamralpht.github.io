@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 function GyroVelocityDemo(element) {
-    element.classList.add('gyro-gravity');
+    element.classList.add('gyro-velocity');
 
     var clip = document.createElement('div');
     clip.className = 'gyro-clip';
