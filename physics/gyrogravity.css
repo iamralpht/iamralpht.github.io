@@ -1,0 +1,57 @@
+.gyro-gravity { position: relative; }
+
+.gyro-gravity>.gyro-clip {
+    display: inline-block;
+    position: relative;
+
+    overflow: hidden;
+
+    width: 320px;
+    height: 480px;
+}
+.gyro-gravity>.gyro-clip>.gyro-img {
+    position: absolute;
+    width: 1280px;
+    height: 480px;
+    background-image: url(stonehenge.jpg);
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.gyro-gravity>.gyro-clip>.gyro-metadata {
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 100px; margin: 0;
+    background-image: linear-gradient(transparent, rgba(0,0,0,0.7));
+}
+.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-progress {
+    position: absolute;
+    left: 10px; right: 10px; height: 2px; bottom: 10px;
+    background-color: rgba(255,255,255,0.3);
+    margin: 0;
+}
+.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-progress>.gyro-thumb {
+    position: absolute;
+    width: 80px;
+    left: 0;
+    height: 2px;
+    bottom: 0;
+    margin: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-attribution {
+    position: absolute;
+    font-size: 14px;
+    text-align: left;
+    bottom: 20px;
+    left: 10px;
+    right: 10px;
+    margin: 0;
+}
+.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-attribution>a {
+    text-decoration: none;
+    color: white;
+}
+.gyro-gravity>.gyro-clip>.gyro-metadata>.gyro-attribution>a:hover {
+    text-decoration: underline;
+}
+

@@ -40,6 +40,10 @@
 <script src="scrollingexample.js"></script>
 <link href="scrollingexample.css" rel="stylesheet"></link>
 
+<!-- Gyro-controlled gravity -->
+<script src="gyrogravity.js"></script>
+<link href="gyrogravity.css" rel="stylesheet"></link>
+
 <link href="controls.css" rel="stylesheet"></link>
 <style>
 body {
@@ -172,9 +176,7 @@ li {
 <p>So far we've used press and velocity as inputs, and we've mapped the output of the physics simulation to either the translation or scale of the object. Our devices have a bunch of sensors and we can control more than just the initial velocity.</p>
 <p>Here's an example where (on mobile only) we use the gyroscope to control the direction of gravity to pan around in a photo. This is similar to Facebook Paper's photo viewer, <a href="http://subjc.com/facebook-paper-photo-panner/">but Facebook Paper uses a direct relationship between the gyro and the scroll position</a>.</p>
 </div>
-<div class="example">
-Scrolling photos using gravity controlled by the gyroscope. Mobile only.
-</div>
+<div class="example" id="gyroGravityExample"></div>
 <div class="content">
 <p>We can also trigger springs based on proximity. <a href="/fab">I wrote up this example previously</a>. Each face circle has a spring which is triggered when the cursor gets close. The motion of the face is then controlled by both the spring and the cursor position: the spring controls how far the face should be between its natural home position and where the cursor currently is.</p>
 </div>
