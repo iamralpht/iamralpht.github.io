@@ -80,7 +80,8 @@ function GyroVelocityDemo(element) {
 
     var model = new ClampedVelocity(-max, 0);
 
-    this._animation = animation(model, function() {
+    // Update the image and scrollbar positions from the physics model.
+    function update() {
         var transform = 'translateX(' + model.x() + 'px) translateZ(0)';
         img.style.webkitTransform = transform;
         img.style.transform = transform;
@@ -88,7 +89,9 @@ function GyroVelocityDemo(element) {
         var progressTransform = 'translateX(' + model.progress() * progressMax + 'px) translateZ(0)';
         thumb.style.webkitTransform = progressTransform;
         thumb.style.transform = progressTransform;
-    });
+    }
+
+    this._animation = animation(model, update);
 
     // This is a really crummy hack to find the single axis which is
     // interesting. Really we should do more math here and normalize
@@ -109,14 +112,34 @@ function GyroVelocityDemo(element) {
         return y;
     }
 
+    // Update the physics model whenever we get a new acceleration value.
+    // We multiply it by a made up constant and use it for the velocity of
+    // the image.
+    function onDeviceMotion(e) {
+        var accel = getInterestingAcceleration(e);
+        // 200 and -ve are made up constants that felt good on a few devices.
+        model.reconfigure(-accel * 200);
+    }
 
-    window.addEventListener('devicemotion',
-        function(e) {
-            var accel = getInterestingAcceleration(e);
-            // 200 and -ve are made up constants that felt good on a few devices.
-            model.reconfigure(-accel * 200);
-        } ,
-        true);
+    var self = this;
+
+    // We only start the animation and listen to the gyro events when the example
+    // is visible. This is because driving layer updates can cause chunkiness in
+    // the other examples...
+    window.addEventListener('scroll', function() {
+        var rect = element.getBoundingClientRect();
+        var visible = rect.bottom > 0 && rect.top < window.innerHeight;
+        if (!visible && self._animation) {
+            window.removeEventListener('devicemotion', onDeviceMotion, true);
+            self._animation.cancel();
+            self._animation = null;
+        } else if (visible && !self._animation) {
+            // listen for events and updating the physics model.
+            window.addEventListener('devicemotion', onDeviceMotion, true);
+            // start updating the position from the physics model.
+            self._animation = animation(model, update);
+        }
+    }, false);
 }
 
 window.addEventListener('load', function() { new GyroVelocityDemo(document.getElementById('gyroVelocityExample')); }, false);
