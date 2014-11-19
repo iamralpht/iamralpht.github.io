@@ -54,7 +54,7 @@ function Panel(panelName, rightOfPanel) {
 Panel.prototype.element = function() { return this._element; }
 Panel.prototype.update = function() {
     var x = this.x.valueOf();
-    var tx = 'translateX(' + x + 'px)';
+    var tx = 'translateX(' + x + 'px) translateZ(0)';
     this._element.style.webkitTransform = tx;
     this._element.style.transform = tx;
 }
