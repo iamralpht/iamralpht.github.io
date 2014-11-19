@@ -31,7 +31,7 @@ var solver = new c.SimplexSolver();
 // solver.
 // Cassowary.js is pretty gnarly in places.
 //
-function Panel(panelName, rightOfPanel) {
+function Panel(panelName, rightOfPanel, i) {
     this._name = panelName;
     this._rightOf = rightOfPanel;
     this._element = document.createElement('div');
@@ -39,15 +39,29 @@ function Panel(panelName, rightOfPanel) {
     this._element.innerText = panelName;
  
     this.x = new c.Variable({ name: panelName + '-x' });
+    this.right = c.plus(this.x, 250);
+
     if (rightOfPanel) {
         // There's a panel that we are positioned to the right of.
         // So we want to be at least 10px right of its left edge
         // But no more than 250px right of its left edge (or 0px right of its right edge?).
-        solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), medium, 0));
-        solver.add(leq(this.x, c.plus(rightOfPanel.x, new c.Expression(250)), medium, 0));
+
+        // What's going on here? If I make the constraint relative to the right-of panel
+        // then the panels expand and contract in an unpleasing order (asymmetrically).
+        // If I make it an absolute constraint then it works OK... Am I not specifying
+        // the inequality correctly?
+
+        //solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), weak, 0));
+        solver.add(geq(this.x, i * 10, weak, 0));
+        solver.add(leq(this.x, rightOfPanel.right, weak, 0));
+        // This is pretty weird. Make sure that the gap between us and the panel next to us
+        // is bigger than the gap it has.
+        //this.gap = c.minus(this.x, rightOfPanel.x);
+        //solver.add(geq(this.gap, rightOfPanel.gap, strong, 0));
     } else {
         // We're the first panel. Pin to the left edge.
-        solver.add(eq(this.x, new c.Expression(0), medium, 0));
+        solver.add(eq(this.x, new c.Expression(0), weak, 0));
+        this.gap = new c.Expression(0);
     }
     this.update();
 }
@@ -62,11 +76,13 @@ Panel.prototype.update = function() {
 var lastPanel = null;
 var panels = [];
 for (var i = 0; i < 5; i++) {
-    var p = new Panel('Panel ' + i, lastPanel);
+    var p = new Panel('Panel ' + i, lastPanel, i);
     lastPanel = p;
     panels.push(p);
     document.body.appendChild(p.element());
 }
+
+solver.add(weakStay(lastPanel.x));
 
 solver.solve();
 
@@ -79,15 +95,17 @@ addTouchOrMouseListener(lastPanel.element(),
 {
     onTouchStart: function() {
         this._startX = lastPanel.x.valueOf();
-        solver.addEditVar(lastPanel.x).beginEdit();
+        solver.addEditVar(lastPanel.x, medium).beginEdit();
         update();
     },
     onTouchMove: function(dx) {
         solver.suggestValue(lastPanel.x, this._startX + dx).resolve();
+        console.log('solver: ' + solver.toString(), solver);
         update();
     },
     onTouchEnd: function() {
         solver.endEdit();
+        solver.resolve();
         update();
     }
 
