@@ -26,10 +26,33 @@ function ButtonDemo(element) {
 
     // Create our CSS button. All of the animation on this button is declared in button.css using the
     // :active pseudoselector as the trigger.
-    this._cssButton = document.createElement('div');
-    this._cssButton.className = 'button css-button';
-    this._cssButton.innerText = 'Press Here';
-    this._element.appendChild(this._cssButton);
+    var col = document.createElement('div');
+    col.className = 'button-column';
+
+    var cssButton = document.createElement('div');
+    cssButton.className = 'button css-button';
+    cssButton.innerText = 'CSS Button';
+
+    col.appendChild(cssButton);
+    // Allow control of the CSS transition duration.
+    var transitionDuration = 200;
+    var controls = new Controls();
+    controls.addText('CSS Transition');
+    controls.addModel([
+        {
+            label: 'Duration (ms)',
+            min: 30, max: 1000,
+            read: function() { return transitionDuration; },
+            write: function(dur) {
+                transitionDuration = dur;
+                cssButton.style.webkitTransitionDuration = dur + 'ms';
+                cssButton.style.transitionDuration = dur + 'ms';
+            }
+        }
+    ]);
+    col.appendChild(controls.element());
+
+    this._element.appendChild(col);
 
     // Create the spring that will control the scale of the spring button. 400 is the spring constant
     // and 20 is the damping. This will be an underdamped spring.
@@ -38,20 +61,24 @@ function ButtonDemo(element) {
     // full scale button.
     this._spring.snap(1);
 
+    col = document.createElement('div');
+    col.className = 'button-column';
     // Create the spring button.
     this._springButton = document.createElement('div');
     this._springButton.className = 'button spring-button';
-    this._springButton.innerText = 'Press Here';
-    this._element.appendChild(this._springButton);
+    this._springButton.innerText = 'Spring Button';
+
+    col.appendChild(this._springButton);
+    this._element.appendChild(col);
 
     // Listen for touch/mouse events on the spring button. We'll get called back on our onTouchXYZ
     // methods.
     addTouchOrMouseListener(this._springButton, this);
 
     // Add some controls so that the user can play with the spring values.
-    var controls = new Controls();
+    controls = new Controls();
     controls.addModel(this._spring, 'Button Spring Controls');
-    this._element.appendChild(controls.element());
+    col.appendChild(controls.element());
 }
 ButtonDemo.prototype.onTouchStart = function() {
     // Set the end-point of the spring to 0. This means the spring will start moving toward that

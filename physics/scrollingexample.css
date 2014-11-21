@@ -17,6 +17,9 @@
     position: absolute;   
     top: 0; left: 0; right: 0;
     margin: 0;
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
 }
 .scrollingdemo .scrolling-list-item {
     margin: 0;

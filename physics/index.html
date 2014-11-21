@@ -141,6 +141,7 @@ li {
 <ul>
  <li>Try slamming the lock screen into the ground!</li>
  <li>What happens when you set the Rebound to 1.0? What about 1.1?</li>
+ <li>Press <b>Reset Position</b> and then try setting the acceleration to a negative value. Now we've changed the UI so that any upwards drag will unlock the machine&mdash;like hiding the notification list on Android or iOS. Physics simulations can give a very different feel depending on these constants, so they're very flexible!</li>
 </ul>
 <p>Now we're going to compare constant deceleration (which is almost the same as the gravity example above; it just means the acceleration constant is negative) with friction. When I first started learning about physics simulations I wrote the constant deceleration simulation and used it for everything, including scrolling. The result was terrible! My scrolling content would stop too abruptly and have a bad feel compared to everyone else's. For scrolling, as well as sliders, friction is a much better feeling simulation.</p>
 <p>In this example you can see the difference between constant deceleration and friction. Give each of the sliders a short, slow fling and watch how they slow down.</p>

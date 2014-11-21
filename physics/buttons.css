@@ -3,16 +3,23 @@
     -webkit-user-select: none;
 }
 
+.buttondemo .button-column {
+    display: inline-block;
+    text-align: center;
+    vertical-align: top;
+    margin: 0 10px;
+}
+
 .buttondemo .button {
     display: inline-block;
     padding: 20px;
     margin: 10px;
     border-radius: 10px;
     min-width: 20%;
-    background-color: blue;
+    background-color: #0d47a1;
 }
 .buttondemo .spring-button {
-    background-color: green;
+    background-color: #1b5e20;
 }
 /*
  * We can actually make the CSS button do everything declaratively. Even though the end result

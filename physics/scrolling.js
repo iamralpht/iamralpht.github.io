@@ -122,7 +122,9 @@ ScrollHandler.prototype.onTouchEnd = function(dx, dy, velocity) {
     this._animation = animation(this._scroll, function() {
         var pos = self._scroll.x();
         self._position = pos;
-        var transform = 'translateY(' + pos + 'px)';
+        // The translateZ is to help older WebKits not collapse this layer into a non-composited layer
+        // since they're also slow at repaints.
+        var transform = 'translateY(' + pos + 'px) translateZ(0)';
         self._element.style.webkitTransform = transform;
         self._element.style.transform = transform;
     });
