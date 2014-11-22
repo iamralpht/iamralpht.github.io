@@ -112,8 +112,8 @@ li {
 
 <div class="content">
 <ul>
- <li>Push on each button periodically. How much energy can you build up by pressing and releasing at opportune moments when the spring has a low damping?</li>
- <li>How does the spring constant relate to the speed of motion? How are damping and the spring constant related?</li>
+ <li>Push on each button periodically. Try setting the damping to 1 and see how large you can make the button.</li>
+ <li>How does the spring constant relate to the speed of motion when you have a small damping? How are damping and the spring constant related?</li>
 </ul>
 <!-- importance of conserving momentum -->
 <p><b>Conserving Momentum</b></p>
@@ -141,7 +141,7 @@ li {
 <ul>
  <li>Try slamming the lock screen into the ground!</li>
  <li>What happens when you set the Rebound to 1.0? What about 1.1?</li>
- <li>Press <b>Reset Position</b> and then try setting the acceleration to a negative value. Now we've changed the UI so that any upwards drag will unlock the machine&mdash;like hiding the notification list on Android or iOS. Physics simulations can give a very different feel depending on these constants, so they're very flexible!</li>
+ <li>Press "Reset Position" and then try setting the acceleration to a negative value. Now we've changed the UI so that any upwards drag will unlock the machine&mdash;like hiding the notification list on Android or iOS. Physics simulations can give a very different feel depending on these constants.</li>
 </ul>
 <p>Now we're going to compare constant deceleration (which is almost the same as the gravity example above; it just means the acceleration constant is negative) with friction. When I first started learning about physics simulations I wrote the constant deceleration simulation and used it for everything, including scrolling. The result was terrible! My scrolling content would stop too abruptly and have a bad feel compared to everyone else's. For scrolling, as well as sliders, friction is a much better feeling simulation.</p>
 <p>In this example you can see the difference between constant deceleration and friction. Give each of the sliders a short, slow fling and watch how they slow down.</p>
@@ -167,6 +167,9 @@ li {
 </div>
 <div class="example" id="scrollingExample"></div>
 <div class="content">
+<ul>
+ <li>Try setting the friction to the smallest value (0.001) and the largest value (0.1) and notice how it changes how far your flicks cause the list to scroll. iOS actually uses different friction coefficients in different places&mdash;In Contacts your flicks take you a lot further than they do in Safari, for example.</li>
+</ul>
 <p>Once you understand how something like scrolling is constructed, it's easy to make things like the "infinite" linear scroller in iTunes Radio on iOS 7. Here we have a constant velocity giving us a linear animation. Note: If you think you might ever drop a frame, <i>don't</i> use linear translation animations. Humans are amazing at tracking linear motion, so dropped frames will be perceived as very jarring. In contrast, humans seem bad at tracking things zooming in or out, so you can drop all kinds of frames in a zoom animation and most people won't notice.</p>
 <p>This example uses a tweaked friction simulation that has a constant velocity which can be temporarily overcome by flicking left or right. Notice what happens when your imparted momentum is consumed and the scroller resumes its previous motion. It's smooth and seamless.</p>
 </div>

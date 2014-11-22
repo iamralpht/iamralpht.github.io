@@ -24,7 +24,8 @@
 }
 .slider-control-row {
     position: relative;
-    height: 25px;
+    height: 30px;
+    line-height: 30px;
 }
 .slider-control-row>.label {
     position: absolute;
@@ -42,4 +43,100 @@
     position: absolute;
     right: 0px;
     width: 40px;
+}
+
+.controls .slider {
+    display: inline-block;
+    position: absolute;
+    left: 155px;
+    width: 210px;
+    height: 30px;
+}
+
+.controls .slider>.slider-min-label {
+    left: -30px;
+    text-align: right;
+}
+.controls .slider>.slider-max-label {
+    right: -30px;
+    text-align: left;
+}
+
+.controls .slider>.label {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    -webkit-transition: opacity 200ms;
+    transition: opacity 200ms;
+    opacity: 0;
+}
+.controls .slider.active>.label {
+    opacity: 1;
+}
+
+.controls .slider::before {
+    display: block;
+    content: ' ';
+
+    position: absolute;
+    width: 180px;
+    left: 15px;
+    top: 12px;
+    height: 6px;
+
+    border-radius: 3px;
+    background-color: #202020;
+    box-shadow: inset 0 1px 1px black, 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+.controls .slider>.thumb {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    box-sizing: border-box;
+
+    border-radius: 15px;
+    box-shadow: inset 0 1px 1px white, 0 1px 1px black;
+    border: 1px solid black;
+    background: #0d47a1;
+
+    will-change: transform;
+    -webkit-transform: translateZ(0);
+}
+.controls .slider>.thumb>.value-bg {
+    will-change: transform, opacity;
+    pointer-events: none;
+    position: absolute;
+    left: -15px;
+    width: 60px;
+    height: 30px;
+    -webkit-transform: scale(0.6) translateZ(0);
+    transform: scale(0.6);
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    -webkit-transition: -webkit-transform 200ms, opacity 100ms 50ms;
+    transition: transform 200ms, opacity 100ms 50ms;
+}
+.controls .slider>.thumb>.value {
+    will-change: transform;
+    pointer-events: none;
+    position: absolute;
+    left: -15px;
+    width: 60px;
+    height: 30px;
+    -webkit-transform: scale(0.6) translateZ(0);
+    transform: scale(0.6);
+    text-align: center;
+
+    -webkit-transition: -webkit-transform 200ms;
+    transition: transform 200ms;
+}
+.controls .slider.active>.thumb>.value {
+    transform: translateY(-50px);
+    -webkit-transform: translateY(-50px) translateZ(0);
+}
+.controls .slider.active>.thumb>.value-bg {
+    transform: translateY(-50px);
+    -webkit-transform: translateY(-50px) translateZ(0);
+    opacity: 1;
 }
