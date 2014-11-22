@@ -275,7 +275,7 @@ function FloatingActionButton(title, image, items) {
 
     this._layout();
 }
-var id = new WebKitCSSMatrix();
+var id = window.WebKitCSSMatrix ? new WebKitCSSMatrix() : -1;
 
 function round(amount, quanta) {
     return (Math.round(amount / quanta) * quanta);
@@ -395,22 +395,30 @@ FloatingActionButton.prototype._updateCursor = function(position, x, isActive) {
 /*
  * Actually create the menu.
  */
-var testMenu = new FloatingActionButton(
-    'Cancel', null,//'img/compose.png', 
-    [
-        { title: 'Paul Krugman', image: 'img/krugman.png' },
-        { title: 'Sophocles', image: 'img/greek.jpg' },
-        { title: 'Ralph Thomas', image: 'img/ralpht.jpg' },
-    ]);
+if (id != -1) {
+    var testMenu = new FloatingActionButton(
+        'Cancel', null,//'img/compose.png', 
+        [
+            { title: 'Paul Krugman', image: 'img/krugman.png' },
+            { title: 'Sophocles', image: 'img/greek.jpg' },
+            { title: 'Ralph Thomas', image: 'img/ralpht.jpg' },
+        ]);
 
-var phone = document.createElement('div');
-phone.className = 'phone';
-phone.appendChild(testMenu.element());
+    var phone = document.createElement('div');
+    phone.className = 'phone';
+    phone.appendChild(testMenu.element());
 
-var hint = document.createElement('span');
-hint.className = 'hint';
-hint.innerText = 'Drag upwards on the red floating action button and then (without letting go) track sideways on an item';
+    var hint = document.createElement('span');
+    hint.className = 'hint';
+    hint.innerText = 'Drag upwards on the red floating action button and then (without letting go) track sideways on an item';
 
-document.body.appendChild(phone);
-document.body.appendChild(hint);
+    document.body.appendChild(phone);
+    document.body.appendChild(hint);
+} else {
+    var error = document.createElement('span');
+    error.className = 'hint';
+    error.textContent = 'Unfortunately this example only works in WebKit derived browsers.';
+
+    document.body.appendChild(error);
+}
 })();
