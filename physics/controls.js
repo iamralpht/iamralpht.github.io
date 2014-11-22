@@ -30,7 +30,7 @@ Controls.prototype.element = function() { return this._element; }
 function addText(parent, text) {
     var d = document.createElement('div');
     d.className = 'label-control-row';
-    d.innerText = text;
+    d.textContent = text;
     parent.appendChild(d);
     return d;
 }
@@ -57,12 +57,12 @@ function Slider(config, color) {
 
     var minLabel = document.createElement('div');
     minLabel.className = 'slider-min-label label';
-    minLabel.innerText = config.min;
+    minLabel.textContent = config.min;
     this._slider.appendChild(minLabel);
 
     var maxLabel = document.createElement('div');
     maxLabel.className = 'slider-max-label label';
-    maxLabel.innerText = config.max;
+    maxLabel.textContent = config.max;
     this._slider.appendChild(maxLabel);
 
     this._thumb = document.createElement('div');
@@ -129,7 +129,7 @@ Slider.prototype._report = function() {
         else if (this._model.step == 0.01) fixedLength = 2;
         stringified = stringified.toFixed(fixedLength);
     }
-    this._value.innerText = stringified;
+    this._value.textContent = stringified;
     if (this._model.onchange) this._model.onchange(mapped);
 }
 
@@ -138,7 +138,7 @@ function addSlider(parent, config) {
     d.className = 'slider-control-row';
     var label = document.createElement('span');
     label.className = 'label';
-    label.innerText = config.label;
+    label.textContent = config.label;
     d.appendChild(label);
 
     var slider = new Slider(config);

@@ -31,7 +31,7 @@ function ButtonDemo(element) {
 
     var cssButton = document.createElement('div');
     cssButton.className = 'button css-button';
-    cssButton.innerText = 'CSS Button';
+    cssButton.textContent = 'CSS Button';
 
     col.appendChild(cssButton);
     // Allow control of the CSS transition duration.
@@ -66,7 +66,7 @@ function ButtonDemo(element) {
     // Create the spring button.
     this._springButton = document.createElement('div');
     this._springButton.className = 'button spring-button';
-    this._springButton.innerText = 'Spring Button';
+    this._springButton.textContent = 'Spring Button';
 
     col.appendChild(this._springButton);
     this._element.appendChild(col);

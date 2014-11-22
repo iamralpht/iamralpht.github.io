@@ -54,7 +54,7 @@ function ScrollingDemo(element) {
         img.style.backgroundImage = 'url(' + m.url + ')';
         d.appendChild(img);
         var text = document.createElement('span');
-        text.innerText = m.band;
+        text.textContent = m.band;
         d.appendChild(text);
         this._scroller.appendChild(d);
     }
