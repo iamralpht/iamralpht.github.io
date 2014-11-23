@@ -96,6 +96,33 @@ li {
     width: 100%;
     height: 500px;
 }
+
+.about {
+    position: relative;
+    width: 100%;
+    background-color: #e0e0e0;
+    margin: 0;
+    padding: 15px 10%;
+    padding-bottom: 40px;
+    box-sizing: border-box;
+    font-size: 18px;
+}
+.ralpht {
+    background-image: url(../ralpht.jpg);
+    background-size: cover;
+    position: absolute;
+    left: 20px;
+    width: calc(10vw - 40px);
+    height: calc(10vw - 40px);
+    margin-right: 20px;
+    border-radius: 100px;
+    border: 2px solid white;
+    box-shadow: 0px 1px 2px black;
+}
+.about>.title {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
 </style>
 </head>
 <body>
@@ -116,7 +143,7 @@ li {
  <li>How does the spring constant relate to the speed of motion when you have a small damping? How are damping and the spring constant related?</li>
 </ul>
 <!-- importance of conserving momentum -->
-<p><b>Conserving Momentum</b></p>
+<p><b>Conserving momentum</b></p>
 <p>In the button example above, the user input is a binary press (the button is either being pressed or not). In most of the other examples on this page, we'll instead seed the physics simulation with the current momentum and position of an object. To simplify the code, I always use a mass of 1, which means that velocity and momentum are the same number and thus interchangeable.</p>
 <p>Why is it important to conserve momentum, though? What happens if we create animations that ignore the momentum that the user imparted to the UI?</p>
 <p>This example is the UI for navigating back in <a href="http://www.android.com/wear/">Android Wear</a>: you drag from the left to the right and release. One version ignores your momentum and just runs the same animation every time. The other example rolls the momentum into an constant acceleration (gravity) simulation if you drag with enough velocity or beyond the half-way point. If you don't drag far enough or drag in the other direction then a spring is used to take the menu back to where it started.</p>
@@ -132,7 +159,7 @@ li {
 <p><a href="http://munews.missouri.edu/news-releases/2012/0124-babies-are-born-with-%E2%80%9Cintuitive-physics%E2%80%9D-knowledge-says-mu-researcher/">Recent research suggests we have an understanding of conservation of momentum from birth</a>. I believe that UI which upholds these strongly held expectations is more pleasing than UI that ignores them.</p>
 
 <!-- different simulations -->
-<p><b>Different Simulations</b></p>
+<p><b>Different simulations</b></p>
 <p>We're going to look at three simple simulations: springs, constant acceleration (or gravity) and friction. These sound pretty boring, but combined with touch we can come up with some good interactions.</p>
 <p>In this example we're using gravity to create a lock screen like the one in Windows 8. When you drag up on the image and release, it keeps its momentum but is pulled down by a constant acceleration. If you don't give it enough momentum, then it falls back down and the machine stays locked. This is a physics-based variant of slide-to-unlock.</p>
 </div>
@@ -153,7 +180,7 @@ li {
  <li>When the thumb hits the end of the slider it just stops moving, and all momentum is immediately lost. What can we do so that we're not throwing away all of the thumb's momentum? We could drag the whole control, we could let the thumb go over the end slightly, or we could even squish the thumb a bit!</li>
 </ul>
 <!-- combining simulations: fall, scroll -->
-<p><b>Combining Simulations</b></p>
+<p><b>Combining simulations</b></p>
 <p>So far we've used individual simulations (spring, gravity and friction) to create various interactions and animations. We can actually combine them to create even more interesting systems. In my recent game for Android, <a href="https://play.google.com/store/apps/details?id=com.infinite_imagination.letterplex">Letterplex</a>, I made the dialogs fall from the top of the screen and land in the middle (as they do in the iOS inspiration <a href="http://www.atebits.com/letterpress/">Letterpress</a>). However when they reach the middle of the screen, they bounce slightly as if landing on a cloud (or an overdamped spring).</p>
 <p>In this non-interactive example you can see how the combination of gravity and a spring makes a nice feeling animation. Hit "Reset Position" to start the animation over.</p>
 </div>
@@ -221,6 +248,12 @@ li {
  <li>The squishy dialog is neat! I thought it'd look really bad, but I actually quite like it. Coincidentally squash and stretch is <a href="http://en.wikipedia.org/wiki/12_basic_principles_of_animation#Squash_and_stretch">the most important of Disney's 12 Principles of Animation</a>.</li>
 </ul>
 <p>The commented JavaScript source code to all of the above examples is available <a href="https://github.com/iamralpht/iamralpht.github.io/tree/master/physics">on github</a>. Also check out <a href="https://github.com/iamralpht/gravitas">Gravitas</a>, a Java library I wrote which contains many of the physical models used here.</p>
+</div>
+<div class="about">
+<div class="ralpht"></div>
+<div class="title">About the author</div>
+Ralph Thomas is a former high-school physics student who has spent the past 15 years focused on user interface implementation. A "full-stack" client engineer, Ralph has written high-performance mobile UIs from kernel input drivers, through hardware-optimized OpenGL ES-based 2D graphics engines, to physics engines and user interface and applications including WebKit performance enhancements. Follow Ralph on <a href="https://twitter.com/i_am_ralpht">Twitter</a> or send him <a href="mailto:ralpht@gmail.com">email</a>.
+</div>
 </div>
 </body>
 </html>

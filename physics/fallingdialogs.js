@@ -118,7 +118,7 @@ function FallingDialogsDemo(element, squishy, rotate) {
         };
         controls.addModel([rotateModel]);
     }
-    controls.addResetButton(dialog.reset.bind(dialog), 'Restart Animation');
+    controls.addResetButton(dialog.reset.bind(dialog), 'Start Animation');
     this._element.appendChild(dialog.element());
     this._element.appendChild(controls.element());
 }

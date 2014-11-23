@@ -110,7 +110,7 @@ function SlidersDemo(element) {
         return config;
     }
 
-    var decelSlider = new Slider(decelerate, 'Decelerating Slider', '#0d47a1');
+    var decelSlider = new Slider(decelerate, 'Decelerating Slider', '#795548');
     this._element.appendChild(decelSlider.element());
 
     // Make a friction-slowed slider.
