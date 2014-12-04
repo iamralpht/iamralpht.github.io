@@ -131,5 +131,5 @@ function makeExample(text, useRelativeLeftEdgeConstraint) {
 }
 
 makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
-makeExample("Here the left edge of each panel is constrained to be greater than the left edge of the previous panel, plus 10 (the first panel's left edge is constrained to equal 0). Notice how Panel 1 is revealed first. I want to express that the x of each panel should be minimized (respecting the constraints and stays), but I don't know how to do that.", true);
+makeExample("Here the left edge of each panel is constrained to be greater than the left edge of the previous panel, plus 10 (the first panel's left edge is constrained to equal 0). Notice how Panel 1 is revealed first -- or change directions a few times while dragging and notice how the panels get bunched up in the middle... I want to express that the x of each panel should be minimized (respecting the constraints and stays), but I don't know how to do that.", true);
 
