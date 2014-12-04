@@ -25,13 +25,12 @@ var requiredStay = function(v, w) { return stay(v, required, w||0); }
 
 var solver = new c.SimplexSolver();
 //
-// Test to create the Twitter for iPad panels movement using cassowary. I want to
-// have constraints that are modulo or OR, but I don't think I can do that.
-// I'm not sure if I can just throw those on top or if I need some other kind of
-// solver.
-// Cassowary.js is pretty gnarly in places.
+// Test to create the Twitter for iPad panels movement using the cassowary constraints solver.
+// The goal is to have the panels collapse to mostly overlap, or fan out with each panel
+// pulling the one underneath it. Crucially, though, the expand and collapse has to be symmetrical,
+// and this is what I've struggled with. 
 //
-function Panel(panelName, rightOfPanel, i) {
+function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint) {
     this._name = panelName;
     this._rightOf = rightOfPanel;
     this._element = document.createElement('div');
@@ -46,14 +45,22 @@ function Panel(panelName, rightOfPanel, i) {
         // So we want to be at least 10px right of its left edge
         // But no more than 250px right of its left edge (or 0px right of its right edge?).
 
+        solver.add(leq(this.x, rightOfPanel.right, weak, 0));
         // What's going on here? If I make the constraint relative to the right-of panel
         // then the panels expand and contract in an unpleasing order (asymmetrically).
-        // If I make it an absolute constraint then it works OK... Am I not specifying
-        // the inequality correctly?
+        // If I make it an absolute constraint then it works OK...
+        //
+        // What I want to do is say: minimize this value respecting the constraints and
+        // whatever stays are set.
 
-        //solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), weak, 0));
-        solver.add(geq(this.x, i * 10, weak, 0));
-        solver.add(leq(this.x, rightOfPanel.right, weak, 0));
+        if (useRelativeLeftEdgeConstraint)
+            solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), weak, 0));
+        else
+            solver.add(geq(this.x, i * 10, weak, 0));
+
+        // Failed experiment to try to express what I wanted as a constraint on the gap
+        // between a panel and its predecessors:
+
         // This is pretty weird. Make sure that the gap between us and the panel next to us
         // is bigger than the gap it has.
         //this.gap = c.minus(this.x, rightOfPanel.x);
@@ -73,40 +80,56 @@ Panel.prototype.update = function() {
     this._element.style.transform = tx;
 }
 
-var lastPanel = null;
-var panels = [];
-for (var i = 0; i < 5; i++) {
-    var p = new Panel('Panel ' + i, lastPanel, i);
-    lastPanel = p;
-    panels.push(p);
-    document.body.appendChild(p.element());
-}
-
-solver.add(weakStay(lastPanel.x));
-
-solver.solve();
-
-function update() {
-    for (var i = 0; i < panels.length; i++)
-        panels[i].update();
-}
-
-addTouchOrMouseListener(lastPanel.element(),
-{
-    onTouchStart: function() {
-        this._startX = lastPanel.x.valueOf();
-        solver.addEditVar(lastPanel.x, medium).beginEdit();
-        update();
-    },
-    onTouchMove: function(dx) {
-        solver.suggestValue(lastPanel.x, this._startX + dx).resolve();
-        console.log('solver: ' + solver.toString(), solver);
-        update();
-    },
-    onTouchEnd: function() {
-        solver.endEdit();
-        solver.resolve();
-        update();
+function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
+    var lastPanel = null;
+    var panels = [];
+    for (var i = 0; i < 5; i++) {
+        var p = new Panel('Panel ' + i, lastPanel, i, useRelativeLeftEdgeConstraint);
+        lastPanel = p;
+        panels.push(p);
+        parentElement.appendChild(p.element());
     }
 
-});
+    solver.add(weakStay(lastPanel.x));
+
+    solver.solve();
+
+    function update() {
+        for (var i = 0; i < panels.length; i++)
+            panels[i].update();
+    }
+
+    addTouchOrMouseListener(lastPanel.element(),
+    {
+        onTouchStart: function() {
+            this._startX = lastPanel.x.valueOf();
+            solver.addEditVar(lastPanel.x, medium).beginEdit();
+            update();
+        },
+        onTouchMove: function(dx) {
+            solver.suggestValue(lastPanel.x, this._startX + dx).resolve();
+            update();
+        },
+        onTouchEnd: function() {
+            solver.endEdit();
+            solver.resolve();
+            update();
+        }
+    });
+}
+
+function makeExample(text, useRelativeLeftEdgeConstraint) {
+    var exampleParent = document.createElement('div');
+    exampleParent.className = 'cards-parent';
+    exampleParent.textContent = text;
+    var container = document.createElement('div');
+    container.className = 'cards-container';
+    exampleParent.appendChild(container);
+    makePanelsExample(container, useRelativeLeftEdgeConstraint);
+
+    document.body.appendChild(exampleParent);
+}
+
+makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
+makeExample("Here the left edge of each panel is constrained to be greater than the left edge of the previous panel, plus 10 (the first panel's left edge is constrained to equal 0). Notice how Panel 1 is revealed first. I want to express that the x of each panel should be minimized (respecting the constraints and stays), but I don't know how to do that.", true);
+
