@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>pretend constraint system</title>
+<style>
+body {
+    background-color: #d0d0d0;
+}
+.scroll-outer {
+    position: absolute;
+    overflow: hidden;
+    top: 50px;
+    left: 10px;
+    width: 200px;
+    height: 200px;
+}
+.scroll-content {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 400px; /* significant, js says scrollport is 200px */
+    background-color: blue;
+    color: white;
+    font-size: 30px;
+    overflow: hidden;
+    pointer-events: none;
+}
+</style>
+</head>
+<body>
+<script src="touch.js"></script>
+<script src="pc.js"></script>
+</body>
+</html>
