@@ -30,7 +30,7 @@ var solver = new c.SimplexSolver();
 // pulling the one underneath it. Crucially, though, the expand and collapse has to be symmetrical,
 // and this is what I've struggled with. 
 //
-function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint) {
+function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint, physicsConstraints) {
     this._name = panelName;
     this._rightOf = rightOfPanel;
     this._element = document.createElement('div');
@@ -45,7 +45,7 @@ function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint) {
         // So we want to be at least 10px right of its left edge
         // But no more than 250px right of its left edge (or 0px right of its right edge?).
 
-        solver.add(leq(this.x, rightOfPanel.right, weak, 0));
+        solver.add(leq(this.x, rightOfPanel.right, medium, 0));
         // What's going on here? If I make the constraint relative to the right-of panel
         // then the panels expand and contract in an unpleasing order (asymmetrically).
         // If I make it an absolute constraint then it works OK...
@@ -53,10 +53,11 @@ function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint) {
         // What I want to do is say: minimize this value respecting the constraints and
         // whatever stays are set.
 
-        if (useRelativeLeftEdgeConstraint)
-            solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), weak, 0));
-        else
-            solver.add(geq(this.x, i * 10, weak, 0));
+        if (useRelativeLeftEdgeConstraint) {
+            solver.add(eq(this.x, 0, weak));
+            solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), medium));
+        } else
+            solver.add(geq(this.x, i * 10, medium, 0));
 
         // Failed experiment to try to express what I wanted as a constraint on the gap
         // between a panel and its predecessors:
@@ -67,7 +68,12 @@ function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint) {
         //solver.add(geq(this.gap, rightOfPanel.gap, strong, 0));
     } else {
         // We're the first panel. Pin to the left edge.
-        solver.add(eq(this.x, new c.Expression(0), weak, 0));
+        // Note that weird things happen when collapsing using relative constraints if the priority is zero...
+        //  XXX: Need to understand what the priority means? Is it just which constraint is relaxed first?
+        solver.add(eq(this.x, new c.Expression(0), weak, 100));
+        if (physicsConstraints) {
+            physicsConstraints.push({ variable: this.x, value: 0 });
+        }
         this.gap = new c.Expression(0);
     }
     this.update();
@@ -83,18 +89,29 @@ Panel.prototype.update = function() {
 function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
     var lastPanel = null;
     var panels = [];
+    var physicsConstraints = [];
     for (var i = 0; i < 5; i++) {
-        var p = new Panel('Panel ' + i, lastPanel, i, useRelativeLeftEdgeConstraint);
+        var p = new Panel(i + ' Panel ' + i, lastPanel, i, useRelativeLeftEdgeConstraint, physicsConstraints);
         lastPanel = p;
         panels.push(p);
         parentElement.appendChild(p.element());
     }
 
-    solver.add(weakStay(lastPanel.x));
-
+    solver.add(mediumStay(lastPanel.x));
     solver.solve();
 
+    function resolvePhysics() {
+        for (var i = 0; i < physicsConstraints.length; i++) {
+            var pc = physicsConstraints[i];
+            if (pc.variable.valueOf() == pc.value)
+                continue;
+            console.log('variable: ' + pc.variable.valueOf() + ' val: ' + pc.value);
+            console.log('physics violation');
+        }
+    }
+
     function update() {
+        resolvePhysics();
         for (var i = 0; i < panels.length; i++)
             panels[i].update();
     }
@@ -103,7 +120,7 @@ function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
     {
         onTouchStart: function() {
             this._startX = lastPanel.x.valueOf();
-            solver.addEditVar(lastPanel.x, medium).beginEdit();
+            solver.addEditVar(lastPanel.x, strong).beginEdit();
             update();
         },
         onTouchMove: function(dx) {
@@ -131,5 +148,5 @@ function makeExample(text, useRelativeLeftEdgeConstraint) {
 }
 
 makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
-makeExample("Here the left edge of each panel is constrained to be greater than the left edge of the previous panel, plus 10 (the first panel's left edge is constrained to equal 0). Notice how Panel 1 is revealed first -- or change directions a few times while dragging and notice how the panels get bunched up in the middle... I want to express that the x of each panel should be minimized (respecting the constraints and stays), but I don't know how to do that.", true);
+makeExample("Here the panel constraints are in terms of the previous panel, so panel[i].left > panel[i-1].left + 10 && panel[i].left < panel[i-1].right. We also say that panel.left == 0 with a weak strength. This makes the panels tend towards the left and not bunch up (so we prefer the minimum possible value. Thanks to Greg Badros for setting me straight on that!", true);
 
