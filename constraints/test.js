@@ -191,7 +191,7 @@ function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
 function makeExample(text, useRelativeLeftEdgeConstraint) {
     var exampleParent = document.createElement('div');
     exampleParent.className = 'cards-parent';
-    exampleParent.textContent = text;
+    exampleParent.innerHTML = text;
     var container = document.createElement('div');
     container.className = 'cards-container';
     exampleParent.appendChild(container);
@@ -200,6 +200,6 @@ function makeExample(text, useRelativeLeftEdgeConstraint) {
     document.body.appendChild(exampleParent);
 }
 
-makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
-makeExample("Here the panel constraints are in terms of the previous panel, so panel[i].left > panel[i-1].left + 10 && panel[i].left < panel[i-1].right. We also say that panel.left == 0 with a weak strength (the first panel's constraint that pins x to 0 has a higher priority than the other panels, meaning that the panels will fully collapse before the first panel travels further left). Thanks to Greg Badros for setting me straight. This is now the correct behavior, except for not having snap points when you release...", true);
+//makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
+makeExample("Here the panel constraints are in terms of the previous panel, so<br><pre>panel[i].left > panel[i-1].left + 10\npanel[i].left < panel[i-1].right\npanel[first].left = 0</pre>But, I've added some touch physics so that Panel 4 keeps moving with friction. Then I made that last constraint enforced by a spring so my constraints really look like:<pre>panel[i].left > panel[i-1].left + 10\npanel[i].left < panel[i-1].right\npanel[first].left = 0 spring</pre>I want to formalize the concept of <b>motion constraints</b> so that I can describe complex interactions in a declarative way." , true);
 
