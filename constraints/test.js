@@ -148,5 +148,5 @@ function makeExample(text, useRelativeLeftEdgeConstraint) {
 }
 
 makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
-makeExample("Here the panel constraints are in terms of the previous panel, so panel[i].left > panel[i-1].left + 10 && panel[i].left < panel[i-1].right. We also say that panel.left == 0 with a weak strength. This makes the panels tend towards the left and not bunch up (so we prefer the minimum possible value. Thanks to Greg Badros for setting me straight on that!", true);
+makeExample("Here the panel constraints are in terms of the previous panel, so panel[i].left > panel[i-1].left + 10 && panel[i].left < panel[i-1].right. We also say that panel.left == 0 with a weak strength (the first panel's constraint that pins x to 0 has a higher priority than the other panels, meaning that the panels will fully collapse before the first panel travels further left). Thanks to Greg Badros for setting me straight. This is now the correct behavior, except for not having snap points when you release...", true);
 
