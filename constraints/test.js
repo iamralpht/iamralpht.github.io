@@ -86,6 +86,32 @@ Panel.prototype.update = function() {
     this._element.style.transform = tx;
 }
 
+function ConstrainedFriction() {
+    this._model = null;
+}
+ConstrainedFriction.prototype.set = function(x, v) {
+    this._model = new Friction(0.001);
+    this._model.set(x, v);
+    this._constrained = false;
+}
+ConstrainedFriction.prototype.hitConstraint = function(value) {
+    if (this._constrained) return;
+    // Only handle hitting one constraint at a time.
+    this._constrained = true;
+    // We really need to know the relationship between the constrained value and our
+    // value. I wonder how we can get that expression?
+    var x = this._model.x();
+    var delta = this._model.x() - value;
+    var velocity = this._model.dx();
+
+    this._model = new Spring(1, 200, 20);
+    this._model.snap(x);
+    this._model.setEnd(delta, velocity);
+}
+ConstrainedFriction.prototype.done = function() { return this._model.done(); }
+ConstrainedFriction.prototype.x = function() { return this._model.x(); }
+ConstrainedFriction.prototype.dx = function() { return this._model.dx(); }
+
 function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
     var lastPanel = null;
     var panels = [];
@@ -100,13 +126,18 @@ function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
     solver.add(mediumStay(lastPanel.x));
     solver.solve();
 
+    var motion = null;
+    var anim = null;
+
     function resolvePhysics() {
         for (var i = 0; i < physicsConstraints.length; i++) {
             var pc = physicsConstraints[i];
             if (pc.variable.valueOf() == pc.value)
                 continue;
-            console.log('variable: ' + pc.variable.valueOf() + ' val: ' + pc.value);
-            console.log('physics violation');
+
+            //console.log('variable: ' + pc.variable.valueOf() + ' val: ' + pc.value);
+            //console.log('physics violation');
+            if (motion) motion.hitConstraint(pc.variable.valueOf() - pc.value);
         }
     }
 
@@ -119,6 +150,13 @@ function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
     addTouchOrMouseListener(lastPanel.element(),
     {
         onTouchStart: function() {
+            if (anim) {
+                anim.cancel();
+                solver.endEdit();
+                solver.resolve();
+                anim = null;
+                motion = null;
+            }
             this._startX = lastPanel.x.valueOf();
             solver.addEditVar(lastPanel.x, strong).beginEdit();
             update();
@@ -127,10 +165,25 @@ function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
             solver.suggestValue(lastPanel.x, this._startX + dx).resolve();
             update();
         },
-        onTouchEnd: function() {
-            solver.endEdit();
-            solver.resolve();
-            update();
+        onTouchEnd: function(dx, dy, v) {
+            // Instead of ending here, create a friction animation.
+            motion = new ConstrainedFriction(0.001);
+            motion.set(this._startX + dx, v.x);
+            anim = animation(motion, function() {
+                var x = motion.x();
+                solver.suggestValue(lastPanel.x, x).resolve();
+                update();
+                if (motion.done()) {
+                    solver.endEdit();
+                    solver.resolve();
+                    update();
+                    anim = null;
+                    motion = null;
+                }
+            });
+            //solver.endEdit();
+            //solver.resolve();
+            //update();
         }
     });
 }
