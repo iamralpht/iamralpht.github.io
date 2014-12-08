@@ -2,38 +2,114 @@
 <head>
 <title>testing cassowary</title>
 <style>
-body {
-    background-color: #d0d0d0;
-}
-.twitter-panel {
+.box {
     position: absolute;
     top: 0; left: 0;
-    height: 150px;
-    width: 250px;
+    text-align: left;
     background-color: white;
+    color: black;
     border-radius: 8px;
-    box-shadow: 0 2px 4px black;
+    box-shadow: 0 1px 4px black;
     padding: 5px;
     font-size: 18px;
     font-family: sans-serif;
+    pointer-events: none;
     will-change: transform;
+    box-sizing: border-box;
 }
 
-.cards-parent {
+.scrolling-example {
+    display: inline-block;
     position: relative;
+    margin-top: 10px;
+    height: 200px;
+    width: 300px;
+    overflow: hidden;
 }
+
 .cards-container {
     position: relative;
+    margin-top: 10px;
     height: 180px;
 }
+
+.constraints {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px;
+    width: 80%;
+    background-color: #f0f0f0;
+    color: black;
+    border-radius: 2px;
+    text-align: left;
+}
+.mono {
+    font-family: monospace;
+    padding: 10px;
+}
 </style>
-</head>
-<body>
+<link href="article.css" rel="stylesheet"></link>
 <script src="touch.js"></script>
 <script src="../physics/animate.js"></script>
 <script src="../physics/friction.js"></script>
 <script src="../physics/spring.js"></script>
 <script src="c.js"></script>
-<script src="test.js"></script>
+<script src="manipulable.js"></script>
+<script src="box.js"></script>
+</head>
+<body>
+<div class="content">
+<div class="title">Sneak Peak: Towards declarative touch interactions</div>
+<div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>December 2014</div>
+<p><b>Note: this is an early draft. I'm really excited about the ideas here and I want to share them with a select few (you!) right now. Most of the words are missing, and I haven't reveiwed or formatted anything that is here. Be warned!</b></p>
+<p>We have layout engines, why not interaction engines?</p>
+<p>Why use constraints? They get us from describing <b>how</b> something should happen to describing <b>what</b> should happen, which is much more concise. This is being declarative.</p>
+<p>Where did constraints systems come from? Sutherland (Sketchpad, constraint relaxation), Borning (ThingLab, relaxation), Badros (Cassowary, simplex). Current applications: Apple AutoLayout (Cassowary).</p>
+<p>Use constraints to define allowable motion, add physics properties to constraints to create <b>motion constraints</b>. For the first time, define touch complex touch interactions declaratively. So simple a graphical tool could do it.</p>
+<p>First example: touch scrolling. Boring. Normally a lot of code, though, check the last post on physics code to see an extremely minimal example. There's a missing feature (motion constraint enforcement while dragging) that means the list items still track 1:1 into the overscroll area.</p>
+</div>
+<div class="example">
+Drag this list vertically<br>
+<div class="scrolling-example" id="scrolling-example"></div>
+<div class="constraints">
+<b>Constraints:</b><br>
+The list items are 40px tall:
+<div class="mono">panel[i].bottom = panel[i].y + 40</div>
+The list items are stacked vertically in a column, with a 10px gap:
+<div class="mono">panel[i].y = panel[i-1].bottom + 10</div>
+<b>Motion constraints:</b><br>
+The first list item can't have a value more than zero:
+<div class="mono">panel[first].y &lt;= 0 <b>spring</b></div>
+The last list item's bottom can't be more than the parent height:
+<div class="mono">panel[last].bottom &gt;= parentHeight <b>spring</b></div>
+</div>
+</div>
+<div class="content">
+<p>Second example is the "Panels" UI from the old Twitter for iPad. It doesn't feel like scrolling at all to use (the panels each half the width of the screen or more, and it implements snap points which I have yet to come up with a motion constraint for). Notice how the panels bounce relative to each other when animating back from the motion constraint.</p>
+</div>
+<div class="example">
+Drag the panels horizontally and release to impart velocity.
+<div class="cards-container" id="twitter-panels-example"></div>
+<div class="constraints">
+<b>Constraints:</b><br>
+The left edge of each panel can't go past the left edge of the panel that came before, plus 10px.
+<div class="mono">panel[i].x &gt; panel[i-1].x + 10</div>
+The left edge of each panel can't go past the right edge of the panel that came before.
+<div class="mono">panel[i].x &lt; panel[i-1].right</div>
+<b>Motion constraint:</b><br>
+The first panel's left edge is pinned to zero. This is motion constraint meaning that when violated it has a physical effect on the system. Here it applies a spring, but it could rebound or completely stop the motion.
+<div class="mono">panel[first].left = 0 <b>spring</b></div>
+</div>
+</div>
+
+<div class="content">
+<p>Android 5 notifications. Just like scrolling but with some extra constraints to do the bunching. I'll add resizing of notifications (like the GMail expandable one) and multitouch next. It falls out of the constraints.</p></div>
+<div class="example">
+<div class="scrolling-example" id="android-notifications"></div>
+</div>
+
+
+
+    <script src="test.js"></script>
 </body>
 </html>

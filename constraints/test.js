@@ -1,7 +1,6 @@
 "use strict";
 
-console.log('lo');
-
+// Helpers to make cassowary.js a bit clearer.
 var weak = c.Strength.weak;
 var medium = c.Strength.medium;
 var strong = c.Strength.strong;
@@ -20,186 +19,165 @@ var stay = function(v, strength, weight) {
 var weakStay =     function(v, w) { return stay(v, weak,     w||0); };
 var mediumStay =   function(v, w) { return stay(v, medium,   w||0); };
 var strongStay =   function(v, w) { return stay(v, strong,   w||0); };
-var requiredStay = function(v, w) { return stay(v, required, w||0); }
+var requiredStay = function(v, w) { return stay(v, required, w||0); };
 
 
-var solver = new c.SimplexSolver();
-//
-// Test to create the Twitter for iPad panels movement using the cassowary constraints solver.
-// The goal is to have the panels collapse to mostly overlap, or fan out with each panel
-// pulling the one underneath it. Crucially, though, the expand and collapse has to be symmetrical,
-// and this is what I've struggled with. 
-//
-function Panel(panelName, rightOfPanel, i, useRelativeLeftEdgeConstraint, physicsConstraints) {
-    this._name = panelName;
-    this._rightOf = rightOfPanel;
-    this._element = document.createElement('div');
-    this._element.className = 'twitter-panel';
-    this._element.innerText = panelName;
- 
-    this.x = new c.Variable({ name: panelName + '-x' });
-    this.right = c.plus(this.x, 250);
-
-    if (rightOfPanel) {
-        // There's a panel that we are positioned to the right of.
-        // So we want to be at least 10px right of its left edge
-        // But no more than 250px right of its left edge (or 0px right of its right edge?).
-
-        solver.add(leq(this.x, rightOfPanel.right, medium, 0));
-        // What's going on here? If I make the constraint relative to the right-of panel
-        // then the panels expand and contract in an unpleasing order (asymmetrically).
-        // If I make it an absolute constraint then it works OK...
-        //
-        // What I want to do is say: minimize this value respecting the constraints and
-        // whatever stays are set.
-
-        if (useRelativeLeftEdgeConstraint) {
-            solver.add(eq(this.x, 0, weak));
-            solver.add(geq(this.x, c.plus(rightOfPanel.x, new c.Expression(10)), medium));
-        } else
-            solver.add(geq(this.x, i * 10, medium, 0));
-
-        // Failed experiment to try to express what I wanted as a constraint on the gap
-        // between a panel and its predecessors:
-
-        // This is pretty weird. Make sure that the gap between us and the panel next to us
-        // is bigger than the gap it has.
-        //this.gap = c.minus(this.x, rightOfPanel.x);
-        //solver.add(geq(this.gap, rightOfPanel.gap, strong, 0));
-    } else {
-        // We're the first panel. Pin to the left edge.
-        // Note that weird things happen when collapsing using relative constraints if the priority is zero...
-        //  XXX: Need to understand what the priority means? Is it just which constraint is relaxed first?
-        solver.add(eq(this.x, new c.Expression(0), weak, 100));
-        if (physicsConstraints) {
-            physicsConstraints.push({ variable: this.x, value: 0 });
-        }
-        this.gap = new c.Expression(0);
-    }
-    this.update();
-}
-Panel.prototype.element = function() { return this._element; }
-Panel.prototype.update = function() {
-    var x = this.x.valueOf();
-    var tx = 'translateX(' + x + 'px) translate3D(10px, 10px, 0)'; // hacky inset.
-    this._element.style.webkitTransform = tx;
-    this._element.style.transform = tx;
-}
-
-function ConstrainedFriction() {
-    this._model = null;
-}
-ConstrainedFriction.prototype.set = function(x, v) {
-    this._model = new Friction(0.001);
-    this._model.set(x, v);
-    this._constrained = false;
-}
-ConstrainedFriction.prototype.hitConstraint = function(value) {
-    if (this._constrained) return;
-    // Only handle hitting one constraint at a time.
-    this._constrained = true;
-    // We really need to know the relationship between the constrained value and our
-    // value. I wonder how we can get that expression?
-    var x = this._model.x();
-    var delta = this._model.x() - value;
-    var velocity = this._model.dx();
-
-    this._model = new Spring(1, 200, 20);
-    this._model.snap(x);
-    this._model.setEnd(delta, velocity);
-}
-ConstrainedFriction.prototype.done = function() { return this._model.done(); }
-ConstrainedFriction.prototype.x = function() { return this._model.x(); }
-ConstrainedFriction.prototype.dx = function() { return this._model.dx(); }
-
-function makePanelsExample(parentElement, useRelativeLeftEdgeConstraint) {
-    var lastPanel = null;
-    var panels = [];
-    var physicsConstraints = [];
-    for (var i = 0; i < 5; i++) {
-        var p = new Panel(i + ' Panel ' + i, lastPanel, i, useRelativeLeftEdgeConstraint, physicsConstraints);
-        lastPanel = p;
-        panels.push(p);
-        parentElement.appendChild(p.element());
-    }
-
-    solver.add(mediumStay(lastPanel.x));
-    solver.solve();
-
-    var motion = null;
-    var anim = null;
-
-    function resolvePhysics() {
-        for (var i = 0; i < physicsConstraints.length; i++) {
-            var pc = physicsConstraints[i];
-            if (pc.variable.valueOf() == pc.value)
+/*
+ * XXX: Note while reading this that the concept of a "motion constraint" isn't
+ *      abstracted fully yet; this is coming soon!
+ */
+// Ops for motion constraints.
+var mc = {
+    greater: function(a, b) { return a >= b; },
+    less: function(a, b) { return a <= b; },
+    equal: function(a, b) { return a == b; },
+};
+// Generate a function that updates a UI when the constraint solver has run. It
+// also enforces motion constraints.
+function updater(boxes, motionConstraints) {
+    function resolveMotionConstraints(manipulator) {
+        for (var i = 0; i < motionConstraints.length; i++) {
+            var pc = motionConstraints[i];
+            if (pc.op(pc.variable.valueOf(), pc.value))
                 continue;
 
-            //console.log('variable: ' + pc.variable.valueOf() + ' val: ' + pc.value);
-            //console.log('physics violation');
-            if (motion) motion.hitConstraint(pc.variable.valueOf() - pc.value);
+            manipulator.hitConstraint(pc);
         }
     }
 
-    function update() {
-        resolvePhysics();
-        for (var i = 0; i < panels.length; i++)
-            panels[i].update();
+    function update(manipulator) {
+        resolveMotionConstraints(manipulator);
+        for (var i = 0; i < boxes.length; i++) {
+            boxes[i].update();
+        }
     }
 
-    addTouchOrMouseListener(lastPanel.element(),
-    {
-        onTouchStart: function() {
-            if (anim) {
-                anim.cancel();
-                solver.endEdit();
-                solver.resolve();
-                anim = null;
-                motion = null;
-            }
-            this._startX = lastPanel.x.valueOf();
-            solver.addEditVar(lastPanel.x, strong).beginEdit();
-            update();
-        },
-        onTouchMove: function(dx) {
-            solver.suggestValue(lastPanel.x, this._startX + dx).resolve();
-            update();
-        },
-        onTouchEnd: function(dx, dy, v) {
-            // Instead of ending here, create a friction animation.
-            motion = new ConstrainedFriction(0.001);
-            motion.set(this._startX + dx, v.x);
-            anim = animation(motion, function() {
-                var x = motion.x();
-                solver.suggestValue(lastPanel.x, x).resolve();
-                update();
-                if (motion.done()) {
-                    solver.endEdit();
-                    solver.resolve();
-                    update();
-                    anim = null;
-                    motion = null;
-                }
-            });
-            //solver.endEdit();
-            //solver.resolve();
-            //update();
+    return update;
+}
+
+function makeTwitterPanelsExample(parentElement) {
+    var solver = new c.SimplexSolver();
+
+    var lastPanel = null;
+    var panels = [];
+    var motionConstraints = [];
+
+    var MIN_GAP = 10;
+    var PANEL_WIDTH = 250;
+
+    for (var i = 0; i < 5; i++) {
+        var p = new Box('Panel ' + (i+1));
+        // Give these boxes "x" and "right" constraints.
+        p.x = new c.Variable({ name: 'panel-' + i + '-x' });
+        p.right = new c.Variable({ name: 'panel-' + i + '-right' });
+        p.bottom = 170;
+        // Make the panel 250 wide.
+        solver.add(eq(p.right, c.plus(p.x, PANEL_WIDTH), medium));
+
+        // Pin the first panel to 0, and add a motion constraint.
+        if (i == 0) {
+            solver.add(eq(p.x, 0, weak, 100));
+            motionConstraints.push({variable: p.x, value: 0, op: mc.equal});
+        } else {
+            // The panel mustn't reveal any space between it and the previous panel.
+            solver.add(leq(p.x, panels[i-1].right, medium, 0));
+
+            // Make the panel tend toward the left (zero). Use a lower priority than
+            // the first panel so the solver will prefer for the first panel to be
+            // zero than any of the additional panels.
+            solver.add(eq(p.x, 0, weak, 0));
+
+            // The panel must be to the right of the previous panel's left edge, plus 10.
+            solver.add(geq(p.x, c.plus(panels[i-1].x, MIN_GAP), medium, 0));
         }
+        panels.push(p);
+        parentElement.appendChild(p.element());
+        lastPanel = p;
+    }
+
+    // Make a manipulator. It takes touch events and updates a constrained variable
+    // from them.
+
+    new Manipulable(lastPanel.x, solver, updater(panels, motionConstraints), parentElement, 'x');
+}
+
+makeTwitterPanelsExample(document.getElementById('twitter-panels-example'));
+
+function makeScrollingExample(parentElement, bunching) {
+    var parentHeight = parentElement.offsetHeight;
+    var solver = new c.SimplexSolver();
+
+    var listItems = [];
+    var motionConstraints = [];
+
+    // This is the scroll position; it's the variable that the manipulator
+    // changes.
+    var scrollPosition = new c.Variable({name: 'scroll-position'});
+
+
+    for (var i = 0; i < 10; i++) {
+        var p = new Box('List Item ' + (i+1));
+        // Use cassowary to layout the items in a column. Names are for debugging only.
+        p.y = new c.Variable({ name: 'list-item-' + i + '-y' });
+        p.bottom = new c.Variable({ name: 'list-item-' + i + '-bottom' });
+
+        // Make items 300px wide.
+        p.right = 300;
+
+        // If we're bunching and this is the first item then let it get bigger
+        // and smaller...
+        if (bunching && i == 0 && false) {
+            solver.add(eq(p.y, 0, weak));
+            solver.add(eq(p.bottom, scrollPosition, weak, 100));
+            solver.add(geq(p.bottom, c.plus(p.y, 40), medium));
+            solver.add(leq(p.bottom, c.plus(p.y, 80), medium));
+        } else {
+            // Make the items 40px tall.
+            solver.add(eq(p.bottom, c.plus(p.y, 40), medium));
+        }
+
+        // Gap of 10 between items.
+        if (i > 0)
+            solver.add(eq(p.y, c.plus(scrollPosition, i*50), weak, 100));
+        else
+            solver.add(eq(p.y, scrollPosition, weak, 100));
+
+        // Bunching. Don't let items go off of the top or bottom.
+        if (bunching) {
+            // XXX: We should express these bunches in terms of
+            //      the previous card, rather than as absolute offsets (i*4).
+            solver.add(geq(p.y, i*3, weak, 100));
+            solver.add(leq(p.bottom, parentHeight + i * 3 - 9*3, weak, 100));
+        }
+
+        listItems.push(p);
+        p.element().style.zIndex = 10 - i;
+        parentElement.appendChild(p.element());
+    }
+    // Add some constraints to the first and last item. The first item can't move
+    // past the top. The last item can't move up beyond the bottom. These are
+    // motion constraints enforced by springs.
+
+    // This prefers the list to be "scrolled" to the top.
+    if (!bunching) solver.add(leq(listItems[0].y, 0, weak));
+
+    motionConstraints.push({
+        variable: listItems[0].y,
+        value: 0,
+        op: mc.less
     });
+    motionConstraints.push({
+        variable: listItems[listItems.length - 1].bottom,
+        value: parentHeight,
+        op: mc.greater
+    });
+
+    new Manipulable(scrollPosition, solver, updater(listItems, motionConstraints), parentElement, 'y');
 }
 
-function makeExample(text, useRelativeLeftEdgeConstraint) {
-    var exampleParent = document.createElement('div');
-    exampleParent.className = 'cards-parent';
-    exampleParent.innerHTML = text;
-    var container = document.createElement('div');
-    container.className = 'cards-container';
-    exampleParent.appendChild(container);
-    makePanelsExample(container, useRelativeLeftEdgeConstraint);
+makeScrollingExample(document.getElementById('scrolling-example'));
+makeScrollingExample(document.getElementById('android-notifications'), true);
 
-    document.body.appendChild(exampleParent);
+function makeAndroidNotificationsExample(parentElement) {
+    var solver = new c.SimplexSolver();
 }
-
-//makeExample('Drag on Panel 4. The left edge of each panel is constrained to be greater than i * 10. The panels expand and collapse as I want, where opening Panel 4 reveals Panel 3, and they collapse in the same order.', false);
-makeExample("Here the panel constraints are in terms of the previous panel, so<br><pre>panel[i].left > panel[i-1].left + 10\npanel[i].left < panel[i-1].right\npanel[first].left = 0</pre>But, I've added some touch physics so that Panel 4 keeps moving with friction. Then I made that last constraint enforced by a spring so my constraints really look like:<pre>panel[i].left > panel[i-1].left + 10\npanel[i].left < panel[i-1].right\npanel[first].left = 0 spring</pre>I want to formalize the concept of <b>motion constraints</b> so that I can describe complex interactions in a declarative way." , true);
-
