@@ -1,0 +1,110 @@
+<html>
+<head>
+<title>Twitter permacards exploration</title>
+<style>
+body {
+    background-color: #404040;
+    text-align: center;
+    font-family: sans-serif;
+}
+.phone {
+    position: relative;
+    display: inline-block;
+    width: 320px;
+    height: 480px;
+    background-color: white;
+}
+.header {
+    position: absolute;
+    width: 100%;
+    height: 60px;
+    background-color: #55acee;
+    background-image: url(img/twitter-logo.png);
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.timeline {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    top: 60px;
+    overflow: hidden;
+}
+.tweet {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 10px;
+    min-height: 55px;
+    text-align: left;
+    pointer-events: none;
+    box-sizing: border-box;
+    background-color: white;
+}
+.tweet>.photo {
+    height: 55px;
+    width: 55px;
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    float: left;
+}
+.tweet>.text {
+    padding-left: 65px;
+}
+.tweet>.text>.username { font-weight: bold; }
+.tweet>.audio {
+    pointer-events: auto;
+    border: 1px solid #55acee;
+    color: #55acee;
+    border-radius: 2px;
+    padding: 5px;
+    margin-top: 5px;
+    margin-left: 65px;
+    text-align: center;
+}
+.tweet>.audio:active {
+    background-color: #55acee;
+    color: white;
+}
+.explain {
+    display: inline-block;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background-color: white;
+    width: 80%;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+}
+</style>
+<script src="touch.js"></script>
+<script src="../physics/animate.js"></script>
+<script src="../physics/friction.js"></script>
+<script src="../physics/spring.js"></script>
+<script src="c.js"></script>
+<script src="manipulable.js"></script>
+<script src="box.js"></script>
+</head>
+<body>
+<div class="phone">
+<div class="header"></div>
+<div class="timeline" id="timeline">
+</div>
+</div>
+<script src="twitter.js"></script>
+<div class="explain">
+<b>What's going on here?</b><br>
+<p>If you could play music or videos from tweets, then you'd want to keep reading your timeline while the music plays (and probably while the video plays too, if you're honest). This is a partial iteration on a UI that pins tweets to the viewport when they're doing something interesting. Try scrolling (by dragging) the timeline, then press "PLAY AUDIO" and keep scrolling.</p>
+<p>We could even make tweets that load webpages do this, so you can see the progress bar and maybe the top of the page or a mini-view of the page as it loads. That way you can keep reading your timeline and queue up more pages to read once they've loaded.</p>
+<p>What's next to make this a more useful design iteration:
+<ul>
+ <li>stack opened tweets instead of completely overlapping them</li>
+ <li>dragging on the stack of opened tweets to expand them, over your timeline, like the notify pulldown in Android.</li>
+ <li>decide if it's OK to have things stacked at the top and bottom</li>
+ <li>desktop and tablet variants</li>
+</ul>
+</div>
+</body>
+</html>

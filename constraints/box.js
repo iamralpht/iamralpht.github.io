@@ -5,7 +5,7 @@
 function Box(textContent) {
     this._element = document.createElement('div');
     this._element.className = 'box';
-    this._element.textContent = textContent;
+    if (textContent) this._element.textContent = textContent;
 
     // These get replaced with constraint variables by the caller.
     this.x = 0;

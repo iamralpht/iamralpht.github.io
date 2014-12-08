@@ -16,6 +16,7 @@ function Manipulable(variable, solver, update, domObject, axis) {
 
     addTouchOrMouseListener(domObject, {
         onTouchStart: function() {
+            console.log('manip start');
             self._hitConstraint = null;
             // If there's an animation already running then kill it.
             if (self._animation) {
