@@ -34,6 +34,7 @@
 }
 
 .constraints {
+    clear: both;
     display: inline-block;
     margin-top: 10px;
     padding: 10px;
@@ -70,7 +71,7 @@
 </div>
 <div class="example">
 Drag this list vertically<br>
-<div class="scrolling-example" id="scrolling-example"></div>
+<div class="scrolling-example" id="scrolling-example"></div><br>
 <div class="constraints">
 <b>Constraints:</b><br>
 The list items are 40px tall:
@@ -89,7 +90,7 @@ The last list item's bottom can't be more than the parent height:
 </div>
 <div class="example">
 Drag the panels horizontally and release to impart velocity.
-<div class="cards-container" id="twitter-panels-example"></div>
+<div class="cards-container" id="twitter-panels-example"></div><br>
 <div class="constraints">
 <b>Constraints:</b><br>
 The left edge of each panel can't go past the left edge of the panel that came before, plus 10px.
@@ -106,6 +107,12 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 <p>Android 5 notifications. Just like scrolling but with some extra constraints to do the bunching. I'll add resizing of notifications (like the GMail expandable one) and multitouch next. It falls out of the constraints.</p></div>
 <div class="example">
 <div class="scrolling-example" id="android-notifications"></div>
+</div>
+<div class="content">
+<p>BUGS: No motion constraints while dragging. Motion constraints need to be evaluated when multiple constraints are violated. We're not tracing the motion constraint to find its relationship to the variable that's being manipulated&mdash;so parallax manipulations might go wrong. No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
+<p>We don't have to just use friction and springs, though. We can revisit a lot of the previous examples which also used gravity and rebounding... Also look at using one input for multiple systems. Do iMessage springy scrolling.</p>
+<p>Also do snap points (pagers, the android system toggle panel, etc).</p>
+<p>What's next? State machines, dependent state, state driven animations (controller updating the view)...</p>
 </div>
 
 
