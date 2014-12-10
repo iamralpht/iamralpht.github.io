@@ -103,7 +103,7 @@ var zIndex = 1;
 // Make a tweet display nested in a box controlled by constraint layout.
 function makeTweet(tweet, solver, update) {
     var box = new Box();
-    box.right = 300;
+    box.right = 320;
     box.height = 65;
 
     box.element().classList.add('tweet');
@@ -125,8 +125,14 @@ function makeTweet(tweet, solver, update) {
     box.element().appendChild(text);
 
     if (tweet.type == 'audio') {
+        box.element().classList.add('audio-tweet');
+        
+        var progress = document.createElement('div');
+        progress.className = 'progress';
+        box.element().appendChild(progress);
+
         var audioControls = document.createElement('div');
-        audioControls.className = 'audio';
+        audioControls.className = 'button';
         audioControls.textContent = 'PLAY AUDIO';
         addTouchOrMouseListener(audioControls, {
             onTouchEnd: function() {
@@ -137,6 +143,7 @@ function makeTweet(tweet, solver, update) {
                     this._constraints = null;
                     solver.solve();
                     box.element().style.zIndex = 'none';
+                    box.element().classList.remove('sticky');
                     audioControls.textContent = 'PLAY AUDIO';
                     return;
                 }
@@ -150,6 +157,7 @@ function makeTweet(tweet, solver, update) {
                 }
                 solver.solve();
                 box.element().style.zIndex = (++zIndex);
+                box.element().classList.add('sticky');
                 audioControls.textContent = 'STOP AUDIO';
             }});
         box.element().appendChild(audioControls);

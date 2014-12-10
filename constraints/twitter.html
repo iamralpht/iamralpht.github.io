@@ -35,6 +35,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
+    border-top: 1px solid #ffffff;
     border-bottom: 1px solid #f0f0f0;
     padding: 10px;
     min-height: 55px;
@@ -54,7 +55,11 @@ body {
     padding-left: 65px;
 }
 .tweet>.text>.username { font-weight: bold; }
-.tweet>.audio {
+.tweet.sticky {
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #a0a0a0;
+}
+.tweet>.button {
     pointer-events: auto;
     border: 1px solid #55acee;
     color: #55acee;
@@ -64,9 +69,28 @@ body {
     margin-left: 65px;
     text-align: center;
 }
-.tweet>.audio:active {
+.tweet>.button:active {
     background-color: #55acee;
     color: white;
+}
+.tweet>.progress {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 3px;
+    background-color: #8899a6;
+    opacity: 0;
+
+    -webkit-transform-origin: 0 0;
+    -webkit-transform: scale(0.01, 1);
+
+    transform-origin: 0 0;
+    transform: scale(0.01, 1);
+
+    -webkit-transition: opacity 250ms, -webkit-transform 30s linear;
+    transition: opacity 250ms, transform 30s linear;
+}
+.tweet.sticky>.progress {
+    opacity: 1;
+    transform: scale(1, 1);
 }
 .explain {
     display: inline-block;
