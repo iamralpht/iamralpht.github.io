@@ -98,10 +98,101 @@ var model = [
     },
 ];
 
+// This object manages the list of tweets that are currently opened and
+// ensures that they all have good constraints.
+function OpenedTweets(solver, update) {
+    this._solver = solver;
+    this._update = update;
+    this._tweets = [];
+}
+OpenedTweets.prototype.makeInteractive = function(index, box, button) {
+    var solver = this._solver;
+    var tweet = {
+        index: index,
+        box: box,
+        button: button,
+        constraints: null,
+        selected: false
+    };
+    this._tweets.push(tweet);
+    var self = this;
+
+    addTouchOrMouseListener(button, {
+        onTouchEnd: function() {
+            /*
+            if (this._constraints) {
+                for (var i = 0; i < this._constraints.length; i++) {
+                    solver.removeConstraint(this._constraints[i]);
+                }
+                this._constraints = null;
+                solver.solve();
+                box.element().style.zIndex = 'none';
+                box.element().classList.remove('sticky');
+                button.textContent = 'PLAY AUDIO';
+                return;
+            }
+            // Pin the opened tweet to be inside the scroll area.
+            this._constraints = [
+                geq(box.y, 0, medium),
+                leq(box.bottom, 420, medium)
+            ];
+            for (var i = 0; i < this._constraints.length; i++) {
+                solver.add(this._constraints[i]);
+            }
+            solver.solve();
+            box.element().style.zIndex = (++zIndex);
+            box.element().classList.add('sticky');
+            button.textContent = 'STOP AUDIO';
+            */
+            if (tweet.selected) self._unselectTweet(tweet);
+            else self._selectTweet(tweet);
+        }});
+}
+OpenedTweets.prototype._selectTweet = function(tweet) {
+    var e = tweet.box.element();
+    e.style.zIndex = (++zIndex);
+    e.classList.add('sticky');
+    tweet.selected = true;
+
+    this._reconstrain();
+}
+OpenedTweets.prototype._unselectTweet = function(tweet) {
+    var e = tweet.box.element();
+    e.style.zIndex = 0;
+    e.classList.remove('sticky');
+    tweet.selected = false;
+
+    this._reconstrain();
+}
+OpenedTweets.prototype._reconstrain = function() {
+    var selected = [];
+
+    for (var i = 0; i < this._tweets.length; i++) {
+        var t = this._tweets[i];
+        if (t.selected) selected.push(t);
+        if (!t.constraints) continue;
+        for (var k = 0; k < t.constraints.length; k++) {
+            this._solver.removeConstraint(t.constraints[k]);
+        }
+        t.constraints = null;
+    }
+    selected.sort(function(a, b) { return a.index - b.index; });
+    for (var i = 0; i < selected.length; i++) {
+        var t = selected[i];
+        t.constraints = [
+            geq(t.box.y, i * 6, medium),
+            leq(t.box.bottom, 420 - (selected.length - i - 1) * 6, medium)
+        ];
+        for (var k = 0; k < t.constraints.length; k++)
+            this._solver.addConstraint(t.constraints[k]);
+    }
+    this._solver.solve();
+}
+
 var zIndex = 1;
 
 // Make a tweet display nested in a box controlled by constraint layout.
-function makeTweet(tweet, solver, update) {
+function makeTweet(index, tweet, openedTweets) {
     var box = new Box();
     box.right = 320;
     box.height = 65;
@@ -134,33 +225,9 @@ function makeTweet(tweet, solver, update) {
         var audioControls = document.createElement('div');
         audioControls.className = 'button';
         audioControls.textContent = 'PLAY AUDIO';
-        addTouchOrMouseListener(audioControls, {
-            onTouchEnd: function() {
-                if (this._constraints) {
-                    for (var i = 0; i < this._constraints.length; i++) {
-                        solver.removeConstraint(this._constraints[i]);
-                    }
-                    this._constraints = null;
-                    solver.solve();
-                    box.element().style.zIndex = 'none';
-                    box.element().classList.remove('sticky');
-                    audioControls.textContent = 'PLAY AUDIO';
-                    return;
-                }
-                // Pin the opened tweet to be inside the scroll area.
-                this._constraints = [
-                    geq(box.y, 0, medium),
-                    leq(box.bottom, 420, medium)
-                ];
-                for (var i = 0; i < this._constraints.length; i++) {
-                    solver.add(this._constraints[i]);
-                }
-                solver.solve();
-                box.element().style.zIndex = (++zIndex);
-                box.element().classList.add('sticky');
-                audioControls.textContent = 'STOP AUDIO';
-            }});
         box.element().appendChild(audioControls);
+
+        openedTweets.makeInteractive(index, box, audioControls);
     }
 
     return box;
@@ -171,13 +238,14 @@ function makeTwitterExample(parentElement) {
     var tweets = [];
     var motionConstraints = [];
     var update = updater(tweets, motionConstraints);
+    var openedTweets = new OpenedTweets(solver, update);
 
     var scrollPosition = new c.Variable();
 
     for (var i = 0; i < model.length * 10; i++) {
         var tweetModel = model[i % model.length];
 
-        var tweet = makeTweet(tweetModel, solver, update);
+        var tweet = makeTweet(i, tweetModel, openedTweets);
         parentElement.appendChild(tweet.element());
 
         tweet.y = new c.Variable();
