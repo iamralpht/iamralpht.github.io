@@ -38,7 +38,7 @@ function updater(boxes, motionConstraints) {
     function resolveMotionConstraints(manipulator) {
         for (var i = 0; i < motionConstraints.length; i++) {
             var pc = motionConstraints[i];
-            if (pc.op(pc.variable.valueOf(), pc.value))
+            if (pc.op(Math.round(pc.variable.valueOf()), Math.round(pc.value)))
                 continue;
 
             manipulator.hitConstraint(pc);
@@ -100,10 +100,22 @@ var model = [
 
 // This object manages the list of tweets that are currently opened and
 // ensures that they all have good constraints.
-function OpenedTweets(solver, update) {
+function OpenedTweets(solver, update, motionConstraints) {
     this._solver = solver;
     this._update = update;
     this._tweets = [];
+    this._spacing = new c.Variable();
+    solver.add(geq(this._spacing, 6, medium));
+    motionConstraints.push({
+        variable: this._spacing,
+        value: 6,
+        op: mc.greater
+    });
+    motionConstraints.push({
+        variable: this._spacing,
+        value: 90,
+        op: mc.less
+    });
 }
 OpenedTweets.prototype.makeInteractive = function(index, box, button) {
     var solver = this._solver;
@@ -117,6 +129,14 @@ OpenedTweets.prototype.makeInteractive = function(index, box, button) {
     this._tweets.push(tweet);
     var self = this;
 
+    // Make it manipulable too, so that it can control the expansion by being
+    // dragged. We use the pointer-events style to ensure that it only does
+    // this when it's in the sticky state (though it should only do it when
+    // its sticky and stuck to the top).
+    new Manipulable(this._spacing, this._solver, this._update, box.element(), 'y');
+
+    // Attempt at a button; should actually do proper gesture detection and not
+    // eat events if it looks like a drag...
     addTouchOrMouseListener(button, {
         onTouchEnd: function() {
             if (tweet.selected) self._unselectTweet(tweet);
@@ -157,7 +177,7 @@ OpenedTweets.prototype._reconstrain = function() {
     for (var i = 0; i < selected.length; i++) {
         var t = selected[i];
         t.constraints = [
-            geq(t.box.y, i * 6, medium),
+            geq(t.box.y, c.times(i, this._spacing), medium),
             leq(t.box.bottom, 420 - (selected.length - i - 1) * 6, medium)
         ];
         for (var k = 0; k < t.constraints.length; k++)
@@ -215,7 +235,7 @@ function makeTwitterExample(parentElement) {
     var tweets = [];
     var motionConstraints = [];
     var update = updater(tweets, motionConstraints);
-    var openedTweets = new OpenedTweets(solver, update);
+    var openedTweets = new OpenedTweets(solver, update, motionConstraints);
 
     var scrollPosition = new c.Variable();
 
