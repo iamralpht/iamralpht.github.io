@@ -119,31 +119,6 @@ OpenedTweets.prototype.makeInteractive = function(index, box, button) {
 
     addTouchOrMouseListener(button, {
         onTouchEnd: function() {
-            /*
-            if (this._constraints) {
-                for (var i = 0; i < this._constraints.length; i++) {
-                    solver.removeConstraint(this._constraints[i]);
-                }
-                this._constraints = null;
-                solver.solve();
-                box.element().style.zIndex = 'none';
-                box.element().classList.remove('sticky');
-                button.textContent = 'PLAY AUDIO';
-                return;
-            }
-            // Pin the opened tweet to be inside the scroll area.
-            this._constraints = [
-                geq(box.y, 0, medium),
-                leq(box.bottom, 420, medium)
-            ];
-            for (var i = 0; i < this._constraints.length; i++) {
-                solver.add(this._constraints[i]);
-            }
-            solver.solve();
-            box.element().style.zIndex = (++zIndex);
-            box.element().classList.add('sticky');
-            button.textContent = 'STOP AUDIO';
-            */
             if (tweet.selected) self._unselectTweet(tweet);
             else self._selectTweet(tweet);
         }});
@@ -152,6 +127,7 @@ OpenedTweets.prototype._selectTweet = function(tweet) {
     var e = tweet.box.element();
     e.style.zIndex = (++zIndex);
     e.classList.add('sticky');
+    tweet.button.textContent = 'STOP AUDIO';
     tweet.selected = true;
 
     this._reconstrain();
@@ -160,6 +136,7 @@ OpenedTweets.prototype._unselectTweet = function(tweet) {
     var e = tweet.box.element();
     e.style.zIndex = 0;
     e.classList.remove('sticky');
+    tweet.button.textContent = 'PLAY AUDIO';
     tweet.selected = false;
 
     this._reconstrain();
