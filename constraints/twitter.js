@@ -63,8 +63,9 @@ var model = [
         type: 'url',
     },
     {
-        user: 'Rachael Nabors',
-        content: "I'm not sure how you make passive income on web animation?"
+        user: 'stuart murdoch',
+        content: "I likes this",
+        type: 'audio',
     },
     {
         user: 'xyz',
@@ -254,7 +255,7 @@ function makeTwitterExample(parentElement) {
 
     var scrollPosition = new c.Variable();
 
-    for (var i = 0; i < model.length * 10; i++) {
+    for (var i = 0; i < model.length * 4; i++) {
         var tweetModel = model[i % model.length];
 
         var tweet = makeTweet(i, tweetModel, openedTweets);
