@@ -231,7 +231,7 @@ function makeTweet(index, tweet, openedTweets) {
 }
 
 function makeTwitterExample(parentElement) {
-    var solver = new c.SimplexSolver();
+    var solver = new MultiEditSolver(new c.SimplexSolver());
     var tweets = [];
     var motionConstraints = [];
     var update = updater(tweets, motionConstraints);

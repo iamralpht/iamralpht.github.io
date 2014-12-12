@@ -21,7 +21,7 @@ function Manipulable(variable, solver, update, domObject, axis) {
             if (self._animation) {
                 self._animation.cancel();
                 try {
-                    solver.endEdit();
+                    solver.endEdit(variable);
                     solver.resolve();
                 } catch (e) {
                     console.log('bad', e);
@@ -31,7 +31,7 @@ function Manipulable(variable, solver, update, domObject, axis) {
             }
             // Start a new edit session.
             this._start = variable.valueOf();
-            solver.addEditVar(variable, c.Strength.strong).beginEdit();
+            solver.beginEdit(variable, c.Strength.strong);
             update(self);
         },
         onTouchMove: function(dx, dy) {
@@ -41,7 +41,7 @@ function Manipulable(variable, solver, update, domObject, axis) {
             // deltas are relative to when a motion violation is reported.
             self._lastPosition = pos;
             self._lastVelocity = 0;
-            solver.suggestValue(variable, pos).resolve();
+            solver.suggestValue(variable, pos);
             update(self);
         },
         onTouchEnd: function(dx, dy, v) {
@@ -71,10 +71,10 @@ Manipulable.prototype._animate = function() {
     var x = this._motion.x();
     this._lastPosition = x;
     this._lastVelocity = this._motion.dx();
-    this._solver.suggestValue(this._variable, x).resolve();
+    this._solver.suggestValue(this._variable, x);
 
     if (this._motion.done()) {
-        this._solver.endEdit();
+        this._solver.endEdit(this._variable);
         this._solver.resolve();
         this._animation = null;
         this._motion = null;

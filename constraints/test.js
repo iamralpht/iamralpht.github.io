@@ -56,7 +56,7 @@ function updater(boxes, motionConstraints) {
 }
 
 function makeTwitterPanelsExample(parentElement) {
-    var solver = new c.SimplexSolver();
+    var solver = new MultiEditSolver(new c.SimplexSolver());
 
     var lastPanel = null;
     var panels = [];
@@ -105,7 +105,7 @@ makeTwitterPanelsExample(document.getElementById('twitter-panels-example'));
 
 function makeScrollingExample(parentElement, bunching) {
     var parentHeight = parentElement.offsetHeight;
-    var solver = new c.SimplexSolver();
+    var solver = new MultiEditSolver(new c.SimplexSolver());
 
     var listItems = [];
     var motionConstraints = [];
@@ -179,5 +179,5 @@ makeScrollingExample(document.getElementById('scrolling-example'));
 makeScrollingExample(document.getElementById('android-notifications'), true);
 
 function makeAndroidNotificationsExample(parentElement) {
-    var solver = new c.SimplexSolver();
+    var solver = new MultiEditSolver(new c.SimplexSolver());
 }
