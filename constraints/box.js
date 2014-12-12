@@ -39,6 +39,8 @@ Box.prototype.update = function() {
         this._lastHeight = h;
         this._element.style.height = h + 'px';
     }
+    if (x == this._lastX && y == this._lastY) return;
+    this._lastX = x; this._lastY = y;
     // Use transform to set the x/y since this is the common
     // case and it generally avoids a relayout.
     var transform = 'translate3D(' + x + 'px, ' + y + 'px, 0)';

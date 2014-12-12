@@ -106,6 +106,7 @@ function OpenedTweets(solver, update, motionConstraints) {
     this._tweets = [];
     this._spacing = new c.Variable();
     solver.add(geq(this._spacing, 6, medium));
+
     motionConstraints.push({
         variable: this._spacing,
         value: 6,
@@ -116,6 +117,9 @@ function OpenedTweets(solver, update, motionConstraints) {
         value: 90,
         op: mc.less
     });
+
+    this._dimmer = document.createElement('div');
+    this._dimmer.className = 'dimmer';
 }
 OpenedTweets.prototype.makeInteractive = function(index, box, button) {
     var solver = this._solver;
@@ -145,7 +149,7 @@ OpenedTweets.prototype.makeInteractive = function(index, box, button) {
 }
 OpenedTweets.prototype._selectTweet = function(tweet) {
     var e = tweet.box.element();
-    e.style.zIndex = (++zIndex);
+    e.style.zIndex = tweet.index + 1;
     e.classList.add('sticky');
     tweet.button.textContent = 'STOP AUDIO';
     tweet.selected = true;
@@ -185,8 +189,17 @@ OpenedTweets.prototype._reconstrain = function() {
     }
     this._solver.solve();
 }
+OpenedTweets.prototype.update = function() {
+    var spacing = this._spacing.valueOf();
+    var showDimmer = spacing > 30;
 
-var zIndex = 1;
+    if (showDimmer == this._lastShowDimmer) return;
+    this._lastShowDimmer = showDimmer;
+    if (showDimmer) this._dimmer.classList.add('show');
+    else this._dimmer.classList.remove('show');
+}
+OpenedTweets.prototype.element = function() { return this._dimmer; }
+
 
 // Make a tweet display nested in a box controlled by constraint layout.
 function makeTweet(index, tweet, openedTweets) {
@@ -237,6 +250,8 @@ function makeTwitterExample(parentElement) {
     var update = updater(tweets, motionConstraints);
     var openedTweets = new OpenedTweets(solver, update, motionConstraints);
 
+    parentElement.appendChild(openedTweets.element());
+
     var scrollPosition = new c.Variable();
 
     for (var i = 0; i < model.length * 10; i++) {
@@ -272,6 +287,12 @@ function makeTwitterExample(parentElement) {
         value: 420,
         op: mc.greater
     });
+
+    // Let openedTweets get an update message when the solver runs so that it
+    // can show/hide its dimming layer. Super need more state control from
+    // state controlling active constraints to constraints driving state (not
+    // sure how to avoid cycles though).
+    tweets.push(openedTweets);
 
     new Manipulable(scrollPosition, solver, update, parentElement, 'y');
 }
