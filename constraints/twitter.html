@@ -1,11 +1,12 @@
 <html>
 <head>
 <title>Twitter permacards exploration</title>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 <style>
 body {
     background-color: #404040;
     text-align: center;
-    font-family: sans-serif;
+    font-family: "Source Sans Pro", sans-serif;
 }
 .phone {
     position: relative;
@@ -38,6 +39,8 @@ body {
     border-top: 1px solid #ffffff;
     border-bottom: 1px solid #f0f0f0;
     padding: 10px;
+    padding-top: 5px;
+    padding-bottom: 15px;
     min-height: 55px;
     text-align: left;
     pointer-events: none;
@@ -94,6 +97,7 @@ body {
 }
 .tweet.sticky>.progress {
     opacity: 1;
+    -webkit-transform: scale(1, 1);
     transform: scale(1, 1);
 }
 .explain {
@@ -138,15 +142,34 @@ body {
 <div class="timeline" id="timeline">
 </div>
 </div>
-<script src="twitter.js"></script>
+<script src="twitter.js"></script><br>
 <div class="explain">
-<b>What's going on here?</b><br>
-<p>If you could play music or videos from tweets, then you'd want to keep reading your timeline while the music plays (and probably while the video plays too, if you're honest). This is a partial iteration on a UI that pins tweets to the viewport when they're doing something interesting. Try scrolling (by dragging) the timeline, then press "PLAY AUDIO" and keep scrolling.</p>
-<p>We could even make tweets that load webpages do this, so you can see the progress bar and maybe the top of the page or a mini-view of the page as it loads. That way you can keep reading your timeline and queue up more pages to read once they've loaded.</p>
-<p>What's next to make this a more useful design iteration:
+<b>Try this:</b><br>
 <ul>
- <li>stack opened tweets instead of completely overlapping them</li>
- <li>dragging on the stack of opened tweets to expand them, over your timeline, like the notify pulldown in Android.</li>
+ <li>Press "PLAY AUDIO" on a couple of tweets and scroll down (by dragging). Notice how the tweets that are playing audio (or enqueued perhaps) stack up at the top.</li>
+ <li>Drag downwards on the stack of tweets (you have to drag on anything except the button, as I'm not doing gesture recognition yet). Notice how they expand and the rest of the timeline is dimmed.</li>
+ <li>Note that this demo can get into a bad state; hit reload if things stop moving.</li>
+</ul>
+<b>What's going on here?</b><br>
+<p>80% of Twitter's users access the service via mobile device. One great frustration I have with the mobile Twitter UI is that when I find an interesting link I have to decide if I'm going to open it and leave the timeline (and be rewarded with a blank screen for a while), or keep reading in case there's something better further down. Normally I keep reading and then scroll back up, and spend ages looking for whatever I thought was worth opening (and sometimes I don't find it again).</p>
+<p>On the desktop I just open all of the interesting links in new tabs and read them once I've finished scanning the timeline and they've loaded (though frequently I forget to read them, and then I find the tab hours later and wonder "how did I get here?"). What if we could do something even better than tabs? Above is an (incomplete) exploration into one idea: make "opened" tweets stick inside the viewport, and stack them up.</p>
+<p>We could even make tweets that load webpages do this, so you can see the progress bar and maybe the top of the page or a mini-view of the page as it loads. That way you can keep reading your timeline and queue up more pages to read once they've loaded.</p>
+<p>What have I learned so far from this work:</p>
+<ul>
+ <li>Overall it hangs together pretty well; it's like an interesting combination of sticky list headings and the Android 5 notification system.</li>
+ <li>The progress bars worked out nicely. Maybe different colors for different types of media (webpage, audio, video, etc).</li>
+ <li>I used a constraint system to represent the way everything moves; it's a different way to program these behaviors and it has turned out to be a good match here. I'll have more to say about using constraints for touch physics soon, as well as the Cassowary Constraint Solver which I'm using here.</li>
+ <li>I don't like tweets stacking on the top and bottom; I think they should only stack on the top. I'm not sure how to "stick" a tweet as it goes off the bottom in that case, though.</li>
+ <li>Is it OK to have the tweet playing music not be frontmost in the stack? What about video&mdash;is there some picture-in-picture mode that falls out of this?</li>
+ <li>I'm worried it's a bit complicated. I'd love to get some constructive feedback!</li>
+</ul>
+<p>What's next to make this a more useful design iteration:</p>
+<ul>
+ <li>do something nicer for expanding the stack of tweets (don't show gaps between them, etc).</li>
+ <li>what's the real UI for closing one of these? URL won't have a button like audio.</li>
+ <li>how would I seamlessly integrate this with "read it later" functionality? Seems closely related; maybe this just supercedes "read it later"?</li>
+ <li>add snap points so that the stack of tweets is either open or closed (and won't stick in between). make tapping the dimmer close the stack.</li>
+ <li>add some other types of "interesting" tweets, like "URL".</li>
  <li>decide if it's OK to have things stacked at the top and bottom</li>
  <li>desktop and tablet variants</li>
 </ul>

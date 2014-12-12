@@ -121,6 +121,7 @@ function OpenedTweets(solver, update, motionConstraints) {
 
     this._dimmer = document.createElement('div');
     this._dimmer.className = 'dimmer';
+    this._selectedCount = 0;
 }
 OpenedTweets.prototype.makeInteractive = function(index, box, button) {
     var solver = this._solver;
@@ -188,11 +189,13 @@ OpenedTweets.prototype._reconstrain = function() {
         for (var k = 0; k < t.constraints.length; k++)
             this._solver.addConstraint(t.constraints[k]);
     }
+    this._selectedCount = selected.length;
     this._solver.solve();
+    this._update();
 }
 OpenedTweets.prototype.update = function() {
     var spacing = this._spacing.valueOf();
-    var showDimmer = spacing > 30;
+    var showDimmer = spacing > 30 && this._selectedCount > 1;
 
     if (showDimmer == this._lastShowDimmer) return;
     this._lastShowDimmer = showDimmer;
