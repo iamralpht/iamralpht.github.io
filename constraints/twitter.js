@@ -45,11 +45,18 @@ function updater(boxes, motionConstraints) {
         }
     }
 
+    // Protect against recursion. When we create an animation the animation system
+    // runs the first frame synchronously which probably isn't needed in this
+    // constraints design...
+    var updating = false;
     function update(manipulator) {
+        if (updating) return;
+        updating = true;
         resolveMotionConstraints(manipulator);
         for (var i = 0; i < boxes.length; i++) {
             boxes[i].update();
         }
+        updating = false;
     }
 
     return update;
