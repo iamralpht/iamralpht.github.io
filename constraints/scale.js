@@ -51,6 +51,13 @@ var requiredStay = function(v, w) { return stay(v, required, w||0); };
 //      sure, but will be much slower). I figured I'd commit this since it reflects my current thinking
 //      of how constraints could be used to solve UI problems. I want to build this into a whole photo
 //      viewer UI--pan with bouncy physics, pinch zoom, pan or flick hard to advance to the next photo, etc.
+//
+//      Actually, I'm not sure that this can be described properly using cassowary since it only solves
+//      linear constraints, and to solve this you need the cartesian distance between the two touch points, which
+//      is non-linear. What Cassowary does let me do is figure out which manipulator is violating any
+//      given constraint and precisely what the relationship (the multiple since it's linear) is--which lets
+//      me propagate feedback to the correct manipulator (but I'm not doing this yet); it's basically just
+//      reading a row out of the simplex tableau.
 
 var solver = new MultiEditSolver(new c.SimplexSolver());
 
