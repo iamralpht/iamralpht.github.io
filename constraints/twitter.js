@@ -181,6 +181,16 @@ OpenedTweets.prototype.update = function() {
     this._lastShowDimmer = showDimmer;
     if (showDimmer) this._dimmer.classList.add('show');
     else this._dimmer.classList.remove('show');
+
+    if (this._selectedCount <= 1) {
+        // Smash the spacing back to the minimum when there's nothing selected.
+        this._solver.beginEdit(this._spacing, c.Strength.strong);
+        this._solver.resolve();
+        this._solver.suggestValue(this._spacing, 6);
+        this._solver.resolve();
+        this._solver.endEdit(this._spacing);
+        this._solver.resolve();
+    }
 }
 OpenedTweets.prototype.element = function() { return this._dimmer; }
 

@@ -17,9 +17,14 @@ function MultiEditSolver(solver) {
 }
 MultiEditSolver.prototype.solver = function() { return this._solver; }
 MultiEditSolver.prototype.beginEdit = function(variable, strength) {
-    if (this._editVars.indexOf(variable) != -1) return;
+    var idx = this._find(variable);
+    if (idx != -1) {
+        this._editVars[idx].count++;
+        console.log('multiple edit sessions on ' + variable.name);
+        return;
+    }
 
-    this._editVars.push({ edit: variable, strength: strength, suggest: null });
+    this._editVars.push({ edit: variable, strength: strength, suggest: null, count: 1 });
     this._reedit();
 }
 MultiEditSolver.prototype._find = function(variable) {
@@ -36,8 +41,11 @@ MultiEditSolver.prototype.endEdit = function(variable) {
         console.warn('cannot end edit on variable that is not being edited');
         return;
     }
-    this._editVars.splice(idx, 1);
-    this._reedit();
+    this._editVars[idx].count--;
+    if (this._editVars[idx].count == 0) {
+        this._editVars.splice(idx, 1);
+        this._reedit();
+    }
 }
 MultiEditSolver.prototype.suggestValue = function(variable, value) {
     if (!this._editing) {
