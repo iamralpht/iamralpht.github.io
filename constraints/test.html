@@ -58,6 +58,7 @@
 <script src="c.js"></script>
 <script src="manipulable.js"></script>
 <script src="multieditsolver.js"></script>
+<script src="motioncontext.js"></script>
 <script src="box.js"></script>
 </head>
 <body>
@@ -111,7 +112,7 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 <div class="scrolling-example" id="android-notifications"></div>
 </div>
 <div class="content">
-<p>BUGS: No motion constraints while dragging. Motion constraints need to be evaluated when multiple constraints are violated. We're not tracing the motion constraint to find its relationship to the variable that's being manipulated&mdash;so parallax manipulations might go wrong. No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
+<p>BUGS: No motion constraints while dragging. Motion constraints need to be evaluated when multiple constraints are violated. No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
 <p>We don't have to just use friction and springs, though. We can revisit a lot of the previous examples which also used gravity and rebounding... Also look at using one input for multiple systems. Do iMessage springy scrolling.</p>
 <p>Also do snap points (pagers, the android system toggle panel, etc).</p>
 <p>What's next? State machines, dependent state, state driven animations (controller updating the view)...</p>
