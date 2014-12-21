@@ -15,6 +15,7 @@ function MultiEditSolver(solver) {
     this.addConstraint = this._solver.addConstraint.bind(this._solver);
     this.removeConstraint = this._solver.removeConstraint.bind(this._solver);
 }
+MultiEditSolver.prototype.solver = function() { return this._solver; }
 MultiEditSolver.prototype.beginEdit = function(variable, strength) {
     if (this._editVars.indexOf(variable) != -1) return;
 

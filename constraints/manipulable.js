@@ -60,6 +60,7 @@ function Manipulable(variable, solver, update, domObject, axis) {
     solver.solve();
     update(this);
 }
+Manipulable.prototype.variable = function() { return this._variable; }
 Manipulable.prototype.createMotion = function(x, v) {
     var m = new Friction(0.001);
     m.set(x, v);
@@ -81,7 +82,7 @@ Manipulable.prototype._animate = function() {
     }
     this._update(this);
 }
-Manipulable.prototype.hitConstraint = function(constraint) {
+Manipulable.prototype.hitConstraint = function(constraint, coefficient) {
     // XXX: Don't handle constraints when there's no animation.
     //      We should undertrack or do whatever behavior the caller
     //      or constraint wants when this happens.

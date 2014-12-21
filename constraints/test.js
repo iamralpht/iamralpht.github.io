@@ -1,5 +1,6 @@
 "use strict";
 
+
 // Helpers to make cassowary.js a bit clearer.
 var weak = c.Strength.weak;
 var medium = c.Strength.medium;
@@ -32,27 +33,59 @@ var mc = {
     less: function(a, b) { return a <= b; },
     equal: function(a, b) { return a == b; },
 };
-// Generate a function that updates a UI when the constraint solver has run. It
-// also enforces motion constraints.
-function updater(boxes, motionConstraints) {
-    function resolveMotionConstraints(manipulator) {
-        for (var i = 0; i < motionConstraints.length; i++) {
-            var pc = motionConstraints[i];
-            if (pc.op(pc.variable.valueOf(), pc.value))
-                continue;
+// This object updates all of the boxes from the constraint solver. It also tests
+// all of the motion constraints and identifies which manipulator caused a motion
+// constraint to be violated.
+function UpdateContext(solver, boxes, motionConstraints) {
+    this._solver = solver;
+    this._boxes = boxes;
+    this._motionConstraints = motionConstraints;
+    this._manipulators = [];
+}
+UpdateContext.prototype.addManipulator = function(manipulator) {
+    this._manipulators.push(manipulator);
+}
+UpdateContext.prototype.update = function() {
+    this._resolveMotionConstraints();
+    for (var i = 0; i < this._boxes.length; i++) {
+        this._boxes[i].update();
+    }
+}
+UpdateContext.prototype._resolveMotionConstraints = function() {
+    var solver = this._solver.solver();
+    function coefficient(manipulator, variable) {
+        var v = manipulator.variable();
+        // Iterate the edit variables in the solver. XXX: these are private and we need a real interface soon.
+        var editVarInfo = solver._editVarMap.get(v);
+        // No edit variable? No contribution to the current violation.
+        if (!editVarInfo) return 0;
+        // Now we can ask the coefficient of the edit's minus variable to the manipulator's variable. This
+        // is what the solver does in suggestValue.
+        var editMinus = editVarInfo.editMinus;
+        // Get the expression that corresponds to the motion constraint's violated variable.
+        // This is probably an "external variable" in cassowary.
+        var expr = solver.rows.get(variable);
+        if (!expr) return 0;
+        // Finally we can compute the value.
+        return expr.coefficientFor(editMinus);
+    }
+    for (var i = 0; i < this._motionConstraints.length; i++) {
+        var pc = this._motionConstraints[i];
+        if (pc.op(pc.variable.valueOf(), pc.value))
+            continue;
 
-            manipulator.hitConstraint(pc);
+        // Notify the manipulators that contributed to this violation.
+        for (var j = 0; j < this._manipulators.length; j++) {
+            var manipulator = this._manipulators[j];
+            var c = coefficient(manipulator, pc.variable);
+
+            // Do nothing if they're unrelated (i.e.: the coefficient is zero; this manipulator doesn't contribute).
+            if (c == 0) continue;
+
+            // We found a manipulator!
+            manipulator.hitConstraint(pc, c);
         }
     }
-
-    function update(manipulator) {
-        resolveMotionConstraints(manipulator);
-        for (var i = 0; i < boxes.length; i++) {
-            boxes[i].update();
-        }
-    }
-
-    return update;
 }
 
 function makeTwitterPanelsExample(parentElement) {
@@ -98,7 +131,11 @@ function makeTwitterPanelsExample(parentElement) {
     // Make a manipulator. It takes touch events and updates a constrained variable
     // from them.
 
-    new Manipulable(lastPanel.x, solver, updater(panels, motionConstraints), parentElement, 'x');
+    var updateContext = new UpdateContext(solver, panels, motionConstraints);
+    var updateFunction = updateContext.update.bind(updateContext);
+
+    var manip = new Manipulable(lastPanel.x, solver, updateFunction, parentElement, 'x');
+    updateContext.addManipulator(manip);
 }
 
 makeTwitterPanelsExample(document.getElementById('twitter-panels-example'));
@@ -172,7 +209,11 @@ function makeScrollingExample(parentElement, bunching) {
         op: mc.greater
     });
 
-    new Manipulable(scrollPosition, solver, updater(listItems, motionConstraints), parentElement, 'y');
+    var updateContext = new UpdateContext(solver, listItems, motionConstraints);
+    var updateFunction = updateContext.update.bind(updateContext);
+
+    var manip = new Manipulable(scrollPosition, solver, updateFunction, parentElement, 'y');
+    updateContext.addManipulator(manip);
 }
 
 makeScrollingExample(document.getElementById('scrolling-example'));
