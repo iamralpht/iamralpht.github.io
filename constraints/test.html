@@ -113,6 +113,17 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 </div>
 <div class="content">
 <p>BUGS: No motion constraints while dragging. Motion constraints need to be evaluated when multiple constraints are violated. No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
+<p>TODO on first pass:</p>
+<ul>
+ <li>Chrome phone tab switcher example with multitouch support.</li>
+ <li>Explain how this is currently useful for 1D work, 2D is frequently non-linear; need a robust solution for non-linear constraints that still has coefficients.</li>
+ <li>Implement feedback while dragging, using coefficients.</li>
+ <li>Scrolling with parallax example.</li>
+ <li>Snap points.</li>
+ <li>Explain how we can use simplex coefficients to give feedback to correct manipulator.</li>
+ <li>Refactor: Manipulable -&gt; Manipulator.</li>
+ <li>Facebook Paper scaling example; still 1D, allow scrolling in the other axis maybe. Needs better touch gesture detection.</li>
+</ul>
 <p>We don't have to just use friction and springs, though. We can revisit a lot of the previous examples which also used gravity and rebounding... Also look at using one input for multiple systems. Do iMessage springy scrolling.</p>
 <p>Also do snap points (pagers, the android system toggle panel, etc).</p>
 <p>What's next? State machines, dependent state, state driven animations (controller updating the view)...</p>
