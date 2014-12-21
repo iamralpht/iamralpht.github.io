@@ -51,7 +51,8 @@ MotionContext.prototype._resolveMotionConstraints = function() {
     }
     for (var i = 0; i < this._motionConstraints.length; i++) {
         var pc = this._motionConstraints[i];
-        if (pc.op(pc.variable.valueOf(), pc.value))
+        var delta = pc.op(pc.variable.valueOf(), pc.value);
+        if (delta == 0)
             continue;
 
         // Notify the manipulators that contributed to this violation.

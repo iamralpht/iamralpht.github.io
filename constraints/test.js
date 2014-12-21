@@ -22,18 +22,6 @@ var mediumStay =   function(v, w) { return stay(v, medium,   w||0); };
 var strongStay =   function(v, w) { return stay(v, strong,   w||0); };
 var requiredStay = function(v, w) { return stay(v, required, w||0); };
 
-
-/*
- * XXX: Note while reading this that the concept of a "motion constraint" isn't
- *      abstracted fully yet; this is coming soon!
- */
-// Ops for motion constraints.
-var mc = {
-    greater: function(a, b) { return a >= b; },
-    less: function(a, b) { return a <= b; },
-    equal: function(a, b) { return a == b; },
-};
-
 function makeTwitterPanelsExample(parentElement) {
     var context = new MotionContext();
     var solver = context.solver();
@@ -56,7 +44,7 @@ function makeTwitterPanelsExample(parentElement) {
         // Pin the first panel to 0, and add a motion constraint.
         if (i == 0) {
             solver.add(eq(p.x, 0, weak, 100));
-            context.addMotionConstraint({variable: p.x, value: 0, op: mc.equal});
+            context.addMotionConstraint(new MotionConstraint(p.x, mc.equal, 0));//{variable: p.x, value: 0, op: mc.equal});
         } else {
             // The panel mustn't reveal any space between it and the previous panel.
             solver.add(leq(p.x, panels[i-1].right, medium, 0));
@@ -146,16 +134,10 @@ function makeScrollingExample(parentElement, bunching) {
     // This prefers the list to be "scrolled" to the top.
     if (!bunching) solver.add(leq(firstBox.y, 0, weak));
 
-    context.addMotionConstraint({
-        variable: firstBox.y,
-        value: 0,
-        op: mc.less
-    });
-    context.addMotionConstraint({
-        variable: lastBox.bottom,
-        value: parentHeight,
-        op: mc.greater
-    });
+    context.addMotionConstraint(
+        new MotionConstraint(firstBox.y, mc.less, 0));
+    context.addMotionConstraint(
+        new MotionConstraint(lastBox.bottom, mc.greater, parentHeight));
 
     var updateFunction = context.update.bind(context);
 

@@ -21,18 +21,6 @@ var mediumStay =   function(v, w) { return stay(v, medium,   w||0); };
 var strongStay =   function(v, w) { return stay(v, strong,   w||0); };
 var requiredStay = function(v, w) { return stay(v, required, w||0); };
 
-
-/*
- * XXX: Note while reading this that the concept of a "motion constraint" isn't
- *      abstracted fully yet; this is coming soon!
- */
-// Ops for motion constraints.
-var mc = {
-    greater: function(a, b) { return a >= b; },
-    less: function(a, b) { return a <= b; },
-    equal: function(a, b) { return a == b; },
-};
-
 // Data model. Fake tweets, some with media attributes to make them sticky.
 var model = [
     {
@@ -87,16 +75,10 @@ function OpenedTweets(context) {
     this._spacing = new c.Variable();
     this._solver.add(geq(this._spacing, 6, medium));
 
-    context.addMotionConstraint({
-        variable: this._spacing,
-        value: 6,
-        op: mc.greater
-    });
-    context.addMotionConstraint({
-        variable: this._spacing,
-        value: 90,
-        op: mc.less
-    });
+    context.addMotionConstraint(
+        new MotionConstraint(this._spacing, mc.greater, 6));
+    context.addMotionConstraint(
+        new MotionConstraint(this._spacing, mc.less, 90));
 
     this._dimmer = document.createElement('div');
     this._dimmer.className = 'dimmer';
@@ -269,16 +251,10 @@ function makeTwitterExample(parentElement) {
     }
 
     // Don't scroll over the ends.
-    context.addMotionConstraint({
-        variable: tweets[0].y,
-        value: 0,
-        op: mc.less
-    });
-    context.addMotionConstraint({
-        variable: tweets[tweets.length - 1].bottom,
-        value: 420,
-        op: mc.greater
-    });
+    context.addMotionConstraint(
+        new MotionConstraint(tweets[0].y, mc.less, 0));
+    context.addMotionConstraint(
+        new MotionConstraint(tweets[tweets.length - 1].bottom, mc.greater, 420));
 
     // Let openedTweets get an update message when the solver runs so that it
     // can show/hide its dimming layer. Super need more state control from
