@@ -7,6 +7,7 @@ function MotionContext() {
     this._boxes = [];
     this._motionConstraints = [];
     this._manipulators = [];
+    this._updating = false;
 }
 MotionContext.prototype.solver = function() { return this._solver; }
 MotionContext.prototype.addBox = function(box) {
@@ -20,10 +21,15 @@ MotionContext.prototype.addManipulator = function(manipulator) {
     this._manipulators.push(manipulator);
 }
 MotionContext.prototype.update = function() {
+    // Prevent re-entrancy which can happen when a motion constraint violation
+    // causes an animation to be created which propagates another update.
+    if (this._updating) return;
+    this._updating = true;
     this._resolveMotionConstraints();
     for (var i = 0; i < this._boxes.length; i++) {
         this._boxes[i].update();
     }
+    this._updating = false;
 }
 MotionContext.prototype._resolveMotionConstraints = function() {
     var solver = this._solver.solver();

@@ -32,35 +32,6 @@ var mc = {
     less: function(a, b) { return a <= b; },
     equal: function(a, b) { return a == b; },
 };
-// Generate a function that updates a UI when the constraint solver has run. It
-// also enforces motion constraints.
-function updater(boxes, motionConstraints) {
-    function resolveMotionConstraints(manipulator) {
-        for (var i = 0; i < motionConstraints.length; i++) {
-            var pc = motionConstraints[i];
-            if (pc.op(Math.round(pc.variable.valueOf()), Math.round(pc.value)))
-                continue;
-
-            manipulator.hitConstraint(pc);
-        }
-    }
-
-    // Protect against recursion. When we create an animation the animation system
-    // runs the first frame synchronously which probably isn't needed in this
-    // constraints design...
-    var updating = false;
-    function update(manipulator) {
-        if (updating) return;
-        updating = true;
-        resolveMotionConstraints(manipulator);
-        for (var i = 0; i < boxes.length; i++) {
-            boxes[i].update();
-        }
-        updating = false;
-    }
-
-    return update;
-}
 
 // Data model. Fake tweets, some with media attributes to make them sticky.
 var model = [
@@ -108,19 +79,20 @@ var model = [
 
 // This object manages the list of tweets that are currently opened and
 // ensures that they all have good constraints.
-function OpenedTweets(solver, update, motionConstraints) {
-    this._solver = solver;
-    this._update = update;
+function OpenedTweets(context) {
+    this._context = context;
+    this._solver = context.solver();
+    this._update = context.update.bind(context);
     this._tweets = [];
     this._spacing = new c.Variable();
-    solver.add(geq(this._spacing, 6, medium));
+    this._solver.add(geq(this._spacing, 6, medium));
 
-    motionConstraints.push({
+    context.addMotionConstraint({
         variable: this._spacing,
         value: 6,
         op: mc.greater
     });
-    motionConstraints.push({
+    context.addMotionConstraint({
         variable: this._spacing,
         value: 90,
         op: mc.less
@@ -146,7 +118,8 @@ OpenedTweets.prototype.makeInteractive = function(index, box, button) {
     // dragged. We use the pointer-events style to ensure that it only does
     // this when it's in the sticky state (though it should only do it when
     // its sticky and stuck to the top).
-    new Manipulable(this._spacing, this._solver, this._update, box.element(), 'y');
+    this._context.addManipulator(
+        new Manipulable(this._spacing, this._solver, this._update, box.element(), 'y'));
 
     // Attempt at a button; should actually do proper gesture detection and not
     // eat events if it looks like a drag...
@@ -255,11 +228,11 @@ function makeTweet(index, tweet, openedTweets) {
 }
 
 function makeTwitterExample(parentElement) {
-    var solver = new MultiEditSolver(new c.SimplexSolver());
+    var context = new MotionContext();
+    var solver = context.solver();
     var tweets = [];
     var motionConstraints = [];
-    var update = updater(tweets, motionConstraints);
-    var openedTweets = new OpenedTweets(solver, update, motionConstraints);
+    var openedTweets = new OpenedTweets(context, motionConstraints);
 
     parentElement.appendChild(openedTweets.element());
 
@@ -285,15 +258,16 @@ function makeTwitterExample(parentElement) {
         solver.add(eq(tweet.bottom, c.plus(tweet.y, 90), medium));
 
         tweets.push(tweet);
+        context.addBox(tweet);
     }
 
     // Don't scroll over the ends.
-    motionConstraints.push({
+    context.addMotionConstraint({
         variable: tweets[0].y,
         value: 0,
         op: mc.less
     });
-    motionConstraints.push({
+    context.addMotionConstraint({
         variable: tweets[tweets.length - 1].bottom,
         value: 420,
         op: mc.greater
@@ -304,8 +278,9 @@ function makeTwitterExample(parentElement) {
     // state controlling active constraints to constraints driving state (not
     // sure how to avoid cycles though).
     tweets.push(openedTweets);
+    context.addBox(openedTweets);
 
-    new Manipulable(scrollPosition, solver, update, parentElement, 'y');
+    context.addManipulator(new Manipulable(scrollPosition, solver, context.update.bind(context), parentElement, 'y'));
 }
 
 makeTwitterExample(document.getElementById('timeline'));
