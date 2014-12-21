@@ -4,20 +4,15 @@
 
 // These are the ops; they return the delta when not met.
 var mc = {
-    greater: //function(a, b) { return a >= b; },
-        function(a, b) {
+    greater: function(a, b) {
             if (a >= b) return 0;
-            return a - b;
+            return b - a;
         },
-    less: //function(a, b) { return a <= b; },
-        function(a, b) {
+    less: function(a, b) {
             if (a <= b) return 0;
             return b - a;
         },
-    equal: //function(a, b) { return a == b; },
-        function(a, b) {
-            return a - b;
-        }
+    equal: function(a, b) { return b - a; }
 };
 
 function MotionConstraint(variable, op, value, physicsModel) {

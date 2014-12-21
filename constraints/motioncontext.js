@@ -32,6 +32,24 @@ MotionContext.prototype.update = function() {
     this._updating = false;
 }
 MotionContext.prototype._resolveMotionConstraints = function() {
+    var allViolations = {};
+    function addViolation(manipulator, motionConstraint, coefficient, delta) {
+        var record = { motionConstraint: motionConstraint, coefficient: coefficient, delta: delta };
+        var name = manipulator.name();
+        if (!allViolations.hasOwnProperty(name)) {
+            allViolations[name] = { manipulator: manipulator, violations: [record] };
+        } else {
+            allViolations[name].violations.push(record);
+        }
+    }
+    function dispatchViolations() {
+        for (var k in allViolations) {
+            var info = allViolations[k];
+            info.manipulator.hitConstraints(info.violations);
+        }
+    }
+
+
     var solver = this._solver.solver();
     function coefficient(manipulator, variable) {
         var v = manipulator.variable();
@@ -63,8 +81,13 @@ MotionContext.prototype._resolveMotionConstraints = function() {
             // Do nothing if they're unrelated (i.e.: the coefficient is zero; this manipulator doesn't contribute).
             if (c == 0) continue;
 
-            // We found a manipulator!
-            manipulator.hitConstraint(pc, c);
+            // We found a violation and the manipulator that contributed. Remember it and we'll
+            // tell the manipulator about all the violations it contributed to at once afterwards
+            // and it can decide what it's going to do about it...
+            //manipulator.hitConstraint(pc, c, delta);
+            addViolation(manipulator, pc, c, delta);
         }
     }
+    // Tell all the manipulators that we're done constraining.
+    dispatchViolations();
 }

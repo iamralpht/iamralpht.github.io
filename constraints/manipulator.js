@@ -1,5 +1,6 @@
 "use strict";
 
+var manipulatorCount = 0;
 
 // This is a wrapper over a cassowary variable. It will create an edit session
 // for it when dragged and listen for violations of motion constraints.
@@ -11,6 +12,7 @@ function Manipulator(variable, solver, update, domObject, axis) {
 
     this._motion = null;
     this._animation = null;
+    this._name = 'manipulator-' + variable.name + '-' + (++manipulatorCount);
 
     var self = this;
 
@@ -60,6 +62,7 @@ function Manipulator(variable, solver, update, domObject, axis) {
     solver.solve();
     update(this);
 }
+Manipulator.prototype.name = function() { return this._name; }
 Manipulator.prototype.variable = function() { return this._variable; }
 Manipulator.prototype.createMotion = function(x, v) {
     var m = new Friction(0.001);
@@ -82,7 +85,7 @@ Manipulator.prototype._animate = function() {
     }
     this._update(this);
 }
-Manipulator.prototype.hitConstraint = function(constraint, coefficient) {
+Manipulator.prototype.hitConstraint = function(constraint, coefficient, delta) {
     // XXX: Don't handle constraints when there's no animation.
     //      We should undertrack or do whatever behavior the caller
     //      or constraint wants when this happens.
@@ -92,14 +95,20 @@ Manipulator.prototype.hitConstraint = function(constraint, coefficient) {
     if (this._hitConstraint == constraint) return;
     this._hitConstraint = constraint;
 
-    var delta = constraint.variable.valueOf() - constraint.value;
-
     // Treat every constraint as a springy constraint. We could instead
     // treat them as whatever the model suggests (stop, rebound). Not
     // there yet.
     this._motion = new Spring(1, 200, 20);
     this._motion.snap(this._lastPosition);
-    this._motion.setEnd(this._lastPosition - delta, this._lastVelocity);
+    this._motion.setEnd(this._lastPosition + delta * coefficient, this._lastVelocity);
     this._animation.cancel();
     this._animation = animation(this._motion, this._animate.bind(this));
+}
+Manipulator.prototype.hitConstraints = function(violations) {
+    // XXX: Do something good here instead.
+    //
+    // Sort the violations by the largest delta and then just handle that one.
+    if (violations.length == 0) return;
+    violations.sort(function(a, b) { return Math.abs(b.delta) - Math.abs(a.delta); });
+    this.hitConstraint(violations[0].motionConstraint, violations[0].coefficient, violations[0].delta);
 }
