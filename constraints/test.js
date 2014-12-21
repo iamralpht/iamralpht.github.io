@@ -68,7 +68,7 @@ function makeTwitterPanelsExample(parentElement) {
 
     var updateFunction = context.update.bind(context);
 
-    var manip = new Manipulable(lastPanel.x, solver, updateFunction, parentElement, 'x');
+    var manip = new Manipulator(lastPanel.x, solver, updateFunction, parentElement, 'x');
     context.addManipulator(manip);
 }
 
@@ -141,7 +141,7 @@ function makeScrollingExample(parentElement, bunching) {
 
     var updateFunction = context.update.bind(context);
 
-    var manip = new Manipulable(scrollPosition, solver, updateFunction, parentElement, 'y');
+    var manip = new Manipulator(scrollPosition, solver, updateFunction, parentElement, 'y');
     context.addManipulator(manip);
 }
 

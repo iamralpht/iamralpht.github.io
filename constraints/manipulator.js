@@ -3,7 +3,7 @@
 
 // This is a wrapper over a cassowary variable. It will create an edit session
 // for it when dragged and listen for violations of motion constraints.
-function Manipulable(variable, solver, update, domObject, axis) {
+function Manipulator(variable, solver, update, domObject, axis) {
     this._variable = variable;
     this._solver = solver;
     this._axis = axis;
@@ -60,13 +60,13 @@ function Manipulable(variable, solver, update, domObject, axis) {
     solver.solve();
     update(this);
 }
-Manipulable.prototype.variable = function() { return this._variable; }
-Manipulable.prototype.createMotion = function(x, v) {
+Manipulator.prototype.variable = function() { return this._variable; }
+Manipulator.prototype.createMotion = function(x, v) {
     var m = new Friction(0.001);
     m.set(x, v);
     return m;
 }
-Manipulable.prototype._animate = function() {
+Manipulator.prototype._animate = function() {
     if (!this._motion) return; // XXX: Somewhere we're not stopping the animation properly.
 
     var x = this._motion.x();
@@ -82,7 +82,7 @@ Manipulable.prototype._animate = function() {
     }
     this._update(this);
 }
-Manipulable.prototype.hitConstraint = function(constraint, coefficient) {
+Manipulator.prototype.hitConstraint = function(constraint, coefficient) {
     // XXX: Don't handle constraints when there's no animation.
     //      We should undertrack or do whatever behavior the caller
     //      or constraint wants when this happens.
