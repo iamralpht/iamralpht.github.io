@@ -33,6 +33,14 @@ MotionContext.prototype.update = function() {
 }
 MotionContext.prototype._resolveMotionConstraints = function() {
     var allViolations = {};
+
+    // We want to call all manipulators so that those that previously were violating but now
+    // are not get those violations removed.
+    for (var i = 0; i < this._manipulators.length; i++) {
+        var manipulator = this._manipulators[i];
+        allViolations[manipulator.name()] = { manipulator: manipulator, violations: [] };
+    }
+
     function addViolation(manipulator, motionConstraint, coefficient, delta) {
         var record = { motionConstraint: motionConstraint, coefficient: coefficient, delta: delta };
         var name = manipulator.name();
