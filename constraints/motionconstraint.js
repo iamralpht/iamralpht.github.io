@@ -22,3 +22,6 @@ function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel
     this.overdragCoefficient = overdragCoefficient || 0.75;
     this.physicsModel = physicsModel;
 }
+MotionConstraint.prototype.delta = function() {
+    return this.op(this.variable, this.value);
+}

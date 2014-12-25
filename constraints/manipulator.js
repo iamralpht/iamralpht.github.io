@@ -122,7 +122,10 @@ Manipulator.prototype._update = function() {
         // If we've hit any constraint then apply that.
         var position = this._motionState.dragStart + this._motionState.dragDelta;
         if (this._hitConstraint) {
-            var violationDelta = this._hitConstraint.op(position, this._hitConstraint.value) * this._constraintCoefficient;
+            // Push the current value into the system so that we can extract the delta.
+            this._solver.suggestValue(this._variable, position);
+
+            var violationDelta = this._hitConstraint.delta() * this._constraintCoefficient;
 
             if (Math.abs(violationDelta) > Math.abs(this._motionState.dragDelta))
                 violationDelta = this._motionState.dragDelta * (violationDelta < 0 ? -1 : 1);
@@ -174,7 +177,7 @@ Manipulator.prototype._createAnimation = function(velocity) {
         // constraint solver to surface violations we only need to remember the coefficient
         // of a given violation.
         var violationDelta =
-            this._hitConstraint.op(this._hitConstraint.variable.valueOf(), this._hitConstraint.value) *
+            this._hitConstraint.delta() *
             this._constraintCoefficient;
 
         var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
