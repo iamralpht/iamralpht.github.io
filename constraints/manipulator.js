@@ -36,7 +36,8 @@ function Manipulator(variable, solver, update, domObject, axis) {
         // Animation from constraint (either from velocity animation, or from drag end).
         constraintAnimation: null,
         constraintAnimationPosition: 0,
-        constraintAnimationVelocity: 0
+        constraintAnimationVelocity: 0,
+        constraintAnimationConstraint: null // the constraint we're animating for.
     };
 
     // Clean up:
@@ -126,17 +127,17 @@ Manipulator.prototype._update = function() {
             position = this._motionState.dragStart + this._motionState.dragDelta * 0.5 * this._constraintCoefficient;
         }
         // Now tell the solver.
-        this._solver.suggestValue(this._variable, position);
+        this._solver.suggestValue(this._variable, Math.round(position));
     } else if (this._motionState.constraintAnimation) {
         this._cancelAnimation('velocityAnimation');
         beginEdit();
         var position = this._motionState.constraintAnimationPosition;
-        this._solver.suggestValue(this._variable, position);
+        this._solver.suggestValue(this._variable, Math.round(position));
     } else if (this._motionState.velocityAnimation) {
         beginEdit();
         var position = this._motionState.velocityAnimationPosition;
         // We don't consider constraints here; we deal with them in didHitConstraint.
-        this._solver.suggestValue(this._variable, position);
+        this._solver.suggestValue(this._variable, Math.round(position));
     } else {
         // We're not doing anything; end the edit.
         if (!this._motionState.editing) return;
@@ -150,14 +151,19 @@ Manipulator.prototype._createAnimation = function(velocity) {
     if (this._motionState.dragging) return;
 
     this._cancelAnimation('velocityAnimation');
-    this._cancelAnimation('constraintAnimation');
     var self = this;
 
     // Create an animation from where we are. This is either just a regular motion or we're
     // violating a constraint and we need to animate out of violation.
     if (this._hitConstraint) {
-        // XXX: Currently we always use a spring to animate us back, but this should come
-        //      from the violated motion constraint instead of being hardcoded.
+        // Don't interrupt an animation caused by a constraint to enforce the same constraint.
+        // This can happen if the constraint is enforced by an underdamped spring, for example.
+        if (this._motionState.constraintAnimation) {
+            if (this._motionState.constraintAnimationConstraint == this._hitConstraint)
+                return;
+            this._cancelAnimation('constraintAnimation');
+        }
+        this._motionState.constraintAnimationConstraint = this._hitConstraint;
 
         // Figure out how far we have to go to be out of violation. Because we use a linear
         // constraint solver to surface violations we only need to remember the coefficient
@@ -167,6 +173,9 @@ Manipulator.prototype._createAnimation = function(velocity) {
             this._constraintCoefficient;
 
         var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : 0;
+
+        // XXX: Currently we always use a spring to animate us back, but this should come
+        //      from the violated motion constraint instead of being hardcoded.
         var motion = new Spring(1, 200, 20);
         motion.snap(this._variable.valueOf());
         motion.setEnd(this._variable.valueOf() + violationDelta, velocity);
@@ -179,11 +188,15 @@ Manipulator.prototype._createAnimation = function(velocity) {
 
                 if (motion.done()) {
                     self._cancelAnimation('constraintAnimation');
+                    self._motionState.constraintAnimationConstraint = null;
                     self._update();
                 }
             });
         return;
     }
+    if (!velocity) return;
+
+    this._cancelAnimation('constraintAnimation');
     // No constraint violation, just a plain motion animation incorporating the velocity
     // imparted by the finger.
     var motion = this.createMotion(this._variable.valueOf(), velocity);
@@ -205,7 +218,6 @@ Manipulator.prototype.hitConstraint = function(constraint, coefficient, delta) {
     if (constraint == this._hitConstraint) return;
     this._hitConstraint = constraint;
     this._constraintCoefficient = coefficient;
-
 
     if (this._motionState.dragging) {
         this._update();
