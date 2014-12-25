@@ -148,6 +148,34 @@ function makeScrollingExample(parentElement, bunching) {
 makeScrollingExample(document.getElementById('scrolling-example'));
 makeScrollingExample(document.getElementById('android-notifications'), true);
 
-function makeAndroidNotificationsExample(parentElement) {
-    var solver = new MultiEditSolver(new c.SimplexSolver());
+function makeGravityExample(parentElement) {
+    var context = new MotionContext();
+    var solver = context.solver();
+
+    var parentHeight = parentElement.offsetHeight;
+
+    var b = new Box('Drag Up');
+    b.y = new c.Variable({name: 'box-y'});
+    b.bottom = new c.Variable({name: 'box-bottom'});
+    b.x = 0; 
+    b.right = 200;
+    
+    context.addBox(b);
+
+    parentElement.appendChild(b.element());
+
+    solver.add(leq(b.bottom, parentHeight, weak));
+    solver.add(eq(b.y, c.plus(b.bottom, -50), medium));
+
+    context.addMotionConstraint(new MotionConstraint(b.bottom, mc.less, parentHeight));
+
+    var manip = new Manipulator(b.y, solver, context.update.bind(context), parentElement, 'y');
+    manip.createMotion = function(x, v) {
+        var motion = new Gravity(5000, 9999999);
+        motion.set(x, v);
+        return motion;
+    }
+    context.addManipulator(manip);
 }
+
+makeGravityExample(document.getElementById('gravity-example'));

@@ -68,7 +68,7 @@ function Manipulator(variable, solver, update, domObject, axis) {
             self._motionState.dragging = false;
             // No velocity, just end the drag and we'll run a constraining animation
             // if needed.
-            if (velocity == 0 && !self._hitConstraint) {
+            if (velocity == 0 && !self._hitConstraint && false) {
                 self._update();
                 return;
             }
@@ -207,13 +207,16 @@ Manipulator.prototype._createAnimation = function(velocity) {
             return;
         }
     }
-    if (!velocity) return;
 
-    this._cancelAnimation('velocityAnimation');
-    this._cancelAnimation('constraintAnimation');
     // No constraint violation, just a plain motion animation incorporating the velocity
     // imparted by the finger.
     var motion = this.createMotion(this._variable.valueOf(), velocity);
+
+    if (motion.done()) return;
+
+    this._cancelAnimation('velocityAnimation');
+    this._cancelAnimation('constraintAnimation');
+    
     this._motionState.velocityAnimation = animation(motion,
         function() {
             self._motionState.velocityAnimationPosition = motion.x();

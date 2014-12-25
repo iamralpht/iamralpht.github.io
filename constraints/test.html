@@ -41,6 +41,11 @@
     height: 180px;
 }
 
+.gravity-example {
+    position: relative;
+    height: 250px;
+}
+
 .constraints {
     clear: both;
     display: inline-block;
@@ -62,6 +67,7 @@
 <script src="../physics/animate.js"></script>
 <script src="../physics/friction.js"></script>
 <script src="../physics/spring.js"></script>
+<script src="../physics/gravity.js"></script>
 <script src="c.js"></script>
 <script src="manipulator.js"></script>
 <script src="multieditsolver.js"></script>
@@ -118,6 +124,12 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 <p>Android 5 notifications. Just like scrolling but with some extra constraints to do the bunching. I'll add resizing of notifications (like the GMail expandable one) and multitouch next. It falls out of the constraints.</p></div>
 <div class="example">
 <div class="scrolling-example" id="android-notifications"></div>
+</div>
+<div class="content">
+<p>Using gravity instead of friction...</p>
+</div>
+<div class="example">
+<div class="gravity-example" id="gravity-example"></div>
 </div>
 <div class="content">
 <p>BUGS: No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
