@@ -15,9 +15,10 @@ var mc = {
     equal: function(a, b) { return b - a; }
 };
 
-function MotionConstraint(variable, op, value, physicsModel) {
+function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel) {
     this.variable = variable;
     this.value = value;
     this.op = op;
+    this.overdragCoefficient = overdragCoefficient || 0.75;
     this.physicsModel = physicsModel;
 }
