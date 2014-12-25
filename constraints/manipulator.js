@@ -67,7 +67,7 @@ function Manipulator(variable, solver, update, domObject, axis) {
             self._motionState.dragging = false;
             // No velocity, just end the drag and we'll run a constraining animation
             // if needed.
-            if (velocity == 0) {
+            if (velocity == 0 && !self._hitConstraint) {
                 self._update();
                 return;
             }
