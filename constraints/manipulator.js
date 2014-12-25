@@ -151,9 +151,11 @@ Manipulator.prototype._createAnimation = function(velocity) {
     // Can't animate if we're being dragged.
     if (this._motionState.dragging) return;
 
-    this._cancelAnimation('velocityAnimation');
     var self = this;
 
+    function sign(x) {
+        return typeof x === 'number' ? x ? x < 0 ? -1 : 1 : x === x ? 0 : NaN : NaN;
+    }
     // Create an animation from where we are. This is either just a regular motion or we're
     // violating a constraint and we need to animate out of violation.
     if (this._hitConstraint) {
@@ -173,30 +175,36 @@ Manipulator.prototype._createAnimation = function(velocity) {
             this._hitConstraint.op(this._hitConstraint.variable.valueOf(), this._hitConstraint.value) *
             this._constraintCoefficient;
 
-        var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : 0;
+        var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
 
-        // XXX: Currently we always use a spring to animate us back, but this should come
-        //      from the violated motion constraint instead of being hardcoded.
-        var motion = new Spring(1, 200, 20);
-        motion.snap(this._variable.valueOf());
-        motion.setEnd(this._variable.valueOf() + violationDelta, velocity);
+        // Only do this if the velocity is going against the constraint, otherwise do the
+        // regular animation. Not sure if this needs to be based on the simulation of the
+        // constraint or not.
+        if (velocity && (sign(velocity) !== sign(violationDelta))) {
+            // XXX: Currently we always use a spring to animate us back, but this should come
+            //      from the violated motion constraint instead of being hardcoded.
+            var motion = new Spring(1, 200, 20);
+            motion.snap(this._variable.valueOf());
+            motion.setEnd(this._variable.valueOf() + violationDelta, velocity);
 
-        this._motionState.constraintAnimation = animation(motion,
-            function() {
-                self._motionState.constraintAnimationPosition = motion.x();
-                self._motionState.constraintAnimationVelocity = motion.dx(); // unused.
-                self._update();
-
-                if (motion.done()) {
-                    self._cancelAnimation('constraintAnimation');
-                    self._motionState.constraintAnimationConstraint = null;
+            this._motionState.constraintAnimation = animation(motion,
+                function() {
+                    self._motionState.constraintAnimationPosition = motion.x();
+                    self._motionState.constraintAnimationVelocity = motion.dx(); // unused.
                     self._update();
-                }
-            });
-        return;
+
+                    if (motion.done()) {
+                        self._cancelAnimation('constraintAnimation');
+                        self._motionState.constraintAnimationConstraint = null;
+                        self._update();
+                    }
+                });
+            return;
+        }
     }
     if (!velocity) return;
 
+    this._cancelAnimation('velocityAnimation');
     this._cancelAnimation('constraintAnimation');
     // No constraint violation, just a plain motion animation incorporating the velocity
     // imparted by the finger.
