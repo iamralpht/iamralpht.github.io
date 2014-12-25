@@ -122,9 +122,8 @@ Manipulator.prototype._update = function() {
         // If we've hit any constraint then apply that.
         var position = this._motionState.dragStart + this._motionState.dragDelta;
         if (this._hitConstraint) {
-            var violationDelta = this._hitConstraint.op(this._hitConstraint.variable.valueOf(), this._hitConstraint.value);
-            violationDelta *= 1 - this._constraintCoefficient;
-            position = this._motionState.dragStart + this._motionState.dragDelta * 0.5 * this._constraintCoefficient;
+            var violationDelta = this._hitConstraint.op(this._hitConstraint.variable.valueOf(), this._hitConstraint.value) * this._constraintCoefficient;
+            position = this._motionState.dragStart + this._motionState.dragDelta + violationDelta * 0.5;
         }
         // Now tell the solver.
         this._solver.suggestValue(this._variable, Math.round(position));
