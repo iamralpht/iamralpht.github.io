@@ -76,9 +76,9 @@ function OpenedTweets(context) {
     this._solver.add(geq(this._spacing, 6, medium));
 
     context.addMotionConstraint(
-        new MotionConstraint(this._spacing, mc.greater, 6));
+        new MotionConstraint(this._spacing, '>=', 6));
     context.addMotionConstraint(
-        new MotionConstraint(this._spacing, mc.less, 90));
+        new MotionConstraint(this._spacing, '<=', 90));
 
     this._dimmer = document.createElement('div');
     this._dimmer.className = 'dimmer';
@@ -252,9 +252,9 @@ function makeTwitterExample(parentElement) {
 
     // Don't scroll over the ends.
     context.addMotionConstraint(
-        new MotionConstraint(tweets[0].y, mc.less, 0));
+        new MotionConstraint(tweets[0].y, '<=', 0));
     context.addMotionConstraint(
-        new MotionConstraint(tweets[tweets.length - 1].bottom, mc.greater, 420));
+        new MotionConstraint(tweets[tweets.length - 1].bottom, '>=', 420));
 
     // Let openedTweets get an update message when the solver runs so that it
     // can show/hide its dimming layer. Super need more state control from

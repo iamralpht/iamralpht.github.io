@@ -77,7 +77,7 @@ MotionContext.prototype._resolveMotionConstraints = function() {
     }
     for (var i = 0; i < this._motionConstraints.length; i++) {
         var pc = this._motionConstraints[i];
-        var delta = pc.op(pc.variable.valueOf(), pc.value);
+        var delta = pc.delta();
         if (delta == 0)
             continue;
 

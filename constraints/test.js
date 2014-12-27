@@ -44,7 +44,7 @@ function makeTwitterPanelsExample(parentElement) {
         // Pin the first panel to 0, and add a motion constraint.
         if (i == 0) {
             solver.add(eq(p.x, 0, weak, 100));
-            context.addMotionConstraint(new MotionConstraint(p.x, mc.equal, 0));//{variable: p.x, value: 0, op: mc.equal});
+            context.addMotionConstraint(new MotionConstraint(p.x, '==', 0));//{variable: p.x, value: 0, op: mc.equal});
         } else {
             // The panel mustn't reveal any space between it and the previous panel.
             solver.add(leq(p.x, panels[i-1].right, medium, 0));
@@ -135,9 +135,9 @@ function makeScrollingExample(parentElement, bunching) {
     if (!bunching) solver.add(leq(firstBox.y, 0, weak));
 
     context.addMotionConstraint(
-        new MotionConstraint(firstBox.y, mc.less, 0));
+        new MotionConstraint(firstBox.y, '<=', 0));
     context.addMotionConstraint(
-        new MotionConstraint(lastBox.bottom, mc.greater, parentHeight));
+        new MotionConstraint(lastBox.bottom, '>=', parentHeight));
 
     var updateFunction = context.update.bind(context);
 
@@ -167,7 +167,7 @@ function makeGravityExample(parentElement) {
     solver.add(leq(b.bottom, parentHeight, weak));
     solver.add(eq(b.y, c.plus(b.bottom, -50), medium));
 
-    context.addMotionConstraint(new MotionConstraint(b.bottom, mc.less, parentHeight));
+    context.addMotionConstraint(new MotionConstraint(b.bottom, '<=', parentHeight));
 
     var manip = new Manipulator(b.y, solver, context.update.bind(context), parentElement, 'y');
     manip.createMotion = function(x, v) {

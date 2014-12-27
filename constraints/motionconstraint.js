@@ -9,16 +9,34 @@ var mc = {
             return b - a;
         },
     less: function(a, b) {
-            if (a <= b) return 0;
-            return b - a;
-        },
+        if (a <= b) return 0;
+        return b - a;
+    },
+    l: function(a, b) {
+        if (a < b) return 0;
+        return b - a;
+    },
+    g: function(a, b) {
+        if (a > b) return 0;
+        return b - a;
+    },
     equal: function(a, b) { return b - a; }
 };
 
 function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel) {
     this.variable = variable;
     this.value = value;
-    this.op = op;
+    if (typeof op === 'string') {
+        switch (op) {
+        case '==': this.op = mc.equal; break;
+        case '>=': this.op = mc.greater; break;
+        case '<=': this.op = mc.less; break;
+        case '<': this.op = mc.l; break;
+        case '>': this.op = mc.g; break;
+        }
+    } else {
+        this.op = op;
+    }
     this.overdragCoefficient = overdragCoefficient || 0.75;
     this.physicsModel = physicsModel;
 }
