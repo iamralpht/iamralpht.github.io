@@ -2,10 +2,14 @@
 
 // This is a DOM block which is positioned from the constraint solver rather than
 // via flow.
-function Box(textContent) {
-    this._element = document.createElement('div');
-    this._element.className = 'box';
-    if (textContent) this._element.textContent = textContent;
+function Box(textContentOrElement) {
+    if (textContentOrElement && textContentOrElement.style) {
+        this._element = textContentOrElement;
+    } else {
+        this._element = document.createElement('div');
+        this._element.className = 'box';
+        if (textContentOrElement) this._element.textContent = textContentOrElement;
+    }
 
     // These get replaced with constraint variables by the caller.
     this.x = 0;
@@ -13,10 +17,13 @@ function Box(textContent) {
     this.right = 100;
     this.bottom = 100;
 
+    this._children = [];
+
     this.update();
 }
 Box.prototype.element = function() { return this._element; }
-Box.prototype.update = function() {
+Box.prototype.addChild = function(box) { this._children.push(box); }
+Box.prototype.update = function(px, py) {
     function get(variable) {
         if (variable.valueOf) return variable.valueOf();
         return variable;
@@ -28,6 +35,15 @@ Box.prototype.update = function() {
 
     var w = Math.max(0, right - x);
     var h = Math.max(0, bottom - y);
+
+    for (var i = 0; i < this._children.length; i++) {
+        this._children[i].update(x, y);
+    }
+
+    if (!px) px = 0;
+    if (!py) py = 0;
+    x -= px;
+    y -= py;
 
     // Be careful about updating width and height since it'll
     // trigger a browser layout.
