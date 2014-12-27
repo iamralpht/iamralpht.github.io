@@ -1,0 +1,92 @@
+<html>
+<head>
+<title>exploring constraint-based motion</title>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<style>
+* { box-sizing: border-box; }
+body {
+    font-family: 'Source Sans Pro';
+    background-color: #404040;
+    color: white;
+}
+.container {
+    position: relative;
+    margin: auto;
+    width: 320px;
+    height: 480px;
+    font-family: 'Roboto', sans-serif;
+    background-image: url(img/gmaps-map.png);
+    overflow: hidden;
+}
+.container>* { pointer-events: none; }
+.box {
+    position: absolute;
+    top: 0; left: 0;
+}
+.photo {
+    background-image: url(img/gmaps-image.jpg);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+.photo-dimming-layer {
+    background-image: linear-gradient(0deg, transparent, rgba(0, 0, 0, 0.7));
+}
+.infobar {
+    background-color: #1976d2;
+    overflow: hidden;
+    padding: 15px;
+}
+.top-navbar {
+    background-image: linear-gradient(0deg, transparent, #1976d2 15%, #1976d2);
+    padding: 15px 60px;
+    line-height: 25px;
+    font-weight: bold;
+}
+.content {
+    overflow: hidden;
+    background-color: white;
+    color: black;
+    padding: 15px;
+}
+</style>
+<script src="touch.js"></script>
+<script src="../physics/animate.js"></script>
+<script src="../physics/friction.js"></script>
+<script src="../physics/spring.js"></script>
+<script src="../physics/gravity.js"></script>
+<script src="c.js"></script>
+<script src="manipulator.js"></script>
+<script src="multieditsolver.js"></script>
+<script src="motioncontext.js"></script>
+<script src="motionconstraint.js"></script>
+<script src="box.js"></script>
+<script src="gmaps.js"></script>
+</head>
+<body>
+Google Maps example<br>
+<div class="container">
+    <div class="form box">
+        <div class="photo box">
+            <div class="photo-dimming-layer box"></div>
+        </div>
+        <div class="content box">
+            <p>Grassy park with tennis/handball courts, horseshoe pits, playgrounds, splash pad &amp; a fenced dog run.</p>
+            <p>600 East Meadow Drive, Palo Alto, CA 94306</p>
+            <p>Open 24 hours</p>
+        </div>
+        <div class="infobar box">
+            <span class="small-title">Mitchell Park</span>
+            <span class="rating">4.5 stars</span>
+            <span class="time">5 minutes</span>
+            <div class="top-navbar box">
+                <span class="top-title">Mitchell Park</span>
+            </div>
+        </div>
+        <div class="navigation-controls box"></div>
+    </div>
+</div>
+</body>
+</html>
