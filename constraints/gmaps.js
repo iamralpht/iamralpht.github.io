@@ -90,24 +90,23 @@ function makeGoogleMapsExample() {
     solver.add(eq(infoBar.y, c.minus(infoBar.bottom, 80), medium));
 
     // Infobar weakly tracks scroll position.
-    solver.add(eq(infoBar.bottom, c.plus(height, scrollPosition), medium));//weak, 100));
+    solver.add(eq(infoBar.bottom, c.plus(height, scrollPosition), medium));
 
     // Infobar shrinks to 55px visible at the top.
     solver.add(geq(infoBar.bottom, 55, medium));
 
 
     // Photo's top is the infobar's top plus 2x scrollpos.
-    solver.add(eq(photo.y, c.plus(infoBar.y, c.times(scrollPosition, (height - photoHeight) / 480)), weak, 100));
+    solver.add(geq(photo.y, c.plus(infoBar.y, c.times(scrollPosition, (height - photoHeight) / 480)), weak));
     // Photo's height
     solver.add(eq(photo.bottom, c.plus(photo.y, photoHeight), medium));
     // Photo doesn't go off the top.
     //solver.add(geq(photo.y, 0, medium));
     //   Actually, make it more interesting, have the photo track at 1/3 position when going off the top.
-    solver.add(geq(photo.y, c.times(c.plus(infoBar.y, c.times(scrollPosition, (height - photoHeight) / 480)), 0.2), weak, 200));
+    solver.add(geq(photo.y, c.times(c.plus(infoBar.y, c.times(scrollPosition, (height - photoHeight) / 480)), 0.2), weak));
 
     // The content is similar to the infobar -- it's weakly positioned at the bottom of
     // the screen and is scrolled up. But it's not constrained by the top of the screen.
-    solver.add(eq(content.y, height, weak));
     solver.add(eq(content.bottom, c.plus(content.y, height), medium));
     solver.add(eq(content.y, c.plus(height, scrollPosition), medium));
 
