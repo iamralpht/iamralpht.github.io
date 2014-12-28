@@ -37,7 +37,12 @@ function Manipulator(variable, solver, update, domObject, axis) {
         constraintAnimation: null,
         constraintAnimationPosition: 0,
         constraintAnimationVelocity: 0,
-        constraintAnimationConstraint: null // the constraint we're animating for.
+        constraintAnimationConstraint: null, // the constraint we're animating for.
+        // Are we running a constraint iteration where we're pretending to have
+        // an animation in order to discover constraints that only apply to
+        // animations (which we wouldn't discover if we had no velocity and thus
+        // didn't create an animation, for example).
+        trialAnimation: false
     };
 
     // Clean up:
@@ -66,13 +71,10 @@ function Manipulator(variable, solver, update, domObject, axis) {
         onTouchEnd: function(dx, dy, v) {
             var velocity = (axis == 'x') ? v.x : v.y;
             self._motionState.dragging = false;
-            // No velocity, just end the drag and we'll run a constraining animation
-            // if needed.
-            if (velocity == 0 && !self._hitConstraint && false) {
-                self._update();
-                return;
-            }
+            self._motionState.trialAnimation = true;
+            update(self);
             self._createAnimation(velocity);
+            self._motionState.trialAnimation = false;
         }
     });
 
@@ -173,19 +175,20 @@ Manipulator.prototype._createAnimation = function(velocity) {
         }
         this._motionState.constraintAnimationConstraint = this._hitConstraint;
 
+        var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
+
+        var delta = this.animating() ? this._hitConstraint.deltaFromAnimation(velocity) : this._hitConstraint.delta();
+
         // Figure out how far we have to go to be out of violation. Because we use a linear
         // constraint solver to surface violations we only need to remember the coefficient
         // of a given violation.
-        var violationDelta =
-            this._hitConstraint.delta() *
-            this._constraintCoefficient;
+        var violationDelta = delta * this._constraintCoefficient;
 
-        var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
 
         // Only do this if the velocity is going against the constraint, otherwise do the
         // regular animation. Not sure if this needs to be based on the simulation of the
         // constraint or not.
-        if (!velocity || (sign(velocity) !== sign(violationDelta) || Math.abs(velocity * 0.1) < Math.abs(violationDelta))) {
+        if (!velocity || (sign(velocity) !== sign(violationDelta) || Math.abs(velocity * 0.1) < Math.abs(violationDelta)) || this._hitConstraint.captive) {
             // XXX: Currently we always use a spring to animate us back, but this should come
             //      from the violated motion constraint instead of being hardcoded.
             var motion = new Spring(1, 200, 20);
@@ -241,6 +244,8 @@ Manipulator.prototype.hitConstraint = function(constraint, coefficient, delta) {
         this._update();
         return;
     }
+    if (this._motionState.trialAnimation)
+        return;
     this._createAnimation();
 }
 Manipulator.prototype.hitConstraints = function(violations) {
@@ -254,4 +259,8 @@ Manipulator.prototype.hitConstraints = function(violations) {
     }
     violations.sort(function(a, b) { return Math.abs(b.delta) - Math.abs(a.delta); });
     this.hitConstraint(violations[0].motionConstraint, violations[0].coefficient, violations[0].delta);
+}
+Manipulator.prototype.animating = function() {
+    if (this._motionState.dragging) return false;
+    return !!this._motionState.velocityAnimation || this._motionState.trialAnimation;
 }

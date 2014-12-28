@@ -41,5 +41,8 @@ function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel
     this.physicsModel = physicsModel;
 }
 MotionConstraint.prototype.delta = function() {
-    return this.op(this.variable, this.value);
+    return this.op(this.variable, this.value, false);
+}
+MotionConstraint.prototype.deltaFromAnimation = function(velocity) {
+    return this.op(this.variable, this.value, true, velocity);
 }

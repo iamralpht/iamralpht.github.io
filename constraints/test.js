@@ -179,3 +179,56 @@ function makeGravityExample(parentElement) {
 }
 
 makeGravityExample(document.getElementById('gravity-example'));
+
+function makePagerExample(parentElement) {
+    var context = new MotionContext();
+    var solver = context.solver();
+
+    var scrollPosition = new c.Variable({name: 'scroll-position'});
+    for (var i = 0; i < 10; i++) {
+        // Constraints aren't the point of this test, so just statically lay
+        // the boxes out and set a motion constraint.
+        var b = new Box('Box ' + (i+1));
+        b.x = new c.Variable();
+        b.right = new c.Variable();
+        b.y = 20;
+        b.bottom = 220;
+
+        solver.add(eq(b.x, c.plus(i * 200, scrollPosition), medium));
+        solver.add(eq(b.right, c.plus(b.x, 200), medium));
+
+        context.addBox(b);
+        parentElement.appendChild(b.element());
+    }
+    // Go to the nearest multiple of 200.
+    var motionConstraint = new MotionConstraint(scrollPosition,
+        function(a, b, isFromAnimation, velocity) {
+            if (a > 0) return -a;
+            if (a < -b * 10) return a + b*10;
+            if (isFromAnimation) {
+                // Find the nearest multiple of b. Need to incorporate velocity
+                // and things in here too. This is pretty non-physical currently :(.
+                // XXX: Come up with a better equation based on the distance that
+                //      would be travelled using a friction equation or something
+                //      like that.
+                var ceil = Math.ceil(a/b);
+                var floor = Math.floor(a/b);
+
+                var nearest = b * Math.round(a/b);
+
+                if (velocity !== undefined)
+                    nearest = (velocity > 0) ? (b * ceil) : (b * floor);
+
+                return nearest - a;
+            }
+            return 0;
+        }, 200);
+    // XXX: Hackery; the constraint should decide if it applies or not.
+    motionConstraint.captive = true;
+    context.addMotionConstraint(motionConstraint);
+
+    var manip = new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'x');
+    context.addManipulator(manip);
+}
+
+makePagerExample(document.getElementById('pager-example'));
