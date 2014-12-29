@@ -113,10 +113,13 @@ function makeGoogleMapsExample() {
     var manip = new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'y');
     context.addManipulator(manip);
 
+
+    // This is the physics model we use for our constraints: a critically damped spring, so no extra bounces.
+    function physicsModel() { return new Spring(1, 440, 37); }
     // Don't drag the infobar off of the bottom.
-    context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height));
+    context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height, 0.75, physicsModel));
     // Don't expose the bottom of the content.
-    context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height));
+    context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height, 0.75, physicsModel));
     // Add a motion constraint to ensure that we allow free scrolling of the content
     // area but spring-snap to position when between the two expanded states.
     var motionConstraint = new MotionConstraint(photo.y,
@@ -133,7 +136,7 @@ function makeGoogleMapsExample() {
             if (velocity && velocity > 0) target = height - 80;
 
             return target - a;
-        }, 0);
+        }, 0, 1, physicsModel);
     motionConstraint.captive = true;
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
@@ -148,7 +151,7 @@ function makeGoogleMapsExample() {
 
             if (velocity > 0) return bottomTarget - a;
             return topTarget - a;
-        }, 0);
+        }, 0, 1, physicsModel);
     motionConstraint.captive = true;
     context.addMotionConstraint(motionConstraint);
 
