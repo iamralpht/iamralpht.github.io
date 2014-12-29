@@ -34,6 +34,9 @@ body {
 .photo-dimming-layer {
     background-image: linear-gradient(0deg, transparent, rgba(0, 0, 0, 0.7));
 }
+.shadow {
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent);
+}
 .infobar {
     background-color: #1976d2;
     overflow: hidden;
@@ -49,8 +52,31 @@ body {
     overflow: hidden;
     background-color: white;
     color: black;
+}
+
+/* This is just style to make the content of the form look nice; it has nothing to do with
+   constraints or any of the things that really move. */
+.time {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+
+.section {
+    border-top: 1px solid #eee;
     padding: 15px;
 }
+.streetview, .morephotos {
+    display: inline-block;
+    width: 48%;
+    height: 80px;
+    background-size: cover;
+    color: white;
+    line-height: 130px;
+    padding: 4px;
+}
+.streetview { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-streetview.jpg); }
+.morephotos { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-image2.jpg); }
 </style>
 <script src="touch.js"></script>
 <script src="../physics/animate.js"></script>
@@ -69,18 +95,28 @@ body {
 Google Maps example<br>
 <div class="container">
     <div class="form box">
+        <div class="shadow box"></div>
         <div class="photo box">
             <div class="photo-dimming-layer box"></div>
         </div>
         <div class="content box">
-            <p>Grassy park with tennis/handball courts, horseshoe pits, playgrounds, splash pad &amp; a fenced dog run.</p>
-            <p>600 East Meadow Drive, Palo Alto, CA 94306</p>
-            <p>Open 24 hours</p>
+            <div class="section"><i>Grassy park with tennis/handball courts, horseshoe pits, playgrounds, splash pad &amp; a fenced dog run.</i></div>
+            <div class="section">600 East Meadow Drive, Palo Alto, CA 94306</div>
+            <div class="section">Open 24 hours</div>
+            <div class="section">More Info...</div>
+            <div class="section">Suggest an edit</div>
+            <div class="section">
+                <div class="streetview">Street View</div>
+                <div class="morephotos">26 Photos</div>
+                Add a photo...
+            </div>
+            <div class="section">Review Summary</div>
+            <div class="section">Reviews</div>
         </div>
         <div class="infobar box">
-            <span class="small-title">Mitchell Park</span>
-            <span class="rating">4.5 stars</span>
-            <span class="time">5 minutes</span>
+            <div class="small-title">Mitchell Park</div>
+            <div class="rating">4.5 stars</div>
+            <div class="time">5 minutes</div>
             <div class="top-navbar box">
                 <span class="top-title">Mitchell Park</span>
             </div>

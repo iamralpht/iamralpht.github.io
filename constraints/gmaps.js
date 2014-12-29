@@ -39,6 +39,8 @@ function makeGoogleMapsExample() {
     // should use a more generic approach in the future where we selectively reflect
     // individual variables into DOM/style.
     var form = new Box(ec('form'));
+    var shadow = new Box(ec('shadow'));
+    form.addChild(shadow);
     var photo = new Box(ec('photo'));
     form.addChild(photo);
     var photoDimmingLayer = new Box(ec('photo-dimming-layer'));
@@ -50,6 +52,18 @@ function makeGoogleMapsExample() {
     var navigationControls = new Box(ec('navigation-controls'));
     form.addChild(navigationControls);
     var content = new Box(ec('content'));
+    // Extract the natural height of the content.
+    var contentHeight = 0;
+    {
+        var el = content.element();
+        el.style.position = 'static';
+        el.style.width = '320px';
+        el.style.height = null;
+        contentHeight = el.offsetHeight;
+        el.style.position = null;
+        el.style.width = null;
+    }
+
     form.addChild(content);
 
     // Add the root box to the content.
@@ -72,6 +86,11 @@ function makeGoogleMapsExample() {
     photo.right = 320;
     photo.y = new c.Variable({name: 'photo-y'});
     photo.bottom = new c.Variable({name: 'photo-bottom'});
+
+    shadow.x = 0;
+    shadow.right = 320;
+    shadow.y = new c.Variable({name: 'shadow-y'});
+    shadow.bottom = new c.Variable({name: 'shadow-bottom'});
 
     photoDimmingLayer.x = 0;
     photoDimmingLayer.y = 0;
@@ -105,9 +124,13 @@ function makeGoogleMapsExample() {
     //   Actually, make it more interesting, have the photo track at 1/3 position when going off the top.
     solver.add(geq(photo.y, c.times(c.plus(infoBar.y, c.times(scrollPosition, (height - photoHeight) / 480)), 0.2), weak));
 
+    // Shadow goes above the photo; could make it get more opaque as we scroll up or something...
+    solver.add(eq(shadow.bottom, photo.y, medium));
+    solver.add(eq(shadow.y, c.plus(shadow.bottom, -5), medium));
+
     // The content is similar to the infobar -- it's weakly positioned at the bottom of
     // the screen and is scrolled up. But it's not constrained by the top of the screen.
-    solver.add(eq(content.bottom, c.plus(content.y, height), medium));
+    solver.add(eq(content.bottom, c.plus(content.y, contentHeight), medium));
     solver.add(eq(content.y, c.plus(height, scrollPosition), medium));
 
     var manip = new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'y');
