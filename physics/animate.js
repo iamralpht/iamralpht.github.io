@@ -22,17 +22,20 @@ limitations under the License.
 function animation(physicsModel, callback) {
     
     function onFrame(handle, model, cb) {
+        if (handle && handle.cancelled) return;
         cb(model);
-        if (!physicsModel.done()) {
+        if (!physicsModel.done() && !handle.cancelled) {
             handle.id = requestAnimationFrame(onFrame.bind(null, handle, model, cb));
         }
     }
     function cancel(handle) {
         if (handle && handle.id)
             cancelAnimationFrame(handle.id);
+        if (handle)
+            handle.cancelled = true;
     }
 
-    var handle = {};
+    var handle = { id: 0, cancelled: false };
     onFrame(handle, physicsModel, callback);
 
     return { cancel: cancel.bind(null, handle) };
