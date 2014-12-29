@@ -164,6 +164,7 @@ function makeGoogleMapsExample() {
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
     // the photo when the photo is at the top of the screen.
+    // Note: this constraint isn't captive, we want it to overflow into scrolling.
     motionConstraint = new MotionConstraint(infoBar.y,
         function(a, b, isFromAnimation, velocity) {
             if (!isFromAnimation) return 0;
@@ -175,7 +176,6 @@ function makeGoogleMapsExample() {
             if (velocity > 0) return bottomTarget - a;
             return topTarget - a;
         }, 0, 1, physicsModel);
-    motionConstraint.captive = true;
     context.addMotionConstraint(motionConstraint);
 
     context.update();

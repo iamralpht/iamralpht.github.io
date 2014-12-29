@@ -9,8 +9,14 @@ body {
     font-family: 'Source Sans Pro';
     background-color: #404040;
     color: white;
+    text-align: center;
+}
+.title {
+    padding: 15px;
+    font-size: 20px;
 }
 .container {
+    text-align: left;
     position: relative;
     margin: auto;
     width: 320px;
@@ -77,6 +83,21 @@ body {
 }
 .streetview { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-streetview.jpg); }
 .morephotos { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-image2.jpg); }
+.explain {
+    color: black;
+    display: inline-block;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background-color: white;
+    width: 80%;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+}
+.explain pre {
+    display: inline;
+    white-space: normal;
+}
 </style>
 <script src="touch.js"></script>
 <script src="../physics/animate.js"></script>
@@ -92,7 +113,9 @@ body {
 <script src="gmaps.js"></script>
 </head>
 <body>
-Google Maps example<br>
+<div class="title">
+Google Maps example&mdash;Drag the blue box upwards.
+</div>
 <div class="container">
     <div class="form box">
         <div class="shadow box"></div>
@@ -123,6 +146,41 @@ Google Maps example<br>
         </div>
         <div class="navigation-controls box"></div>
     </div>
+</div>
+<div class="explain">
+<b>Drag upwards on the blue box to reveal more information, keep dragging to scroll.</b>
+<br>
+This is a reproduction of a touch interaction in Google Maps on Android and iOS using constraints and motion constraints. Here's the cast of objects that move:
+<ul>
+ <li><b>infoBar</b>&mdash;the blue box with the summary information</li>
+ <li><b>topNavbar</b>&mdash;the bold "Mitchell Park" text that shows up at the very top of the UI when the photo is scrolled away</li>
+ <li><b>photo</b>&mdash;the large cover photo</li>
+ <li><b>shadow</b>&mdash;the shadow cast by the photo on the map</li>
+ <li><b>photoDimmingLayer</b>&mdash;the gradient at the top of the screen that only shows over the photo</li>
+ <li><b>content</b>&mdash;the full information on the park, the scrollable data</li>
+</ul>
+These are the constraints enforced upon them:
+<ul>
+ <li><pre>infoBar.bottom = screenHeight</pre> the bottom of the infoBar is weakly at the bottom of the UI</li>
+ <li><pre>infoBar.y = infoBar.bottom - 80</pre> the info bar is 80px tall (I need to support a "height" property properly...)</li>
+ <li><pre>infoBar.bottom = screenHeight + scrollPosition</pre> the infoBar moves up and down with the scroll position</li>
+ <li><pre>photo.y = infoBar.y + scrollPosition * (screenHeight - photoHeight) / screenHeight</pre> the photo's top is aligned with the infoBar's top, but the scroll position causes it to move faster (the ratio is so that the photo will be fully revealed when it reaches the top of the UI)</li>
+ <li><pre>photo.bottom = photo.y + photoHeight</pre> give the photo its height (again, need a crisper height concept)</li>
+ <li><pre>photo.y &gt;= infoBar.y + scrollPosition * ((screenHeight / photoHeight) / screenHeight) * 0.2</pre> this causes the photo to slowly track upwards when the infoBar is dragged upwards from its middle position. The real Google Maps app just leaves the photo in place, which is a simpler rule: <pre>photo.y &gt;= 0</pre>. I liked the way this one looked better...</li>
+ <li><pre>content.y = screenHeight + scrollPosition</pre> the content starts at the bottom of the screen and tracks scroll position</li>
+ <li><pre>content.bottom = content.y + contentHeight</pre> give the content its height</li>
+</ul>
+So we used <b>only eight</b> constraints, and that got us all of the relative motion as well as the basic 2D layout. Now we can start adding motion constraints to limit how far we can drag things with physics simulations...
+<ul>
+ <li><pre>infoBar.bottom &lt;= screenHeight spring</pre> don't allow the infoBar off the bottom of the screen.</li>
+ <li><pre>content.bottom &gt;= screenHeight spring</pre> don't allow the bottom of the content above the bottom of the screen.</li>
+</ul>
+Now we can't drag off of the ends, we just need to ensure that we can't leave the UI in a bad mid-state. I don't have a good expression for snap positions yet, so the rules are expressed with a few lines of code currently, but still in terms of constraints. We say:
+<ul>
+ <li>when animating if <pre>photo.y &gt;= 0</pre> then snap it to either the bottom position (<pre>screenHeight - infoBar's height</pre>) or to zero, the top position.</li>
+ <li>when animating if <pre>photo.y &lt;= 0</pre> then snap the infoBar to either the middle position or the top position.</li>
+</ul>
+This ensures that our UI doesn't stop in bad mid-positions. I'm going to come up with a way of expressing these complicated snapping rules more clearly soon. They are expressed in terms of a single variable, but they frequently need to consult other variables.
 </div>
 </body>
 </html>
