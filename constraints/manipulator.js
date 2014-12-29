@@ -182,13 +182,14 @@ Manipulator.prototype._createAnimation = function(velocity) {
         // Figure out how far we have to go to be out of violation. Because we use a linear
         // constraint solver to surface violations we only need to remember the coefficient
         // of a given violation.
-        var violationDelta = delta * this._constraintCoefficient;
-
+        var violationDelta = delta / this._constraintCoefficient;
 
         // Only do this if the velocity is going against the constraint, otherwise do the
         // regular animation. Not sure if this needs to be based on the simulation of the
         // constraint or not.
         if (!velocity || (sign(velocity) !== sign(violationDelta) || Math.abs(velocity * 0.1) < Math.abs(violationDelta)) || this._hitConstraint.captive) {
+            this._cancelAnimation('constraintAnimation');
+            this._cancelAnimation('velocityAnimation');
             // XXX: Currently we always use a spring to animate us back, but this should come
             //      from the violated motion constraint instead of being hardcoded.
             var motion = new Spring(1, 200, 20);
