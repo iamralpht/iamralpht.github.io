@@ -117,6 +117,40 @@ function makeGoogleMapsExample() {
     context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height));
     // Don't expose the bottom of the content.
     context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height));
+    // Add a motion constraint to ensure that we allow free scrolling of the content
+    // area but spring-snap to position when between the two expanded states.
+    var motionConstraint = new MotionConstraint(photo.y,
+        function(a, b, isFromAnimation, velocity) {
+            // We want to say that the photo's y has to either be the same as the infobar's
+            // y or it has to be less than zero. If it's zero or less then we don't care to
+            // enforce anything.
+            if (a <= 0) return 0;
+            if (!isFromAnimation) return 0;
+            if (a >= infoBar.y.valueOf()) return 0;
+            // Where do we want it to end with y = 0, or with y = (height - 80) which is the
+            // home position.
+            var target = 0;
+            if (velocity && velocity > 0) target = height - 80;
+
+            return target - a;
+        }, 0);
+    motionConstraint.captive = true;
+    context.addMotionConstraint(motionConstraint);
+    // Add a second motion constraint that prevents the infobar from partially covering
+    // the photo when the photo is at the top of the screen.
+    motionConstraint = new MotionConstraint(infoBar.y,
+        function(a, b, isFromAnimation, velocity) {
+            if (!isFromAnimation) return 0;
+            // If the photo isn't touching the top then we're not enforcing.
+            if (photo.y.valueOf() > 0) return 0;
+            var topTarget = 0 - 80 + 55;
+            var bottomTarget = photoHeight;
+
+            if (velocity > 0) return bottomTarget - a;
+            return topTarget - a;
+        }, 0);
+    motionConstraint.captive = true;
+    context.addMotionConstraint(motionConstraint);
 
     context.update();
 }
