@@ -190,10 +190,8 @@ Manipulator.prototype._createAnimation = function(velocity) {
         if (!velocity || (sign(velocity) !== sign(violationDelta) || Math.abs(velocity * 0.1) < Math.abs(violationDelta)) || this._hitConstraint.captive) {
             this._cancelAnimation('constraintAnimation');
             this._cancelAnimation('velocityAnimation');
-            // XXX: Currently we always use a spring to animate us back, but this should come
-            //      from the violated motion constraint instead of being hardcoded.
-            var motion = new Spring(1, 200, 20);
-            motion.snap(this._variable.valueOf());
+            var motion = this._hitConstraint.createMotion(this._variable.valueOf());//new Spring(1, 200, 20);
+            //motion.snap(this._variable.valueOf());
             motion.setEnd(this._variable.valueOf() + violationDelta, velocity);
 
             this._motionState.constraintAnimation = animation(motion,

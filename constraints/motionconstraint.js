@@ -46,3 +46,8 @@ MotionConstraint.prototype.delta = function() {
 MotionConstraint.prototype.deltaFromAnimation = function(velocity) {
     return this.op(this.variable, this.value, true, velocity);
 }
+MotionConstraint.prototype.createMotion = function(startPosition) {
+    var motion = this.physicsModel ? this.physicsModel() : new Spring(1, 200, 20);
+    motion.snap(startPosition);
+    return motion;
+}
