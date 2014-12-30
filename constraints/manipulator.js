@@ -135,17 +135,17 @@ Manipulator.prototype._update = function() {
             position += violationDelta * this._hitConstraint.overdragCoefficient;
         }
         // Now tell the solver.
-        this._solver.suggestValue(this._variable, Math.round(position));
+        this._solver.suggestValue(this._variable, position);
     } else if (this._motionState.constraintAnimation) {
         this._cancelAnimation('velocityAnimation');
         beginEdit();
         var position = this._motionState.constraintAnimationPosition;
-        this._solver.suggestValue(this._variable, Math.round(position));
+        this._solver.suggestValue(this._variable, position);
     } else if (this._motionState.velocityAnimation) {
         beginEdit();
         var position = this._motionState.velocityAnimationPosition;
         // We don't consider constraints here; we deal with them in didHitConstraint.
-        this._solver.suggestValue(this._variable, Math.round(position));
+        this._solver.suggestValue(this._variable, position);
     } else {
         // We're not doing anything; end the edit.
         if (!this._motionState.editing) return;

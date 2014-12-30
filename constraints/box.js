@@ -1,5 +1,10 @@
 "use strict";
 
+(function() {
+
+var dPR = window.devicePixelRatio;
+function roundOffset(x) { return Math.round(x * dPR) / dPR; }
+
 // This is a DOM block which is positioned from the constraint solver rather than
 // via flow.
 function Box(textContentOrElement) {
@@ -45,6 +50,11 @@ Box.prototype.update = function(px, py) {
     x -= px;
     y -= py;
 
+    x = roundOffset(x);
+    y = roundOffset(y);
+    w = roundOffset(w);
+    h = roundOffset(h);
+
     // Be careful about updating width and height since it'll
     // trigger a browser layout.
     if (w != this._lastWidth) {
@@ -63,3 +73,7 @@ Box.prototype.update = function(px, py) {
     this._element.style.webkitTransform = transform;
     this._element.style.transform = transform;
 }
+
+window.Box = Box;
+
+})();
