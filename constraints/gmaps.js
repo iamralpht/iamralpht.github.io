@@ -126,11 +126,15 @@ function makeGoogleMapsExample() {
 
     // Shadow goes above the photo; could make it get more opaque as we scroll up or something...
     solver.add(eq(shadow.bottom, photo.y, medium));
-    solver.add(eq(shadow.y, c.plus(shadow.bottom, -5), medium));
+    solver.add(eq(shadow.y, c.plus(shadow.bottom, -5), medium)); // Shadow is 5px tall.
 
     // The content is similar to the infobar -- it's weakly positioned at the bottom of
     // the screen and is scrolled up. But it's not constrained by the top of the screen.
-    solver.add(eq(content.bottom, c.plus(content.y, contentHeight), medium));
+    // 
+    // We add some extra height to the content so that overdragging doesn't expose the map
+    // underneath. This is pretty hacky.
+    var extraContentHeight = 1000;
+    solver.add(eq(content.bottom, c.plus(content.y, contentHeight + extraContentHeight), medium));
     solver.add(eq(content.y, c.plus(height, scrollPosition), medium));
 
     var manip = new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'y');
@@ -142,7 +146,7 @@ function makeGoogleMapsExample() {
     // Don't drag the infobar off of the bottom.
     context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height, 0.75, physicsModel));
     // Don't expose the bottom of the content.
-    context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height, 0.75, physicsModel));
+    context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height + extraContentHeight, 0.75, physicsModel));
     // Add a motion constraint to ensure that we allow free scrolling of the content
     // area but spring-snap to position when between the two expanded states.
     var motionConstraint = new MotionConstraint(photo.y,
