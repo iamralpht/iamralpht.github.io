@@ -127,10 +127,7 @@ Manipulator.prototype._update = function() {
             // Push the current value into the system so that we can extract the delta.
             this._solver.suggestValue(this._variable, position);
 
-            var violationDelta = this._hitConstraint.delta() / this._constraintCoefficient;
-
-            if (Math.abs(violationDelta) > Math.abs(this._motionState.dragDelta))
-                violationDelta = this._motionState.dragDelta * (violationDelta < 0 ? -1 : 1);
+            var violationDelta = this._hitConstraint.delta() * this._constraintCoefficient;
 
             position += violationDelta * this._hitConstraint.overdragCoefficient;
         }
