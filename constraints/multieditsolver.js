@@ -8,6 +8,9 @@ function MultiEditSolver(solver) {
     this._editing = false;
     this._editVars = [];
 
+    // More recent edits get a higher priority.
+    this._priority = 0;
+
     // Hacky; figure out what the real API here is.
     this.add = this._solver.add.bind(this._solver);
     this.solve = this._solver.solve.bind(this._solver);
@@ -24,7 +27,7 @@ MultiEditSolver.prototype.beginEdit = function(variable, strength) {
         return;
     }
 
-    this._editVars.push({ edit: variable, strength: strength, suggest: null, count: 1 });
+    this._editVars.push({ edit: variable, strength: strength, priority: this._priority++, suggest: null, count: 1 });
     this._reedit();
 }
 MultiEditSolver.prototype._find = function(variable) {
@@ -61,15 +64,21 @@ MultiEditSolver.prototype.suggestValue = function(variable, value) {
     this._solver.suggestValue(variable, value).resolve();
 }
 MultiEditSolver.prototype._reedit = function() {
-    if (this._editing) this._solver.endEdit();
+    if (this._editing) {
+        this._solver.endEdit();
+        this._solver.removeAllEditVars();
+    }
     this._editing = false;
 
-    if (this._editVars.length == 0) return;
+    if (this._editVars.length == 0) {
+        this._solver.resolve();
+        return;
+    }
     
     for (var i = 0; i < this._editVars.length; i++) {
         var v = this._editVars[i];
 
-        this._solver.addEditVar(v.edit, v.strength);
+        this._solver.addEditVar(v.edit, v.strength, v.priority);
     }
 
     this._solver.beginEdit();
