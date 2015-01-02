@@ -275,7 +275,7 @@ function makeClankExample(parentElement) {
 
             // Gap is defined as the gap between this tab and the previous.
             solver.add(eq(gap, c.minus(p.y, lastTab.y), strong));//medium));
-            solver.add(geq(gap, 0, strong));//medium));
+            solver.add(geq(gap, 5, strong));//medium));
             solver.add(leq(gap, TAB_HEIGHT/2, strong));//medium));
 
             // The gap is also the spacing plus a slack variable. The slack
