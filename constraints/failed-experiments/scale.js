@@ -58,6 +58,14 @@ var requiredStay = function(v, w) { return stay(v, required, w||0); };
 //      given constraint and precisely what the relationship (the multiple since it's linear) is--which lets
 //      me propagate feedback to the correct manipulator (but I'm not doing this yet); it's basically just
 //      reading a row out of the simplex tableau.
+//
+// What about single finger scaling?
+//   height = 1.4 * height (or whatever aspect ratio)
+//   fingery = y + PROPORTION * height
+//   fingerx = x + PROPORTION * width
+// That should just do translation.
+//   bottom = 400
+// Now it'll grow for y drags and scroll for x drags, like FB paper.
 
 var solver = new MultiEditSolver(new c.SimplexSolver());
 

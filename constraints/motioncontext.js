@@ -101,9 +101,12 @@ MotionContext.prototype._resolveMotionConstraints = function() {
             // We found a violation and the manipulator that contributed. Remember it and we'll
             // tell the manipulator about all the violations it contributed to at once afterwards
             // and it can decide what it's going to do about it...
-            //manipulator.hitConstraint(pc, c, delta);
             addViolation(manipulator, pc, c, d);
         }
+        // XXX: We should find ONE manipulator, or figure out which manipulator to target in the
+        //      case of multiple. If we have one doing an animation, and one doing a touch drag
+        //      then maybe we want to constrain the animating manipulator and let the touch one
+        //      ride?
     }
     // Tell all the manipulators that we're done constraining.
     dispatchViolations();

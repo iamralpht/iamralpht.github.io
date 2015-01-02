@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>chrome mobile tab switcher</title>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<style>
+body {
+    background-color: #444;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+.box {
+    position: absolute;
+    top: 0; left: 0;
+    text-align: left;
+    background-color: white;
+    color: black;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px black;
+    padding: 5px;
+    font-size: 18px;
+    font-family: sans-serif;
+    pointer-events: none;
+    will-change: transform;
+    box-sizing: border-box;
+}
+.clank-example {
+    position: relative;
+    height: 400px;
+    width: 320px;
+    margin: auto;
+}
+.clank-example .box {
+    pointer-events: auto;
+}
+.constraints {
+    position: relative;
+    margin: auto;
+    margin-top: 10px;
+    padding: 10px;
+    width: 80%;
+    background-color: #f0f0f0;
+    color: black;
+    border-radius: 2px;
+    text-align: left;
+}
+</style>
+<script src="touch.js"></script>
+<script src="../physics/animate.js"></script>
+<script src="../physics/friction.js"></script>
+<script src="../physics/spring.js"></script>
+<script src="../physics/gravity.js"></script>
+<script src="c.js"></script>
+<script src="manipulator.js"></script>
+<script src="multieditsolver.js"></script>
+<script src="motioncontext.js"></script>
+<script src="motionconstraint.js"></script>
+<script src="box.js"></script>
+</head>
+<body>
+<div class="clank-example" id="clank-example">
+</div>
+<div class="constraints">
+<p><b>Failed experiment: Chrome for Android</b></p>
+<p>I tried to recreate the Chrome for Android tab selection interface by specifying constraints on the spacing between tabs. I was aiming to support both the scrolling mechanic and the multitouch expansion mechanic. I also wanted to get the behavior where tabs move slowly at the top (as they start to move downwards) and then track at 1:1 after they've passed the top third. I tried here by expressing each card's vertical offset as an increasing fraction of the "spacing".</p>
+<p>I decided after this that I'd be much better off starting with vertical scrolling and then adding to that. I also think that the behavior that Chrome has where the top tabs start moving slowly is non-linear and so not directly representable with Cassowary.</p>
+<p>What did I learn?</p>
+<ul>
+ <li>There are cases in here where an animation and the active touch point will conspire to violate a constraint. I added code to the MotionContext to see if any "editing" Manipulator's variables were related and to cancel animations if so (with the idea that touch takes precedence) but this didn't really solve the problem and the ultimate fix is probably more complex (where the constraint that is relating the two manipulating variables specifies what should happen; probably normally you DO want to kill animations in preference to touch, but it's not clear enough from this experiment).</li>
+ <li>It's really hard to understand the system when you have animations and touch gestures violating motion constraints at the same time, or even what the best outcome would be.</li>
+ <li>It's frustrating not being able to have non-linear equations. Even something really simple like the Android 5.0 app switcher UI would be hard to approximate. It would be possible to map from a non-linear space to the linear solver (one simple way would be to use a perspective projection, but you could use any function to map).
+</ul>
+<p>Where to from here?</p>
+<ul>
+ <li>Investigate other kinds of constraint solvers that can handle non-linear relationships. Perhaps something like Lagrange Multipliers would be a useful technique?</li>
+</ul>
+</div>
+<script src="clank.js"></script>
+</body>
+</html>

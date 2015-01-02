@@ -51,16 +51,6 @@
     height: 250px;
 }
 
-.clank-example {
-    position: relative;
-    height: 400px;
-    width: 320px;
-    margin: auto;
-}
-.clank-example .box {
-    pointer-events: auto;
-}
-
 .constraints {
     clear: both;
     display: inline-block;
@@ -153,22 +143,16 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 <div class="pager-example" id="pager-example"></div>
 </div>
 <div class="content">
-<p>Chrome Mobile example, using multitouch.</p>
-</div>
-<div class="example">
-<div class="clank-example" id="clank-example"></div>
-</div>
-<div class="content">
 <p>BUGS: No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
 <p>TODO on first pass:</p>
 <ul>
  <li>Chrome phone tab switcher example with multitouch support.</li>
  <li>Explain how this is currently useful for 1D work, 2D is frequently non-linear; need a robust solution for non-linear constraints that still has coefficients.</li>
  <li>Explain how we can use simplex coefficients to give feedback to correct manipulator.</li>
+ <li>Explain how we cancel animations that conflict with an active touch, and then allow constraining afterwards.</li>
  <li>Facebook Paper scaling example; still 1D, allow scrolling in the other axis maybe. Needs better touch gesture detection.</li>
 </ul>
 <p>We don't have to just use friction and springs, though. We can revisit a lot of the previous examples which also used gravity and rebounding... Also look at using one input for multiple systems. Do iMessage springy scrolling.</p>
-<p>Also do snap points (pagers, the android system toggle panel, etc).</p>
 <p>What's next? State machines, dependent state, state driven animations (controller updating the view)...</p>
 </div>
 

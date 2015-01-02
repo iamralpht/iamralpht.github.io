@@ -260,3 +260,4 @@ Manipulator.prototype.animating = function() {
     if (this._motionState.dragging) return false;
     return !!this._motionState.velocityAnimation || this._motionState.trialAnimation;
 }
+Manipulator.prototype.editing = function() { return this._motionState.editing; }
