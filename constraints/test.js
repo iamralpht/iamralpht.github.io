@@ -235,6 +235,9 @@ function makePagerExample(parentElement) {
 makePagerExample(document.getElementById('pager-example'));
 
 function makeScalingExample(parentElement) {
+    var parentHeight = 480;
+    var parentWidth = 320;
+
     var context = new MotionContext();
     var solver = context.solver();
 
@@ -254,34 +257,28 @@ function makeScalingExample(parentElement) {
     //
     //   width = height * aspect
     //
-    var aspect = 320 / 480;
+    var aspect = parentWidth / parentHeight;
     solver.add(eq(width, c.times(height, aspect), required));
 
     // The height is controlled by the scale.
     //
-    //  height = scale * 480
+    //  height = scale * 480 (parentHeight)
     //
-    solver.add(eq(height, c.times(scale, 480), medium));
-
-    // The height starts out at 200.
-    //
-    //  height = 200
-    //
-    //solver.add(eq(height, 200, weak));
+    solver.add(eq(height, c.times(scale, parentHeight), medium));
 
     // The bottom of the box is pinned to the bottom of the screen, like FB Paper.
     //
-    //  bottom = 480
+    //  bottom = 480 (parentHeight)
     //
-    solver.add(eq(480, box.bottom, strong));
+    solver.add(eq(parentHeight, box.bottom, medium));
 
     // The box is centered horizontally.
     // 
     //  centerX := x + width/2
-    //  centerX = 320/2
+    //  centerX = 320/2 (parentWidth / 2)
     //
     var centerX = c.plus(box.x, c.times(width, 0.5));
-    solver.add(eq(centerX, 320/2, medium));
+    solver.add(eq(centerX, parentWidth/2, medium));
 
     // Make a variable for width so that we can create a motion constraint for it.
     // Motion constraints should probably be able to understand expressions, too...
