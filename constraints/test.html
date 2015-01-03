@@ -77,6 +77,8 @@
 }
 .mono {
     font-family: monospace;
+}
+div.mono {
     padding: 10px;
 }
 </style>
@@ -160,6 +162,28 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 </div>
 <div class="example">
 <div class="scaling-example" id="scaling-example"></div>
+<div class="constraints">
+We manipulate the box's "y" variable for vertical drags.<br>
+<b>Constraints:</b><br>
+Constrain the aspect ratio of the box (aspect = parentWidth / parentHeight):
+<div class="mono">box.width = box.height * aspect</div>
+Relate the height to the scale:
+<div class="mono">box.height = scale * parentHeight</div>
+Pin the box to the bottom of the screen:
+<div class="mono">box.bottom = parentHeight</div>
+Center the box horizontally:
+<div class="mono">(box.x + box.width/2) = parentWidth / 2</div>
+<b>Motion Constraints:</b><br>
+The box's width must be greater than 150px. We're really expressing a constraint on the minimum scale, but because we can get the coefficients out of Cassowary, we can write this in terms of the box's width.
+<div class="mono">box.width &gt;= 150 spring</div>
+The box's top mustn't go above the top of the screen. Again, this is really a scale constraint (the scale can't be more than 1.0), but we're expressing it in terms of box.y because that's more natural.
+<div class="mono">box.y &gt;= 0 spring</div>
+<b>Notes:</b><br>
+<ul>
+ <li>We can tweak the constraints to make the box go off the bottom when it gets to small instead of shrinking further and things like that. So we have a lot of flexibility with this kind of system.</li>
+ <li>There's slip! If you drag from the middle of the box, you'll see that the part of the image you grabbed slips out from under your finger. That's because the manipulator is just operating on the box's y coordinate. If we wanted to avoid slip then we'd have to create a new variable when the finger goes down, relate it to y (i.e.: <span class="mono">fingery = box.y - 123 * scale</span>, based on the current scale and finger start position) and then manipulate <span class="mono">fingery</span> instead of <span class="mono">box.y</span>. This isn't very hard, but the current Manipulator code doesn't support it.</li>
+</ul>
+</div>
 </div>
 <div class="content">
 <p>BUGS: No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
