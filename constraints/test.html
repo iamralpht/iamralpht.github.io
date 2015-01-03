@@ -51,6 +51,19 @@
     height: 250px;
 }
 
+.scaling-example {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    margin: auto;
+}
+
+.scaling-example .box {
+    background-image: url(../physics/stonehenge.jpg);
+    background-size: cover;
+    background-position: center;
+}
+
 .constraints {
     clear: both;
     display: inline-block;
@@ -141,6 +154,12 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 </div>
 <div class="example">
 <div class="pager-example" id="pager-example"></div>
+</div>
+<div class="content">
+<p>Scaling. This is using a vertical drag to do scaling. With more flexible gesture processing we could use the horizontal part of the gesture to scroll horizontally, too.</p>
+</div>
+<div class="example">
+<div class="scaling-example" id="scaling-example"></div>
 </div>
 <div class="content">
 <p>BUGS: No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
