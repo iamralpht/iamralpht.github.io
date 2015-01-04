@@ -64,6 +64,24 @@
     background-position: center;
 }
 
+.photos-example {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    margin: auto;
+    background-color: black;
+    overflow: hidden;
+}
+
+.photos-example .box {
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
 .constraints {
     clear: both;
     display: inline-block;
@@ -158,6 +176,13 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 <div class="pager-example" id="pager-example"></div>
 </div>
 <div class="content">
+<p>Paging/snapping for photos.</p>
+</div>
+<div class="example">
+<div class="photos-example" id="photos-example"></div>
+</div>
+
+<div class="content">
 <p>Scaling. This is using a vertical drag to do scaling. With more flexible gesture processing we could use the horizontal part of the gesture to scroll horizontally, too.</p>
 </div>
 <div class="example">
@@ -202,5 +227,6 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 
 
     <script src="test.js"></script>
+    <script src="photos.js"></script>
 </body>
 </html>

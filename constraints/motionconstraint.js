@@ -20,7 +20,27 @@ var mc = {
         if (a > b) return 0;
         return b - a;
     },
-    equal: function(a, b) { return b - a; }
+    equal: function(a, b) { return b - a; },
+    // This is an animation-only constraint. Need a better way to declare what these
+    // are and why (maybe the animation detection needs to move to the MotionConstraint
+    // rather than being in the op?).
+    modulo: function(a, b, isFromAnimation, velocity) {
+        if (!isFromAnimation) return 0;
+        // This is bogus; we're just inventing some friction constant and assuming that
+        // this is what the manipulator is using. We probably need the manipulator to
+        // tell us the end point or local minima/maxima so that we can decide which
+        // direction we're going to trigger in from that...
+        // This is correct for pagers and things where the manipulator is actually using
+        // this friction value, though.
+        //
+        var friction = new Friction(0.001);
+        friction.set(a, velocity);
+        var duration = 1;//friction.duration();
+        var end = velocity ? friction.x(duration) : a;
+        // Where is the end point closest to?
+        var nearest = b * Math.round(end/b);
+        return nearest - a;
+    }
 };
 
 function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel) {
@@ -33,6 +53,7 @@ function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel
         case '<=': this.op = mc.less; break;
         case '<': this.op = mc.l; break;
         case '>': this.op = mc.g; break;
+        case '%': this.op = mc.modulo; break;
         }
     } else {
         this.op = op;
