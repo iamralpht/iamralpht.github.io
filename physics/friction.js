@@ -32,8 +32,8 @@ Friction.prototype.set = function(x, v) {
     this._v = v;
     this._startTime = (new Date()).getTime();
 }
-Friction.prototype.x = function() {
-    var dt = ((new Date()).getTime() - this._startTime) / 1000;
+Friction.prototype.x = function(dt) {
+    if (dt == undefined) dt = ((new Date()).getTime() - this._startTime) / 1000;
     return this._x + this._v * Math.pow(this._drag, dt) / this._dragLog - this._v / this._dragLog;
 }
 Friction.prototype.dx = function() {
