@@ -26,6 +26,9 @@ function almostZero(a, epsilon) { return almostEqual(a, 0, epsilon); }
  *
  * This physics textbook explains the model:
  *  http://www.stewartcalculus.com/data/CALCULUS%20Concepts%20and%20Contexts/upfiles/3c3-AppsOf2ndOrders_Stu.pdf
+ *
+ * A critically damped spring has: damping*damping - 4 * mass * springConstant == 0. If it's greater than zero
+ * then the spring is overdamped, if it's less than zero then it's underdamped.
  */
 function Spring(mass, springConstant, damping) {
     this._m = mass;
