@@ -43,7 +43,7 @@ var mc = {
     }
 };
 
-function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel) {
+function MotionConstraint(variable, op, value, options) {
     this.variable = variable;
     this.value = value;
     if (typeof op === 'string') {
@@ -58,9 +58,15 @@ function MotionConstraint(variable, op, value, overdragCoefficient, physicsModel
     } else {
         this.op = op;
     }
-    this.overdragCoefficient = overdragCoefficient || 0.75;
-    this.physicsModel = physicsModel;
+    if (!options) options = {};
+    this.overdragCoefficient = options.overdragCoefficient || 0.75;
+    this.physicsModel = options.physicsModel;
+    this.captive = options.captive || false;
+    this.animationOnly = options.animationOnly || false;
 }
+// Some random physics models to use in options. Not sure these belong here.
+MotionConstraint.underDamped = function() { return new Spring(1, 200, 20); }
+MotionConstraint.criticallyDamped = function() { return new Spring(1, 200, Math.sqrt(4 * 1 * 200)); }
 MotionConstraint.prototype.delta = function() {
     return this.op(this.variable, this.value, false);
 }
@@ -68,7 +74,7 @@ MotionConstraint.prototype.deltaFromAnimation = function(velocity) {
     return this.op(this.variable, this.value, true, velocity);
 }
 MotionConstraint.prototype.createMotion = function(startPosition) {
-    var motion = this.physicsModel ? this.physicsModel() : new Spring(1, 200, 20);
+    var motion = this.physicsModel ? this.physicsModel() : new Spring(1, 200, 20);//Math.sqrt(200 * 4));
     motion.snap(startPosition);
     return motion;
 }

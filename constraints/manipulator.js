@@ -138,6 +138,13 @@ Manipulator.prototype._update = function() {
         beginEdit();
         var position = this._motionState.constraintAnimationPosition;
         this._solver.suggestValue(this._variable, position);
+        // If we're no longer in violation then we can kill the constraint animation and
+        // create a new velocity animation unless our constraint is captive (in which case
+        // we remain captured).
+        if (!this._motionState.constraintAnimationConstraint.captive && this._motionState.constraintAnimationConstraint.delta() == 0) {
+            var velocity = this._motionState.constraintAnimationVelocity;
+            this._createAnimation(velocity);
+        }
     } else if (this._motionState.velocityAnimation) {
         beginEdit();
         var position = this._motionState.velocityAnimationPosition;
@@ -181,30 +188,27 @@ Manipulator.prototype._createAnimation = function(velocity) {
         // of a given violation.
         var violationDelta = delta / this._constraintCoefficient;
 
-        // Only do this if the velocity is going against the constraint, otherwise do the
-        // regular animation. Not sure if this needs to be based on the simulation of the
-        // constraint or not.
-        if (!velocity || (sign(velocity) !== sign(violationDelta) || Math.abs(velocity * 0.1) < Math.abs(violationDelta)) || this._hitConstraint.captive) {
-            this._cancelAnimation('constraintAnimation');
-            this._cancelAnimation('velocityAnimation');
-            var motion = this._hitConstraint.createMotion(this._variable.valueOf());//new Spring(1, 200, 20);
-            //motion.snap(this._variable.valueOf());
-            motion.setEnd(this._variable.valueOf() + violationDelta, velocity);
+        // We always do the constraint animation when we've hit a constraint. If the constraint
+        // isn't captive then we'll fall out of it and into a regular velocity animation later
+        // on (this is how the ends of scroll springs work).
+        this._cancelAnimation('constraintAnimation');
+        this._cancelAnimation('velocityAnimation');
+        var motion = this._hitConstraint.createMotion(this._variable.valueOf());
+        motion.setEnd(this._variable.valueOf() + violationDelta, velocity);
 
-            this._motionState.constraintAnimation = animation(motion,
-                function() {
-                    self._motionState.constraintAnimationPosition = motion.x();
-                    self._motionState.constraintAnimationVelocity = motion.dx(); // unused.
+        this._motionState.constraintAnimation = animation(motion,
+            function() {
+                self._motionState.constraintAnimationPosition = motion.x();
+                self._motionState.constraintAnimationVelocity = motion.dx(); // unused.
+                self._update();
+
+                if (motion.done()) {
+                    self._cancelAnimation('constraintAnimation');
+                    self._motionState.constraintAnimationConstraint = null;
                     self._update();
-
-                    if (motion.done()) {
-                        self._cancelAnimation('constraintAnimation');
-                        self._motionState.constraintAnimationConstraint = null;
-                        self._update();
-                    }
-                });
-            return;
-        }
+                }
+            });
+        return;
     }
 
     // No constraint violation, just a plain motion animation incorporating the velocity
