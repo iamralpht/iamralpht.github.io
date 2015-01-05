@@ -144,42 +144,45 @@ function makeGoogleMapsExample() {
     // This is the physics model we use for our constraints: a critically damped spring, so no extra bounces.
     function physicsModel() { return new Spring(1, 440, 37); }
     // Don't drag the infobar off of the bottom.
-    context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height, 0.75, physicsModel));
+    context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height, { overdragCoefficient: 0.75, physicsModel: physicsModel }));
     // Don't expose the bottom of the content.
-    context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height + extraContentHeight, 0.75, physicsModel));
+    context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height + extraContentHeight, { overdragCoefficient: 0.75, physicsModel: physicsModel }));
     // Add a motion constraint to ensure that we allow free scrolling of the content
     // area but spring-snap to position when between the two expanded states.
     var motionConstraint = new MotionConstraint(photo.y,
-        function(a, b, isFromAnimation, velocity) {
+        function(a, b, velocity) {
             // We want to say that the photo's y has to either be the same as the infobar's
             // y or it has to be less than zero. If it's zero or less then we don't care to
             // enforce anything.
             if (a <= 0) return 0;
-            if (!isFromAnimation) return 0;
-            if (a >= infoBar.y.valueOf()) return 0;
+            if (Math.round(a) >= Math.round(infoBar.y.valueOf()) - 1) return 0;
+
+            console.log('enforce motion constraint A ' + a + ' infobar y: ' + infoBar.y.valueOf());
+
             // Where do we want it to end with y = 0, or with y = (height - 80) which is the
             // home position.
             var target = 0;
             if (velocity && velocity > 0) target = height - 80;
 
             return target - a;
-        }, 0, 1, physicsModel);
-    motionConstraint.captive = true;
+        }, 0, { overdragCoefficient: 1, physicsModel: physicsModel, animationOnly: true, captive: true, passive: true });
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
     // the photo when the photo is at the top of the screen.
     // Note: this constraint isn't captive, we want it to overflow into scrolling.
     motionConstraint = new MotionConstraint(infoBar.y,
-        function(a, b, isFromAnimation, velocity) {
-            if (!isFromAnimation) return 0;
+        function(a, b, velocity) {
             // If the photo isn't touching the top then we're not enforcing.
-            if (photo.y.valueOf() > 0) return 0;
+            if (photo.y.valueOf() >= 2) return 0;
+
+            console.log('enforce motion constraint B');
+
             var topTarget = 0 - 80 + 55;
             var bottomTarget = photoHeight;
 
             if (velocity > 0) return bottomTarget - a;
             return topTarget - a;
-        }, 0, 1, physicsModel);
+        }, 0, { overdragCoefficient: 1, physicsModel: physicsModel, animationOnly: true, captive: true, passive: true });
     context.addMotionConstraint(motionConstraint);
 
     context.update();

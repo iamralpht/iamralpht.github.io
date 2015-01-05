@@ -77,6 +77,7 @@ function makePhotosExample(parentElement) {
     // Motion constraint to enforce pager behavior.
     var motionConstraint = new MotionConstraint(scrollPosition, '%', parentWidth + padding);
     motionConstraint.captive = true;
+    motionConstraint.animationOnly = true;
     context.addMotionConstraint(motionConstraint);
 
     // Some basic motion constraints to stop us going past the ends.

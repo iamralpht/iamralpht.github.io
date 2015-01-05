@@ -78,30 +78,26 @@ MotionContext.prototype._resolveMotionConstraints = function() {
     for (var i = 0; i < this._motionConstraints.length; i++) {
         var pc = this._motionConstraints[i];
         var delta = pc.delta();
-        var animationDelta = pc.deltaFromAnimation();
-        if (delta == 0 && animationDelta == 0)
+        if (delta == 0)
             continue;
 
         // Notify the manipulators that contributed to this violation.
         for (var j = 0; j < this._manipulators.length; j++) {
             var manipulator = this._manipulators[j];
-            var animating = manipulator.animating();
             
             // If there's no delta and the manipulator isn't animating then it isn't a violation we want to deal
             // with now.
-            if (delta == 0 && !animating) continue;
+            if (delta == 0) continue;
 
             var c = coefficient(manipulator, pc.variable);
 
             // Do nothing if they're unrelated (i.e.: the coefficient is zero; this manipulator doesn't contribute).
             if (c == 0) continue;
 
-            var d = animating ? animationDelta : delta;
-
             // We found a violation and the manipulator that contributed. Remember it and we'll
             // tell the manipulator about all the violations it contributed to at once afterwards
             // and it can decide what it's going to do about it...
-            addViolation(manipulator, pc, c, d);
+            addViolation(manipulator, pc, c, delta);
         }
         // XXX: We should find ONE manipulator, or figure out which manipulator to target in the
         //      case of multiple. If we have one doing an animation, and one doing a touch drag

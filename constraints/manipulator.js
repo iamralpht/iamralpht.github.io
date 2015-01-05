@@ -119,11 +119,13 @@ Manipulator.prototype._update = function() {
         // Kill any animations we already have.
         this._cancelAnimation('velocityAnimation');
         this._cancelAnimation('constraintAnimation');
+        this._motionState.velocityAnimationVelocity = 0;
+        this._motionState.constraintAnimationVelocity = 0;
         // Start an edit.
         beginEdit();
         // If we've hit any constraint then apply that.
         var position = this._motionState.dragStart + this._motionState.dragDelta;
-        if (this._hitConstraint) {
+        if (this._hitConstraint && !this._hitConstraint.animationOnly) {
             // Push the current value into the system so that we can extract the delta.
             this._solver.suggestValue(this._variable, position);
 
@@ -155,6 +157,8 @@ Manipulator.prototype._update = function() {
         if (!this._motionState.editing) return;
         this._solver.endEdit(this._variable);
         this._motionState.editing = false;
+        this._motionState.velocityAnimationVelocity = 0;
+        this._motionState.constraintAnimationVelocity = 0;
     }
     this._updateSystem();
 }
@@ -177,17 +181,24 @@ Manipulator.prototype._createAnimation = function(velocity) {
                 return;
             this._cancelAnimation('constraintAnimation');
         }
+
         this._motionState.constraintAnimationConstraint = this._hitConstraint;
 
         var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
 
-        var delta = this.animating() ? this._hitConstraint.deltaFromAnimation(velocity) : this._hitConstraint.delta();
+        var delta = this._hitConstraint.delta(velocity);
 
         // Figure out how far we have to go to be out of violation. Because we use a linear
         // constraint solver to surface violations we only need to remember the coefficient
         // of a given violation.
         var violationDelta = delta / this._constraintCoefficient;
 
+        // Passive constraints apply when we have no velocity or the velocity is going to
+        // cause the passive constraint to be violated even more. It's like a one-way (direction)
+        // constraint.
+        //
+        // This feels really hacky, and passive is the wrong name.
+        if (!this._hitConstraint.passive || sign(violationDelta) !== sign(velocity)) {
         // We always do the constraint animation when we've hit a constraint. If the constraint
         // isn't captive then we'll fall out of it and into a regular velocity animation later
         // on (this is how the ends of scroll springs work).
@@ -209,6 +220,7 @@ Manipulator.prototype._createAnimation = function(velocity) {
                 }
             });
         return;
+        }
     }
 
     // No constraint violation, just a plain motion animation incorporating the velocity
@@ -257,7 +269,16 @@ Manipulator.prototype.hitConstraints = function(violations) {
         this._constraintCoefficient = 1;
         return;
     }
-    violations.sort(function(a, b) { return Math.abs(b.delta) - Math.abs(a.delta); });
+    violations.sort(function(a, b) {
+        var amc = a.motionConstraint;
+        var bmc = b.motionConstraint;
+        // Non animation-only constraints are less important than animation only ones;
+        // we should also sort on overdrag coefficient so that we get the tightest
+        // constraints to the top.
+        if (amc.animationOnly == bmc.animationOnly)
+            return Math.abs(b.delta) - Math.abs(a.delta);
+        return (amc.animationOnly - bmc.animationOnly);
+    });
     this.hitConstraint(violations[0].motionConstraint, violations[0].coefficient, violations[0].delta);
 }
 Manipulator.prototype.animating = function() {
