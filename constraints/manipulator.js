@@ -184,9 +184,20 @@ Manipulator.prototype._createAnimation = function(velocity) {
 
         this._motionState.constraintAnimationConstraint = this._hitConstraint;
 
-        var velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
+        // Determine the current velocity and end point if no constraint had been hit. Some
+        // discontinuous constraint ops use this to determine which point they're going to snap to.
+        velocity = self._motionState.velocityAnimation ? self._motionState.velocityAnimationVelocity : velocity;
+        var endPosition = this._variable.valueOf();
+        if (self._motionState.velocityAnimation) endPosition = self._motionState.velocityAnimation.model.x(60);
+        else if (velocity) {
+            var motion = this.createMotion(this._variable.valueOf(), velocity);
+            endPosition = motion.x(60);
+        }
 
-        var delta = this._hitConstraint.delta(velocity);
+        // We pass through the "natural" end point and the start position. MotionConstraints
+        // shouldn't need velocity, so we don't pass that through. (Perhaps there's a constraint
+        // that does need it, then I'll put it back; haven't found that constraint yet).
+        var delta = this._hitConstraint.delta(endPosition, this._motionState.dragStart);
 
         // Figure out how far we have to go to be out of violation. Because we use a linear
         // constraint solver to surface violations we only need to remember the coefficient
