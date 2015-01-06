@@ -167,7 +167,7 @@ function makeGoogleMapsExample() {
             if (startPosition <= -5) target = 0;
 
             return target - a;
-        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: true });
+        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: false });
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
     // the photo when the photo is at the top of the screen.
