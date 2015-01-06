@@ -125,7 +125,7 @@ Manipulator.prototype._update = function() {
         beginEdit();
         // If we've hit any constraint then apply that.
         var position = this._motionState.dragStart + this._motionState.dragDelta;
-        if (this._hitConstraint && !this._hitConstraint.animationOnly) {
+        if (this._hitConstraint) {
             // Push the current value into the system so that we can extract the delta.
             this._solver.suggestValue(this._variable, position);
 
@@ -275,9 +275,9 @@ Manipulator.prototype.hitConstraints = function(violations) {
         // Non animation-only constraints are less important than animation only ones;
         // we should also sort on overdrag coefficient so that we get the tightest
         // constraints to the top.
-        if (amc.animationOnly == bmc.animationOnly)
+        if (amc.overdragCoefficient == bmc.overdragCoefficient)
             return Math.abs(b.delta) - Math.abs(a.delta);
-        return (amc.animationOnly - bmc.animationOnly);
+        return (bmc.overdragCoefficient - amc.overdragCoefficient);
     });
     this.hitConstraint(violations[0].motionConstraint, violations[0].coefficient, violations[0].delta);
 }

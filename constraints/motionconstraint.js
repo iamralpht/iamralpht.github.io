@@ -71,8 +71,6 @@ function MotionConstraint(variable, op, value, options) {
     this.overdragCoefficient = options.overdragCoefficient || 0.75;
     this.physicsModel = options.physicsModel;
     this.captive = options.captive || false;
-    this.passive = options.passive || false;
-    this.animationOnly = options.animationOnly || false;
 }
 // Some random physics models to use in options. Not sure these belong here.
 MotionConstraint.underDamped = function() { return new Spring(1, 200, 20); }

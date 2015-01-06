@@ -157,15 +157,13 @@ function makeGoogleMapsExample() {
             if (a <= 0) return 0;
             if (Math.round(a) >= Math.round(infoBar.y.valueOf()) - 1) return 0;
 
-            console.log('enforce motion constraint A ' + a + ' infobar y: ' + infoBar.y.valueOf());
-
             // Where do we want it to end with y = 0, or with y = (height - 80) which is the
             // home position.
             var target = 0;
             if (velocity && velocity > 0) target = height - 80;
 
             return target - a;
-        }, 0, { overdragCoefficient: 1, physicsModel: physicsModel, animationOnly: true, captive: true, passive: true });
+        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: true });
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
     // the photo when the photo is at the top of the screen.
@@ -175,14 +173,12 @@ function makeGoogleMapsExample() {
             // If the photo isn't touching the top then we're not enforcing.
             if (photo.y.valueOf() >= 2) return 0;
 
-            console.log('enforce motion constraint B');
-
             var topTarget = 0 - 80 + 55;
             var bottomTarget = photoHeight;
 
             if (velocity > 0) return bottomTarget - a;
             return topTarget - a;
-        }, 0, { overdragCoefficient: 1, physicsModel: physicsModel, animationOnly: true, captive: true, passive: true });
+        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: true });
     context.addMotionConstraint(motionConstraint);
 
     context.update();
