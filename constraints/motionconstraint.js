@@ -21,33 +21,24 @@ var mc = {
         return b - a;
     },
     equal: function(a, b) { return b - a; },
-    // This is an animation-only constraint. Need a better way to declare what these
-    // are and why (maybe the animation detection needs to move to the MotionConstraint
-    // rather than being in the op?).
-    modulo: function(a, b, velocity) {
-        // This is bogus; we're just inventing some friction constant and assuming that
-        // this is what the manipulator is using. We probably need the manipulator to
-        // tell us the end point or local minima/maxima so that we can decide which
-        // direction we're going to trigger in from that...
-        //
-        // XXX: Move this end-position computation out to the manipulator. We might be
-        //      interested in the start, current and projected end, but we shouldn't care
-        //      about velocity or physics particularly here...
-        //
-        // This is correct for pagers and things where the manipulator is actually using
-        // this friction value, though.
-        //
-        var end = a;
-        if (velocity) {
-            var friction = new Friction(0.001);
-            friction.set(a, velocity);
-            // We say that the end is after 60sec. We should compute the end time but it
-            // requires a numerical method (like newton-raphson) for springs, so we just
-            // give it a "big" time instead.
-            end = friction.x(60);
-        }
-        // Where is the end point closest to?
-        var nearest = b * Math.round(end/b);
+    modulo: function(a, b, naturalEndPosition) {
+        var nearest = b * Math.round(naturalEndPosition/b);
+        return nearest - a;
+    },
+    // Like modulo, but only snaps to the current or adjacent values. Really good for pagers.
+    adjacentModulo: function(a, b, naturalEndPosition, gestureStartPosition) {
+        if (gestureStartPosition === undefined) return mc.modulo(a, b, naturalEndPosition);
+
+        var startNearest = Math.round(gestureStartPosition/b);
+        var endNearest = Math.round(naturalEndPosition/b);
+
+        var difference = endNearest - startNearest;
+
+        // Make the difference at most 1, so that we're only going to adjacent snap points.
+        if (difference) difference /= Math.abs(difference);
+
+        var nearest = (startNearest + difference) * b;
+
         return nearest - a;
     }
 };
@@ -75,8 +66,10 @@ function MotionConstraint(variable, op, value, options) {
 // Some random physics models to use in options. Not sure these belong here.
 MotionConstraint.underDamped = function() { return new Spring(1, 200, 20); }
 MotionConstraint.criticallyDamped = function() { return new Spring(1, 200, Math.sqrt(4 * 1 * 200)); }
-MotionConstraint.prototype.delta = function(velocity) {
-    return this.op(this.variable, this.value, velocity);
+MotionConstraint.prototype.delta = function(naturalEndPosition, gestureStartPosition) {
+    if (!naturalEndPosition) naturalEndPosition = this.variable;
+
+    return this.op(this.variable, this.value, naturalEndPosition, gestureStartPosition);
 }
 MotionConstraint.prototype.createMotion = function(startPosition) {
     var motion = this.physicsModel ? this.physicsModel() : new Spring(1, 200, 20);//Math.sqrt(200 * 4));
