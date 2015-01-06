@@ -88,13 +88,13 @@ Spring.prototype._solve = function(initial, velocity) {
         };
     }
 }
-Spring.prototype.x = function(t) {
-    if (!t) t = (new Date()).getTime();
-    return this._solution ? this._endPosition + this._solution.x((t - this._startTime) / 1000.0) : 0;
+Spring.prototype.x = function(dt) {
+    if (dt == undefined) dt = ((new Date()).getTime() - this._startTime) / 1000.0;
+    return this._solution ? this._endPosition + this._solution.x(dt) : 0;
 }
-Spring.prototype.dx = function(t) {
-    if (!t) t = (new Date()).getTime();
-    return this._solution ? this._solution.dx((t - this._startTime) / 1000.0) : 0;
+Spring.prototype.dx = function(dt) {
+    if (dt == undefined) dt = ((new Date()).getTime() - this._startTime) / 1000.0;
+    return this._solution ? this._solution.dx(dt) : 0;
 }
 Spring.prototype.setEnd = function(x, velocity, t) {
     if (!t) t = (new Date()).getTime();

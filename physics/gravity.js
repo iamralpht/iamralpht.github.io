@@ -36,9 +36,9 @@ Gravity.prototype.set = function(x, v) {
     this._v = v;
     this._startTime = (new Date()).getTime();
 }
-Gravity.prototype.x = function() {
+Gravity.prototype.x = function(dt) {
     var t = (new Date()).getTime();
-    var dt = (t - this._startTime) / 1000.0;
+    if (dt == undefined) dt = (t - this._startTime) / 1000.0;
     return this._x + this._v * dt + 0.5 * this._a * dt * dt;
 }
 Gravity.prototype.dx = function() {
