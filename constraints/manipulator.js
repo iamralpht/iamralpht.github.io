@@ -177,7 +177,7 @@ Manipulator.prototype._createAnimation = function(velocity) {
         // Don't interrupt an animation caused by a constraint to enforce the same constraint.
         // This can happen if the constraint is enforced by an underdamped spring, for example.
         if (this._motionState.constraintAnimation) {
-            if (this._motionState.constraintAnimationConstraint == this._hitConstraint)
+            if (this._motionState.constraintAnimationConstraint == this._hitConstraint || this._motionState.constraintAnimationConstraint.captive)
                 return;
             this._cancelAnimation('constraintAnimation');
         }
@@ -193,23 +193,38 @@ Manipulator.prototype._createAnimation = function(velocity) {
             var motion = this.createMotion(this._variable.valueOf(), velocity);
             endPosition = motion.x(60);
         }
+        var startPosition = this._motionState.dragStart;
+        // If the constraint isn't relative to our variable then we need to use the solver to
+        // get the appropriate startPosition and endPosition.
+        if (this._variable != this._hitConstraint.variable) {
+            var original = this._variable.valueOf();
+            if (this._motionState.editing) {
+                this._solver.suggestValue(this._variable, startPosition);
+                this._solver.solve();
+                startPosition = this._hitConstraint.variable.valueOf();
+
+                this._solver.suggestValue(this._variable, endPosition);
+                this._solver.solve();
+                endPosition = this._hitConstraint.variable.valueOf();
+
+                this._solver.suggestValue(this._variable, original);
+                this._solver.solve();
+            } else {
+                // XXX: Should start a temporary edit to avoid this...
+                console.warn('not editing; cannot figure out correct start/end positions for motion constraint');
+            }
+        }
 
         // We pass through the "natural" end point and the start position. MotionConstraints
         // shouldn't need velocity, so we don't pass that through. (Perhaps there's a constraint
         // that does need it, then I'll put it back; haven't found that constraint yet).
-        var delta = this._hitConstraint.delta(endPosition, this._motionState.dragStart);
+        var delta = this._hitConstraint.delta(endPosition, startPosition);
 
         // Figure out how far we have to go to be out of violation. Because we use a linear
         // constraint solver to surface violations we only need to remember the coefficient
         // of a given violation.
         var violationDelta = delta / this._constraintCoefficient;
 
-        // Passive constraints apply when we have no velocity or the velocity is going to
-        // cause the passive constraint to be violated even more. It's like a one-way (direction)
-        // constraint.
-        //
-        // This feels really hacky, and passive is the wrong name.
-        if (!this._hitConstraint.passive || sign(violationDelta) !== sign(velocity)) {
         // We always do the constraint animation when we've hit a constraint. If the constraint
         // isn't captive then we'll fall out of it and into a regular velocity animation later
         // on (this is how the ends of scroll springs work).
@@ -231,7 +246,6 @@ Manipulator.prototype._createAnimation = function(velocity) {
                 }
             });
         return;
-        }
     }
 
     // No constraint violation, just a plain motion animation incorporating the velocity
