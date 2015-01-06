@@ -149,13 +149,16 @@ function makeGoogleMapsExample() {
     context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height + extraContentHeight, { overdragCoefficient: 0.75, physicsModel: physicsModel }));
     // Add a motion constraint to ensure that we allow free scrolling of the content
     // area but spring-snap to position when between the two expanded states.
+    //
+    // XXX: This is junk. Need to add some kind of "range" constraint type. Maybe once we have the "natural end" calculation moved out.
+    /*
     var motionConstraint = new MotionConstraint(photo.y,
         function(a, b, velocity) {
             // We want to say that the photo's y has to either be the same as the infobar's
             // y or it has to be less than zero. If it's zero or less then we don't care to
             // enforce anything.
             if (a <= 0) return 0;
-            if (Math.round(a) >= Math.round(infoBar.y.valueOf()) - 1) return 0;
+            if (Math.round(a) >= Math.round(infoBar.y.valueOf())) return 0;
 
             // Where do we want it to end with y = 0, or with y = (height - 80) which is the
             // home position.
@@ -163,7 +166,7 @@ function makeGoogleMapsExample() {
             if (velocity && velocity > 0) target = height - 80;
 
             return target - a;
-        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: true });
+        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel });
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
     // the photo when the photo is at the top of the screen.
@@ -178,9 +181,9 @@ function makeGoogleMapsExample() {
 
             if (velocity > 0) return bottomTarget - a;
             return topTarget - a;
-        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: true });
+        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel });
     context.addMotionConstraint(motionConstraint);
-
+    */
     context.update();
 }
 
