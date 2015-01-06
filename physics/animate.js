@@ -38,5 +38,5 @@ function animation(physicsModel, callback) {
     var handle = { id: 0, cancelled: false };
     onFrame(handle, physicsModel, callback);
 
-    return { cancel: cancel.bind(null, handle) };
+    return { cancel: cancel.bind(null, handle), model: physicsModel };
 }
