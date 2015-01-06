@@ -147,13 +147,12 @@ function makeGoogleMapsExample() {
     context.addMotionConstraint(new MotionConstraint(infoBar.bottom, '<=', height, { overdragCoefficient: 0.75, physicsModel: physicsModel }));
     // Don't expose the bottom of the content.
     context.addMotionConstraint(new MotionConstraint(content.bottom, '>=', height + extraContentHeight, { overdragCoefficient: 0.75, physicsModel: physicsModel }));
-    // Add a motion constraint to ensure that we allow free scrolling of the content
-    // area but spring-snap to position when between the two expanded states.
-    //
-    // XXX: This is junk. Need to add some kind of "range" constraint type. Maybe once we have the "natural end" calculation moved out.
-    /*
+
+    // This is a motion constraint with a complicated predicate which snaps the position when
+    // the photo hasn't reached the top of the screen yet. We don't want to leave the UI with
+    // the photo half-way up the screen...
     var motionConstraint = new MotionConstraint(photo.y,
-        function(a, b, velocity) {
+        function(a, b, naturalEnd, startPosition) {
             // We want to say that the photo's y has to either be the same as the infobar's
             // y or it has to be less than zero. If it's zero or less then we don't care to
             // enforce anything.
@@ -163,27 +162,29 @@ function makeGoogleMapsExample() {
             // Where do we want it to end with y = 0, or with y = (height - 80) which is the
             // home position.
             var target = 0;
-            if (velocity && velocity > 0) target = height - 80;
+            if (naturalEnd >= height/2) target = height - 80;
+            // If we started from the photo being above the origin then we will only go there.
+            if (startPosition <= -5) target = 0;
 
             return target - a;
-        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel });
+        }, 0, { overdragCoefficient: 0, physicsModel: physicsModel, captive: true });
     context.addMotionConstraint(motionConstraint);
     // Add a second motion constraint that prevents the infobar from partially covering
     // the photo when the photo is at the top of the screen.
+    // This prevents us from getting stuck between 
     // Note: this constraint isn't captive, we want it to overflow into scrolling.
     motionConstraint = new MotionConstraint(infoBar.y,
-        function(a, b, velocity) {
+        function(a, b, naturalEnd) {
             // If the photo isn't touching the top then we're not enforcing.
-            if (photo.y.valueOf() >= 2) return 0;
+            if (photo.y.valueOf() >= 0) return 0;
 
             var topTarget = 0 - 80 + 55;
             var bottomTarget = photoHeight;
 
-            if (velocity > 0) return bottomTarget - a;
+            if (naturalEnd > 0) return bottomTarget - a;
             return topTarget - a;
         }, 0, { overdragCoefficient: 0, physicsModel: physicsModel });
     context.addMotionConstraint(motionConstraint);
-    */
     context.update();
 }
 
