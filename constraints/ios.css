@@ -19,6 +19,14 @@
 }
 .ios-example .control-center {
     background-image: url(img/ios-control-center.png);
-    background-color: rgba(128, 128, 128, 0.8);
+    background-color: rgba(190, 190, 190, 0.8);
     background-position-y: top;
+}
+
+.ios-example .menu {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.ios-example .control-sensor, .ios-example .menu-sensor {
+    pointer-events: auto;
 }
