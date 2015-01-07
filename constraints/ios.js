@@ -71,7 +71,7 @@ function makeControlCenter(parentElement) {
 
     // Add some constraints to position the object that takes the drag events.
     //  controlSensor.y = controlCenter.y - 100 // expose some sensor when the control center is hidden.
-    solver.add(eq(controlSensor.y, c.plus(controlCenter.y, -100), medium));
+    solver.add(eq(controlSensor.y, c.plus(controlCenter.y, -150), medium));
     solver.add(eq(controlSensor.bottom, c.plus(controlSensor.y, parentHeight), medium));
 
     // Add a manipulator to the control center's y.
@@ -153,10 +153,14 @@ function makeControlCenter(parentElement) {
 
     // Position the sensor.
     solver.add(eq(menuSensor.y, menu.y, medium));
-    solver.add(eq(menuSensor.bottom, c.plus(menu.bottom, 100), medium));
+    solver.add(eq(menuSensor.bottom, c.plus(menu.bottom, 150), medium));
 
     // Create a manipulator. We override the motion type to use gravity.
     context.addManipulator(new Manipulator(menu.y, solver, context.update.bind(context), menuSensor.element(), 'y'));
+
+    // Make the parent element cancel touch events so that the page doesn't scroll if you
+    // grab an insensitive bit (which is super annoying).
+    addTouchOrMouseListener(parentElement, {});
 }
 
 makeControlCenter(document.getElementById('ios-example'));
