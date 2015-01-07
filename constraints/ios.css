@@ -1,0 +1,24 @@
+.ios-example {
+    position: relative;
+    width: 320px;
+    height: 568px;
+    margin: auto;
+    overflow: hidden;
+}
+
+.ios-example .box {
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+.ios-example .backdrop {
+    background-image: url(img/ios-home.jpg);
+}
+.ios-example .control-center {
+    background-image: url(img/ios-control-center.png);
+    background-color: rgba(128, 128, 128, 0.8);
+    background-position-y: top;
+}
