@@ -1,0 +1,32 @@
+.win7-overscroll-example {
+    position: relative;
+    width: 470px;
+    height: 550px;
+    margin: auto;
+}
+
+.win7-overscroll-example .box {
+    border-radius: 0px;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.win7-overscroll-example>.window {
+    background-image: url(img/window.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    will-change: transform;
+}
+
+.win7-overscroll-example .clip {
+    overflow: hidden;
+    will-change: transform;
+}
+
+.win7-overscroll-example .image {
+    background-image: url(img/5086396751_fb4ca9804a_z.jpg);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    will-change: transform;
+}

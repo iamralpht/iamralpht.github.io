@@ -101,6 +101,7 @@ div.mono {
 }
 </style>
 <link href="ios.css" rel="stylesheet"></link>
+<link href="win7overscroll.css" rel="stylesheet"></link>
 <link href="article.css" rel="stylesheet"></link>
 <script src="touch.js"></script>
 <script src="../physics/animate.js"></script>
@@ -123,6 +124,7 @@ div.mono {
 <p>Why use constraints? They get us from describing <b>how</b> something should happen to describing <b>what</b> should happen, which is much more concise. This is being declarative.</p>
 <p>Where did constraints systems come from? Sutherland (Sketchpad, constraint relaxation), Borning (ThingLab, relaxation), Badros (Cassowary, simplex). Current applications: Apple AutoLayout (Cassowary), CSS position sticky.</p>
 <p>Use constraints to define allowable motion, add physics properties to constraints to create <b>motion constraints</b>. For the first time, define touch complex touch interactions declaratively. So simple a graphical tool could do it.</p>
+<p>Metaphor to explain: slot-car racing. Linear constraint system describes track, manipulator describes controller and car, motion constraints describe obstacles/buffers.</p>
 <p>First example: touch scrolling. Boring. Normally a lot of code, though, check the last post on physics code to see an extremely minimal example. There's a missing feature (motion constraint enforcement while dragging) that means the list items still track 1:1 into the overscroll area.</p>
 </div>
 <div class="example">
@@ -227,6 +229,18 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
     </div>
 </div>
 <div class="content">
+<p>Window 7-style overscroll.</p>
+</div>
+<div class="example">
+    <div class="win7-overscroll-example" id="win7-overscroll-example">
+        <div class="window box">
+            <div class="clip box">
+                <div class="image box"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
 <p>BUGS: No item-to-item motion constraint examples. No parser yet! Can't tweak constraints in examples yet...</p>
 <p>TODO on first pass:</p>
 <ul>
@@ -245,5 +259,6 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
     <script src="test.js"></script>
     <script src="photos.js"></script>
     <script src="ios.js"></script>
+    <script src="win7overscroll.js"></script>
 </body>
 </html>
