@@ -164,3 +164,84 @@ function makeControlCenter(parentElement) {
 }
 
 makeControlCenter(document.getElementById('ios-example'));
+
+
+// iOS app switcher
+function makeAppSwitcher(parentElement) {
+    var parentWidth = 320;
+    var parentHeight = 568;
+
+    // We actually need to make all of the "apps" and "icons" in this example.
+    var context = new MotionContext();
+    var solver = context.solver();
+
+    var appWidth = parentWidth / 2;
+    var appHeight = parentHeight / 2;
+    var appTop = parentHeight / 4;
+    var iconTop = appTop + appHeight + 20;
+    var iconHeight = 72;
+    
+    var appPadding = 80;
+
+    // Apps should be spaced apart for a nice look.
+    var appSpacing = appWidth + appPadding;
+    // Icons should be spaced half as much as apps.
+    var iconSpacing = appSpacing / 2;
+    // The icons should start out centered under their apps.
+    var iconOffset = appWidth / 2;
+
+    var firstApp = null;
+    var lastApp = null;
+
+    var firstIcon = null;
+
+    var scrollOffset = new c.Variable({name: 'scroll-offset'});
+    solver.add(eq(scrollOffset, 0, weak));
+
+    // Create our apps.
+    for (var i = 0; i < 10; i++) {
+        // Create an "app".
+        var app = new Box('App ' + (i+1));
+        app.x = new c.Variable({name: 'app-' + i + '-x'});
+        app.right = new c.Variable({name: 'app-' + i + '-right'});
+        app.y = appTop;
+        app.bottom = appTop + appHeight;
+
+        context.addBox(app);
+        app.element().classList.add('app');
+        parentElement.appendChild(app.element());
+        if (!firstApp) firstApp = app;
+        lastApp = app;
+
+        // Specify width (right = x + appWidth).
+        solver.add(eq(app.right, c.plus(app.x, appWidth), medium));
+        // Specify x (i * appWidth + scrollOffset).
+        solver.add(eq(app.x, c.plus(i * (appWidth + appPadding), scrollOffset), medium));
+
+        // Create an icon.
+        var icon = new Box('');
+        icon.x = new c.Variable({name: 'icon-' + i + '-x'});
+        icon.right = new c.Variable({name: 'icon-' + i + '-right'});
+        icon.y = iconTop;
+        icon.bottom = iconTop + iconHeight;
+
+        if (!firstIcon) firstIcon = icon;
+
+        context.addBox(icon);
+        icon.element().classList.add('icon');
+        parentElement.appendChild(icon.element());
+
+        // The icon's width is 72.
+        solver.add(eq(icon.right, c.plus(icon.x, 72), medium));
+        // Icon's x is centered under the first app (specify with constraint?) and half the distance as apps.
+        // Moves 0.5x the speed of the app to stay centered.
+        // THIS is the really interesting relationship in here -- that the icon offset is some constant + scrollOffset / 2.
+        // This is why dragging the icons moves the apps faster and vice versa.
+        solver.add(eq(icon.x, c.plus(iconOffset + iconSpacing * i, c.times(scrollOffset, 0.5)), medium));
+    }
+    context.addManipulator(new Manipulator(firstIcon.x, solver, context.update.bind(context), parentElement, 'x'));
+
+    context.update();
+}
+
+makeAppSwitcher(document.getElementById('app-switcher-example'));

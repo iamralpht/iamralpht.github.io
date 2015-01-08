@@ -1,3 +1,6 @@
+/*
+ * iOS control center and notification pull down example.
+ */
 .ios-example {
     position: relative;
     width: 320px;
@@ -56,4 +59,21 @@
 
 .ios-example .control-sensor, .ios-example .menu-sensor {
     pointer-events: auto;
+}
+
+
+/*
+ * iOS app switcher UI
+ */
+.app-switcher-example {
+    position: relative;
+    width: 320px;
+    height: 568px;
+    margin: auto;
+    overflow: hidden;
+
+    background-image: url(img/wallpaper.jpg);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
 }
