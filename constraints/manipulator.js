@@ -57,6 +57,8 @@ function Manipulator(variable, domObject, axis) {
 
     addTouchOrMouseListener(domObject, {
         onTouchStart: function() {
+            // Kill other manipulators that are doing something to a related variable.
+            self._motionContext.stopOthers(self._variable);
             // Start a new edit session.
             self._motionState.dragging = true;
             self._motionState.dragStart = variable.valueOf();
@@ -313,3 +315,9 @@ Manipulator.prototype.animating = function() {
     return !!this._motionState.velocityAnimation || this._motionState.trialAnimation;
 }
 Manipulator.prototype.editing = function() { return this._motionState.editing; }
+Manipulator.prototype.cancelAnimations = function() {
+    this._cancelAnimation('velocityAnimation');
+    this._cancelAnimation('constraintAnimation');
+    this._hitConstraint = null; // XXX: Hacky -- want to prevent starting a new constraint animation in update; just want it to end the edit.
+    this._update();
+}

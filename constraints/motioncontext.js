@@ -35,6 +35,24 @@ MotionContext.prototype.update = function() {
     }
     this._updating = false;
 }
+// Find out how a manipulator is related to a variable.
+MotionContext.prototype._coefficient = function(manipulator, variable) {
+    var solver = this._solver.solver();
+    var v = manipulator.variable();
+    // Iterate the edit variables in the solver. XXX: these are private and we need a real interface soon.
+    var editVarInfo = solver._editVarMap.get(v);
+    // No edit variable? No contribution to the current violation.
+    if (!editVarInfo) return 0;
+    // Now we can ask the coefficient of the edit's minus variable to the manipulator's variable. This
+    // is what the solver does in suggestValue.
+    var editMinus = editVarInfo.editMinus;
+    // Get the expression that corresponds to the motion constraint's violated variable.
+    // This is probably an "external variable" in cassowary.
+    var expr = solver.rows.get(variable);
+    if (!expr) return 0;
+    // Finally we can compute the value.
+    return expr.coefficientFor(editMinus);
+}
 MotionContext.prototype._resolveMotionConstraints = function() {
     var allViolations = {};
 
@@ -61,24 +79,6 @@ MotionContext.prototype._resolveMotionConstraints = function() {
         }
     }
 
-
-    var solver = this._solver.solver();
-    function coefficient(manipulator, variable) {
-        var v = manipulator.variable();
-        // Iterate the edit variables in the solver. XXX: these are private and we need a real interface soon.
-        var editVarInfo = solver._editVarMap.get(v);
-        // No edit variable? No contribution to the current violation.
-        if (!editVarInfo) return 0;
-        // Now we can ask the coefficient of the edit's minus variable to the manipulator's variable. This
-        // is what the solver does in suggestValue.
-        var editMinus = editVarInfo.editMinus;
-        // Get the expression that corresponds to the motion constraint's violated variable.
-        // This is probably an "external variable" in cassowary.
-        var expr = solver.rows.get(variable);
-        if (!expr) return 0;
-        // Finally we can compute the value.
-        return expr.coefficientFor(editMinus);
-    }
     for (var i = 0; i < this._motionConstraints.length; i++) {
         var pc = this._motionConstraints[i];
         var delta = pc.delta();
@@ -93,7 +93,7 @@ MotionContext.prototype._resolveMotionConstraints = function() {
             // with now.
             if (delta == 0) continue;
 
-            var c = coefficient(manipulator, pc.variable);
+            var c = this._coefficient(manipulator, pc.variable);
 
             // Do nothing if they're unrelated (i.e.: the coefficient is zero; this manipulator doesn't contribute).
             if (c == 0) continue;
@@ -110,4 +110,12 @@ MotionContext.prototype._resolveMotionConstraints = function() {
     }
     // Tell all the manipulators that we're done constraining.
     dispatchViolations();
+}
+MotionContext.prototype.stopOthers = function(variable) {
+    // Kill all the manipulators that are animating this variable. There's a new touch point
+    // that's now dominant.
+    for (var i = 0; i < this._manipulators.length; i++) {
+        var manipulator = this._manipulators[i];
+        if (this._coefficient(manipulator, variable) != 0) manipulator.cancelAnimations();
+    }
 }
