@@ -137,7 +137,7 @@ function makeGoogleMapsExample() {
     solver.add(eq(content.bottom, c.plus(content.y, contentHeight + extraContentHeight), medium));
     solver.add(eq(content.y, c.plus(height, scrollPosition), medium));
 
-    var manip = new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'y');
+    var manip = new Manipulator(scrollPosition, parentElement, 'y');
     context.addManipulator(manip);
 
 

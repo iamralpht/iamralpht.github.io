@@ -75,7 +75,7 @@ function makeControlCenter(parentElement) {
     solver.add(eq(controlSensor.bottom, c.plus(controlSensor.y, parentHeight), medium));
 
     // Add a manipulator to the control center's y.
-    context.addManipulator(new Manipulator(controlCenter.y, solver, context.update.bind(context), controlSensor.element(), 'y'));
+    context.addManipulator(new Manipulator(controlCenter.y, controlSensor.element(), 'y'));
 
 
     // Now do the pulldown menu from the top. This one uses gravity and is interesting because
@@ -155,12 +155,14 @@ function makeControlCenter(parentElement) {
     solver.add(eq(menuSensor.y, menu.y, medium));
     solver.add(eq(menuSensor.bottom, c.plus(menu.bottom, 150), medium));
 
-    // Create a manipulator. We override the motion type to use gravity.
-    context.addManipulator(new Manipulator(menu.y, solver, context.update.bind(context), menuSensor.element(), 'y'));
+    // Create a manipulator for the menu.
+    context.addManipulator(new Manipulator(menu.y, menuSensor.element(), 'y'));
 
     // Make the parent element cancel touch events so that the page doesn't scroll if you
     // grab an insensitive bit (which is super annoying).
     addTouchOrMouseListener(parentElement, {});
+
+    context.update();
 }
 
 makeControlCenter(document.getElementById('ios-example'));
@@ -272,10 +274,10 @@ function makeAppSwitcher(parentElement) {
     iconListener.className = 'icon-listener';
     parentElement.appendChild(iconListener);
 
-    context.addManipulator(new Manipulator(firstIcon.x, solver, context.update.bind(context), iconListener, 'x'));
+    context.addManipulator(new Manipulator(firstIcon.x, iconListener, 'x'));
 
     // Also allow the x position of the apps to be dragged.
-    context.addManipulator(new Manipulator(firstApp.x, solver, context.update.bind(context), parentElement, 'x'));
+    context.addManipulator(new Manipulator(firstApp.x, parentElement, 'x'));
     context.update();
 }
 

@@ -101,7 +101,7 @@ OpenedTweets.prototype.makeInteractive = function(index, box, button) {
     // this when it's in the sticky state (though it should only do it when
     // its sticky and stuck to the top).
     this._context.addManipulator(
-        new Manipulator(this._spacing, this._solver, this._update, box.element(), 'y'));
+        new Manipulator(this._spacing, box.element(), 'y'));
 
     // Attempt at a button; should actually do proper gesture detection and not
     // eat events if it looks like a drag...
@@ -263,7 +263,7 @@ function makeTwitterExample(parentElement) {
     tweets.push(openedTweets);
     context.addBox(openedTweets);
 
-    context.addManipulator(new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'y'));
+    context.addManipulator(new Manipulator(scrollPosition, parentElement, 'y'));
 }
 
 makeTwitterExample(document.getElementById('timeline'));

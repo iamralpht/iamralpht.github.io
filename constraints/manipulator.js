@@ -4,11 +4,11 @@ var manipulatorCount = 0;
 
 // This is a wrapper over a cassowary variable. It will create an edit session
 // for it when dragged and listen for violations of motion constraints.
-function Manipulator(variable, solver, update, domObject, axis) {
+function Manipulator(variable, domObject, axis) {
     this._variable = variable;
-    this._solver = solver;
+    this._solver = null;
     this._axis = axis;
-    this._updateSystem = update;
+    this._context = null;
 
     this._motion = null;
     this._animation = null;
@@ -72,16 +72,18 @@ function Manipulator(variable, solver, update, domObject, axis) {
             var velocity = (axis == 'x') ? v.x : v.y;
             self._motionState.dragging = false;
             self._motionState.trialAnimation = true;
-            update(self);
+            if (self._motionContext) self._motionContext.update();
             self._createAnimation(velocity);
             self._motionState.trialAnimation = false;
         }
     });
-
+}
+// This method is called by the MotionContext when this manipulator is added to it.
+Manipulator.prototype._setMotionContext = function(motionContext) {
+    this._motionContext = motionContext;
+    this._solver = motionContext.solver();
     // Add a stay to the variable we're going to manipulate.
-    solver.add(new c.StayConstraint(variable, c.Strength.medium, 0));
-    solver.solve();
-    update(this);
+    this._solver.add(new c.StayConstraint(this._variable, c.Strength.medium, 0));
 }
 Manipulator.prototype.name = function() { return this._name; }
 Manipulator.prototype.variable = function() { return this._variable; }
@@ -160,7 +162,7 @@ Manipulator.prototype._update = function() {
         this._motionState.velocityAnimationVelocity = 0;
         this._motionState.constraintAnimationVelocity = 0;
     }
-    this._updateSystem();
+    if (this._motionContext) this._motionContext.update();
 }
 Manipulator.prototype._createAnimation = function(velocity) {
     // Can't animate if we're being dragged.

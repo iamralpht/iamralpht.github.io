@@ -16,9 +16,13 @@ MotionContext.prototype.addBox = function(box) {
 MotionContext.prototype.boxes = function() { return this._boxes; }
 MotionContext.prototype.addMotionConstraint = function(motionConstraint) {
     this._motionConstraints.push(motionConstraint);
+    return motionConstraint;
 }
 MotionContext.prototype.addManipulator = function(manipulator) {
     this._manipulators.push(manipulator);
+    manipulator._setMotionContext(this);
+    this.update(); // XXX: Remove -- constructing a Manipulator used to do this, moved it here but it should go.
+    return manipulator;
 }
 MotionContext.prototype.update = function() {
     // Prevent re-entrancy which can happen when a motion constraint violation

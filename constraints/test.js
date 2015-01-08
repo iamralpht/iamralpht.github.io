@@ -66,9 +66,7 @@ function makeTwitterPanelsExample(parentElement) {
     // Make a manipulator. It takes touch events and updates a constrained variable
     // from them.
 
-    var updateFunction = context.update.bind(context);
-
-    var manip = new Manipulator(lastPanel.x, solver, updateFunction, parentElement, 'x');
+    var manip = new Manipulator(lastPanel.x, parentElement, 'x');
     context.addManipulator(manip);
 }
 
@@ -139,9 +137,7 @@ function makeScrollingExample(parentElement, bunching) {
     context.addMotionConstraint(
         new MotionConstraint(lastBox.bottom, '>=', parentHeight, { physicsModel: MotionConstraint.criticallyDamped }));
 
-    var updateFunction = context.update.bind(context);
-
-    var manip = new Manipulator(scrollPosition, solver, updateFunction, parentElement, 'y');
+    var manip = new Manipulator(scrollPosition, parentElement, 'y');
     context.addManipulator(manip);
 }
 
@@ -169,7 +165,7 @@ function makeGravityExample(parentElement) {
 
     context.addMotionConstraint(new MotionConstraint(b.bottom, '<=', parentHeight, { captive: true }));
 
-    var manip = new Manipulator(b.y, solver, context.update.bind(context), parentElement, 'y');
+    var manip = new Manipulator(b.y, parentElement, 'y');
     manip.createMotion = function(x, v) {
         var motion = new Gravity(5000, 9999999);
         motion.set(x, v);
@@ -238,7 +234,7 @@ function makeScalingExample(parentElement) {
 
     parentElement.appendChild(box.element());
     context.addBox(box);
-    context.addManipulator(new Manipulator(box.y, solver, context.update.bind(context), parentElement, 'y'));
+    context.addManipulator(new Manipulator(box.y, parentElement, 'y'));
 }
 makeScalingExample(document.getElementById('scaling-example'));
 

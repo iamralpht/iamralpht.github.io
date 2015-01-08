@@ -86,7 +86,7 @@ function makePhotosExample(parentElement) {
 
 
     // Add a manipulator to scroll through the photos.
-    context.addManipulator(new Manipulator(scrollPosition, solver, context.update.bind(context), parentElement, 'x'));
+    context.addManipulator(new Manipulator(scrollPosition, parentElement, 'x'));
 }
 
 makePhotosExample(document.getElementById('photos-example'));
