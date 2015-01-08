@@ -168,6 +168,11 @@ makeControlCenter(document.getElementById('ios-example'));
 
 // iOS app switcher
 function makeAppSwitcher(parentElement) {
+    function randomLightColor() {
+        function randomInt() { return 128 + Math.round(Math.random() * 128); }
+        return 'rgb(' + randomInt() + ', ' + randomInt() + ', ' + randomInt() + ')';
+    }
+
     var parentWidth = 320;
     var parentHeight = 568;
 
@@ -177,8 +182,8 @@ function makeAppSwitcher(parentElement) {
 
     var appWidth = parentWidth / 2;
     var appHeight = parentHeight / 2;
-    var appTop = parentHeight / 4;
-    var iconTop = appTop + appHeight + 20;
+    var appTop = parentHeight / 6;
+    var iconTop = appTop + appHeight + 40;
     var iconHeight = 72;
     
     var appPadding = 80;
@@ -196,7 +201,6 @@ function makeAppSwitcher(parentElement) {
     var firstIcon = null;
 
     var scrollOffset = new c.Variable({name: 'scroll-offset'});
-    solver.add(eq(scrollOffset, 0, weak));
 
     // Create our apps.
     for (var i = 0; i < 10; i++) {
@@ -207,8 +211,11 @@ function makeAppSwitcher(parentElement) {
         app.y = appTop;
         app.bottom = appTop + appHeight;
 
+        var appColor = randomLightColor();
+
         context.addBox(app);
         app.element().classList.add('app');
+        app.element().style.backgroundColor = appColor;
         parentElement.appendChild(app.element());
         if (!firstApp) firstApp = app;
         lastApp = app;
@@ -216,7 +223,7 @@ function makeAppSwitcher(parentElement) {
         // Specify width (right = x + appWidth).
         solver.add(eq(app.right, c.plus(app.x, appWidth), medium));
         // Specify x (i * appWidth + scrollOffset).
-        solver.add(eq(app.x, c.plus(i * (appWidth + appPadding), scrollOffset), medium));
+        solver.add(eq(app.x, c.plus(i * (appWidth + appPadding), scrollOffset), strong));
 
         // Create an icon.
         var icon = new Box('');
@@ -229,6 +236,7 @@ function makeAppSwitcher(parentElement) {
 
         context.addBox(icon);
         icon.element().classList.add('icon');
+        icon.element().style.backgroundColor = appColor;
         parentElement.appendChild(icon.element());
 
         // The icon's width is 72.
@@ -237,10 +245,37 @@ function makeAppSwitcher(parentElement) {
         // Moves 0.5x the speed of the app to stay centered.
         // THIS is the really interesting relationship in here -- that the icon offset is some constant + scrollOffset / 2.
         // This is why dragging the icons moves the apps faster and vice versa.
-        solver.add(eq(icon.x, c.plus(iconOffset + iconSpacing * i, c.times(scrollOffset, 0.5)), medium));
+        solver.add(eq(icon.x, c.plus(iconOffset + iconSpacing * i, c.times(scrollOffset, 0.5)), strong));
     }
-    context.addManipulator(new Manipulator(firstIcon.x, solver, context.update.bind(context), parentElement, 'x'));
 
+
+    // Add some motion constraints. We're going to constrain the centers of the first and last windows to be
+    // no more or less than the center of the screen.
+    var firstAppCenter = new c.Variable({name: 'first-app-center'});
+    var lastAppCenter = new c.Variable({name: 'last-app-center'});
+
+    solver.add(eq(firstAppCenter, c.plus(firstApp.x, appWidth/2), strong));
+    solver.add(eq(lastAppCenter, c.plus(lastApp.x, appWidth/2), strong));
+
+    context.addMotionConstraint(new MotionConstraint(firstAppCenter, '<=', parentWidth/2));
+    context.addMotionConstraint(new MotionConstraint(lastAppCenter, '>=', parentWidth/2));
+
+    // Try to line the first app up in the center when we boot.
+    solver.add(eq(firstAppCenter, parentWidth/2, weak));
+
+    // Now make a manipulator for the cards and one for the icons. We're going to create and statically position 
+    // an element to act as the icon drag listener, and just use the parentElement for dragging the cards.
+    //
+    // The way that the icon listener is positioned has nothing to do with this example (nor really does the way
+    // that we're selecting events) so I'm simply using CSS.
+    var iconListener = document.createElement('div');
+    iconListener.className = 'icon-listener';
+    parentElement.appendChild(iconListener);
+
+    context.addManipulator(new Manipulator(firstIcon.x, solver, context.update.bind(context), iconListener, 'x'));
+
+    // Also allow the x position of the apps to be dragged.
+    context.addManipulator(new Manipulator(firstApp.x, solver, context.update.bind(context), parentElement, 'x'));
     context.update();
 }
 

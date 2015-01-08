@@ -77,3 +77,10 @@
     background-position: center center;
     background-repeat: no-repeat;
 }
+
+.app-switcher-example .icon-listener {
+    position: absolute;
+    height: 150px;
+    width: 100%;
+    bottom: 0;
+}
