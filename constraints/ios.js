@@ -188,7 +188,7 @@ function makeAppSwitcher(parentElement) {
     var iconTop = appTop + appHeight + 40;
     var iconHeight = 72;
     
-    var appPadding = 80;
+    var appPadding = 40;
 
     // Apps should be spaced apart for a nice look.
     var appSpacing = appWidth + appPadding;

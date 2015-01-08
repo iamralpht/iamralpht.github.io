@@ -84,3 +84,7 @@
     width: 100%;
     bottom: 0;
 }
+
+.app-switcher-example .app {
+    border-radius: 0px;
+}
