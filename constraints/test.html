@@ -28,48 +28,6 @@
 .box:nth-child(7) { background-color: purple; }
 .box:nth-child(9) { background-color: brown; }
 */
-.scrolling-example {
-    display: inline-block;
-    position: relative;
-    margin-top: 10px;
-    height: 200px;
-    width: 300px;
-    overflow: hidden;
-}
-
-.cards-container {
-    position: relative;
-    margin-top: 10px;
-    height: 180px;
-}
-
-.gravity-example {
-    position: relative;
-    height: 250px;
-}
-
-.pager-example {
-    position: relative;
-    height: 250px;
-}
-
-.scaling-example {
-    position: relative;
-    width: 320px;
-    height: 480px;
-    margin: auto;
-}
-
-.scaling-example .box {
-    background-image: url(examples/img/184310605_c038be8db5_z.jpg);
-    background-size: cover;
-    background-position: center;
-    text-align: center;
-
-    font-size: 30px;
-    color: black;
-    text-shadow: 0 -1px 0px white;
-}
 
 
 .constraints {
@@ -90,6 +48,7 @@ div.mono {
     padding: 10px;
 }
 </style>
+<link href="examples/simple.css" rel="stylesheet"></link>
 <link href="examples/photos.css" rel="stylesheet"></link>
 <link href="examples/ios.css" rel="stylesheet"></link>
 <link href="examples/win7overscroll.css" rel="stylesheet"></link>
@@ -105,6 +64,7 @@ div.mono {
 <script src="motioncontext.js"></script>
 <script src="motionconstraint.js"></script>
 <script src="box.js"></script>
+<script src="examples/prelude.js"></script>
 </head>
 <body>
 <div class="content">
@@ -247,7 +207,7 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 
 
 
-    <script src="examples/test.js"></script>
+    <script src="examples/simple.js"></script>
     <script src="examples/photos.js"></script>
     <script src="examples/ios.js"></script>
     <script src="examples/win7overscroll.js"></script>

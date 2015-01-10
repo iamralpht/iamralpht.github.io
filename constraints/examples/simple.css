@@ -1,0 +1,42 @@
+.scrolling-example {
+    display: inline-block;
+    position: relative;
+    margin-top: 10px;
+    height: 200px;
+    width: 300px;
+    overflow: hidden;
+}
+
+.cards-container {
+    position: relative;
+    margin-top: 10px;
+    height: 180px;
+}
+
+.gravity-example {
+    position: relative;
+    height: 250px;
+}
+
+.pager-example {
+    position: relative;
+    height: 250px;
+}
+
+.scaling-example {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    margin: auto;
+}
+
+.scaling-example .box {
+    background-image: url(img/184310605_c038be8db5_z.jpg);
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+
+    font-size: 30px;
+    color: black;
+    text-shadow: 0 -1px 0px white;
+}
