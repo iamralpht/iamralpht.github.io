@@ -27,7 +27,7 @@ function makeGoogleMapsExample() {
     infoBar.addChild(topNavbar);
     var navigationControls = new Box(ec('navigation-controls'));
     form.addChild(navigationControls);
-    var content = new Box(ec('content'));
+    var content = new Box(ec('gmaps-content'));
     // Extract the natural height of the content.
     var contentHeight = 0;
     {

@@ -14,8 +14,9 @@
 .gmaps .box {
     position: absolute;
     top: 0; left: 0;
-    border-radius: none;
+    border-radius: 0px;
     background-color: transparent;
+    box-shadow: none;
 }
 .gmaps .photo {
     background-image: url(img/gmaps-image.jpg);
@@ -32,6 +33,7 @@
 }
 .gmaps .infobar {
     background-color: #1976d2;
+    color: white;
     overflow: hidden;
     padding: 15px;
 }
@@ -40,8 +42,9 @@
     padding: 15px 60px;
     line-height: 25px;
     font-weight: bold;
+    color: white;
 }
-.gmaps .content {
+.gmaps .gmaps-content {
     overflow: hidden;
     background-color: white;
     color: black;

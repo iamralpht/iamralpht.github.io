@@ -2,8 +2,6 @@
 <head>
 <title>Towards declarative touch interactions</title>
 <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-<link href="ios.css" rel="stylesheet"></link>
-<link href="win7overscroll.css" rel="stylesheet"></link>
 <link href="article.css" rel="stylesheet"></link>
 <script src="touch.js"></script>
 <script src="../physics/animate.js"></script>
@@ -16,6 +14,34 @@
 <script src="motioncontext.js"></script>
 <script src="motionconstraint.js"></script>
 <script src="box.js"></script>
+
+<style>
+.box {
+    position: absolute;
+    top: 0; left: 0;
+    text-align: left;
+    background-color: white;
+    color: black;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px black;
+    padding: 5px;
+    font-size: 18px;
+    font-family: sans-serif;
+    pointer-events: none;
+    will-change: transform;
+    box-sizing: border-box;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
+}
+</style>
+
+<!-- examples style -->
+<link href="examples/simple.css" rel="stylesheet"></link>
+<link href="examples/photos.css" rel="stylesheet"></link>
+<link href="examples/ios.css" rel="stylesheet"></link>
+<link href="examples/win7overscroll.css" rel="stylesheet"></link>
+<link href="examples/gmaps.css" rel="stylesheet"></link>
+
 </head>
 <body>
 <div class="content">
@@ -32,5 +58,161 @@
 <p>We just described full momentum scrolling with one manipulator and two motion constraints. It handles all of the tricky edge cases, like when you start dragging while the photo is already bouncing on one of the edges, or if you impart momentum while in the overdrag. In systems where there are multiple manipulators, Slalom identifies the correct manipulator that is causing a motion constraint violation and applies feedback to it.</p>
 <p>Here are some more examples with links to the source. In all cases there's significantly less code and the code is cleaner using Slalom than the imperative alternative.</p>
 </div>
+<div class="example">
+Drag this list vertically<br>
+<div class="scrolling-example" id="scrolling-example"></div><br>
+<div class="constraints">
+<b>Constraints:</b><br>
+The list items are 40px tall:
+<div class="mono">panel[i].bottom = panel[i].y + 40</div>
+The list items are stacked vertically in a column, with a 10px gap:
+<div class="mono">panel[i].y = panel[i-1].bottom + 10</div>
+<b>Motion constraints:</b><br>
+The first list item can't have a value more than zero:
+<div class="mono">panel[first].y &lt;= 0 <b>spring</b></div>
+The last list item's bottom can't be more than the parent height:
+<div class="mono">panel[last].bottom &gt;= parentHeight <b>spring</b></div>
+</div>
+</div>
+<div class="content">
+<p>Second example is the "Panels" UI from the old Twitter for iPad. It doesn't feel like scrolling at all to use (the panels each half the width of the screen or more, and it implements snap points which I have yet to come up with a motion constraint for). Notice how the panels bounce relative to each other when animating back from the motion constraint.</p>
+</div>
+<div class="example">
+Drag the panels horizontally and release to impart velocity.
+<div class="cards-container" id="twitter-panels-example"></div><br>
+<div class="constraints">
+<b>Constraints:</b><br>
+The left edge of each panel can't go past the left edge of the panel that came before, plus 10px.
+<div class="mono">panel[i].x &gt; panel[i-1].x + 10</div>
+The left edge of each panel can't go past the right edge of the panel that came before.
+<div class="mono">panel[i].x &lt; panel[i-1].right</div>
+<b>Motion constraint:</b><br>
+The first panel's left edge is pinned to zero. This is motion constraint meaning that when violated it has a physical effect on the system. Here it applies a spring, but it could rebound or completely stop the motion.
+<div class="mono">panel[first].left = 0 <b>spring</b></div>
+</div>
+</div>
+
+<div class="content">
+<p>Android 5 notifications. Just like scrolling but with some extra constraints to do the bunching. I'll add resizing of notifications (like the GMail expandable one) and multitouch next. It falls out of the constraints.</p></div>
+<div class="example">
+<div class="scrolling-example" id="android-notifications"></div>
+</div>
+<div class="content">
+<p>Using gravity instead of friction...</p>
+</div>
+<div class="example">
+<div class="gravity-example" id="gravity-example"></div>
+</div>
+<div class="content">
+<p>Paging/snapping for photos.</p>
+</div>
+<div class="example">
+<div class="photos-example" id="photos-example"></div>
+</div>
+
+<div class="content">
+<p>Scaling. This is using a vertical drag to do scaling. With more flexible gesture processing we could use the horizontal part of the gesture to scroll horizontally, too.</p>
+</div>
+<div class="example">
+<div class="scaling-example" id="scaling-example"></div>
+<div class="constraints">
+We manipulate the box's "y" variable for vertical drags.<br>
+<b>Constraints:</b><br>
+Constrain the aspect ratio of the box (aspect = parentWidth / parentHeight):
+<div class="mono">box.width = box.height * aspect</div>
+Relate the height to the scale:
+<div class="mono">box.height = scale * parentHeight</div>
+Pin the box to the bottom of the screen:
+<div class="mono">box.bottom = parentHeight</div>
+Center the box horizontally:
+<div class="mono">(box.x + box.width/2) = parentWidth / 2</div>
+<b>Motion Constraints:</b><br>
+The box's width must be greater than 150px. We're really expressing a constraint on the minimum scale, but because we can get the coefficients out of Cassowary, we can write this in terms of the box's width.
+<div class="mono">box.width &gt;= 150 spring</div>
+The box's top mustn't go above the top of the screen. Again, this is really a scale constraint (the scale can't be more than 1.0), but we're expressing it in terms of box.y because that's more natural.
+<div class="mono">box.y &gt;= 0 spring</div>
+<b>Notes:</b><br>
+<ul>
+ <li>We can tweak the constraints to make the box go off the bottom when it gets to small instead of shrinking further and things like that. So we have a lot of flexibility with this kind of system.</li>
+ <li>There's slip! If you drag from the middle of the box, you'll see that the part of the image you grabbed slips out from under your finger. That's because the manipulator is just operating on the box's y coordinate. If we wanted to avoid slip then we'd have to create a new variable when the finger goes down, relate it to y (i.e.: <span class="mono">fingery = box.y - 123 * scale</span>, based on the current scale and finger start position) and then manipulate <span class="mono">fingery</span> instead of <span class="mono">box.y</span>. This isn't very hard, but the current Manipulator code doesn't support it.</li>
+</ul>
+</div>
+</div>
+<div class="content">
+<p>iOS Control Center and Notification panel example; interruptible.</p>
+</div>
+<div class="example">
+    <div class="ios-example" id="ios-example">
+        <div class="box backdrop"></div>
+        <div class="box control-center"></div>
+        <div class="box menu">A chill breeze blows from the East. Your body starts to shiver, for no mere mortal can resist the ...<div class="calendar">Meetings</div>You will be in meetings from dawn til dusk today.</div> 
+
+        <div class="box control-sensor"></div>
+        <div class="box menu-sensor"></div>
+    </div>
+</div>
+<div class="content">
+<p>iOS app switcher; icons move faster than the content but a single pair of motion constraints are all that's needed because of being able to discover the relationships between variables by inspecting the simplex tableau.</p>
+</div>
+<div class="example">
+    <div class="app-switcher-example" id="app-switcher-example">
+
+    </div>
+</div>
+<div class="content">
+<p>Window 7-style overscroll.</p>
+</div>
+<div class="example">
+    <div class="win7-overscroll-example" id="win7-overscroll-example">
+        <div class="window box">
+            <div class="clip box">
+                <div class="image box"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="content">
+<p>Google Maps transition to details view.</p>
+</div>
+<div class="example">
+<div class="container gmaps">
+    <div class="form box">
+        <div class="shadow box"></div>
+        <div class="photo box">
+            <div class="photo-dimming-layer box"></div>
+        </div>
+        <div class="gmaps-content box">
+            <div class="section"><i>Grassy park with tennis/handball courts, horseshoe pits, playgrounds, splash pad &amp; a fenced dog run.</i></div>
+            <div class="section">600 East Meadow Drive, Palo Alto, CA 94306</div>
+            <div class="section">Open 24 hours</div>
+            <div class="section">More Info...</div>
+            <div class="section">Suggest an edit</div>
+            <div class="section">
+                <div class="streetview">Street View</div>
+                <div class="morephotos">26 Photos</div>
+                Add a photo...
+            </div>
+            <div class="section">Review Summary</div>
+            <div class="section">Reviews</div>
+        </div>
+        <div class="infobar box">
+            <div class="small-title">Mitchell Park</div>
+            <div class="rating">4.5 stars</div>
+            <div class="time">5 minutes</div>
+            <div class="top-navbar box">
+                <span class="top-title">Mitchell Park</span>
+            </div>
+        </div>
+        <div class="navigation-controls box"></div>
+    </div>
+</div>
+</div>
+<!-- examples code -->
+    <script src="examples/prelude.js"></script>
+    <script src="examples/simple.js"></script>
+    <script src="examples/photos.js"></script>
+    <script src="examples/ios.js"></script>
+    <script src="examples/win7overscroll.js"></script>
+    <script src="examples/gmaps.js"></script>
 </body>
 </html>
