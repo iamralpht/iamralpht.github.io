@@ -152,7 +152,6 @@ function makeGravityExample(parentElement) {
     }
     context.addManipulator(manip);
 }
-
 makeGravityExample(document.getElementById('gravity-example'));
 
 function makeScalingExample(parentElement) {
@@ -164,7 +163,7 @@ function makeScalingExample(parentElement) {
 
     var scale = new c.Variable({name: 'scale'});
 
-    var box = new Box('Drag Me Upwards');
+    var box = new Box('');
 
     box.x = new c.Variable({name: 'x'});
     box.y = new c.Variable({name: 'y'});
@@ -212,9 +211,10 @@ function makeScalingExample(parentElement) {
     solver.add(eq(widthV, width, required));
     solver.add(geq(width, 150, weak));
 
-    // Motion constraints on scale. We express the constraints on other variables
-    context.addMotionConstraint(new MotionConstraint(widthV, '>=', 150));
-    context.addMotionConstraint(new MotionConstraint(box.y, '>=', 0));
+    // Motion constraints on scale. We express the constraints on other variables.
+    // Use a physics model that doesn't overbounce.
+    context.addMotionConstraint(new MotionConstraint(widthV, '>=', 150, { physicsModel: MotionConstraint.criticallyDamped }));
+    context.addMotionConstraint(new MotionConstraint(box.y, '>=', 0, { physicsModel: MotionConstraint.criticallyDamped }));
 
     parentElement.appendChild(box.element());
     context.addBox(box);

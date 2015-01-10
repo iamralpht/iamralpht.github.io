@@ -57,11 +57,6 @@ Box.prototype.update = function(px, py) {
     x -= px;
     y -= py;
 
-    x = roundOffset(x);
-    y = roundOffset(y);
-    w = roundOffset(w);
-    h = roundOffset(h);
-
     var xscale = 1;
     var yscale = 1;
 
@@ -73,6 +68,15 @@ Box.prototype.update = function(px, py) {
         yscale = h / this.domHeight;
         h = this.domHeight;
     }
+    // Don't do rounding if we're doing transform-based scaling
+    // because it makes it jumpy.
+    if (xscale == 1 && yscale == 1) {
+        x = roundOffset(x);
+        y = roundOffset(y);
+        w = roundOffset(w);
+        h = roundOffset(h);
+    }
+
     // Be careful about updating width and height since it'll
     // trigger a browser layout.
     if (w != this._lastWidth) {

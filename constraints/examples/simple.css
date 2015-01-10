@@ -19,12 +19,6 @@
     width: 300px;
     height: 350px;
 }
-.gravity-example>.box {
-/*
-    border-radius: 100px;
-    background-color: red;
-    */
-}
 
 .pager-example {
     position: relative;
@@ -36,6 +30,8 @@
     width: 320px;
     height: 480px;
     margin: auto;
+    background-color: #404040;
+    overflow: hidden;
 }
 
 .scaling-example .box {
