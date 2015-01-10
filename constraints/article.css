@@ -4,10 +4,12 @@ body {
     font-size: 22px;
 }
 .content {
-    margin: 40px 10%;
-    margin-bottom: 0;
+    padding: 40px 10%;
+    padding-bottom: 0;
 }
-div {
+.constraints {
+    padding: 40px 10%;
+    background-color: #ededed;
 }
 .title {
     font-weight: bold;
@@ -32,8 +34,8 @@ li {
 .example {
     box-sizing: border-box;
     width: 100%;
-    background-color: #404040;
-    color: white;
+    background-color: #ddd;
+    color: black;
     border: none;
     padding: 10px;
     overflow: hidden;

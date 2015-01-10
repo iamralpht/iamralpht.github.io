@@ -23,7 +23,7 @@
     background-color: white;
     color: black;
     border-radius: 8px;
-    box-shadow: 0 1px 4px black;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     padding: 5px;
     font-size: 18px;
     font-family: sans-serif;
@@ -59,8 +59,10 @@
 <p>Here are some more examples with links to the source. In all cases there's significantly less code and the code is cleaner using Slalom than the imperative alternative.</p>
 </div>
 <div class="example">
-Drag this list vertically<br>
-<div class="scrolling-example" id="scrolling-example"></div><br>
+<i>Drag these lists vertically</i><br>
+<div class="scrolling-example" id="scrolling-example"></div>
+<div class="scrolling-example" id="android-notifications"></div><br>
+</div>
 <div class="constraints">
 <b>Constraints:</b><br>
 The list items are 40px tall:
@@ -73,13 +75,13 @@ The first list item can't have a value more than zero:
 The last list item's bottom can't be more than the parent height:
 <div class="mono">panel[last].bottom &gt;= parentHeight <b>spring</b></div>
 </div>
-</div>
 <div class="content">
 <p>Second example is the "Panels" UI from the old Twitter for iPad. It doesn't feel like scrolling at all to use (the panels each half the width of the screen or more, and it implements snap points which I have yet to come up with a motion constraint for). Notice how the panels bounce relative to each other when animating back from the motion constraint.</p>
 </div>
 <div class="example">
-Drag the panels horizontally and release to impart velocity.
-<div class="cards-container" id="twitter-panels-example"></div><br>
+<i>Drag the panels horizontally and release to impart velocity.</i>
+<div class="cards-container" id="twitter-panels-example"></div>
+</div>
 <div class="constraints">
 <b>Constraints:</b><br>
 The left edge of each panel can't go past the left edge of the panel that came before, plus 10px.
@@ -90,23 +92,18 @@ The left edge of each panel can't go past the right edge of the panel that came 
 The first panel's left edge is pinned to zero. This is motion constraint meaning that when violated it has a physical effect on the system. Here it applies a spring, but it could rebound or completely stop the motion.
 <div class="mono">panel[first].left = 0 <b>spring</b></div>
 </div>
-</div>
-
-<div class="content">
-<p>Android 5 notifications. Just like scrolling but with some extra constraints to do the bunching. I'll add resizing of notifications (like the GMail expandable one) and multitouch next. It falls out of the constraints.</p></div>
-<div class="example">
-<div class="scrolling-example" id="android-notifications"></div>
-</div>
 <div class="content">
 <p>Using gravity instead of friction...</p>
 </div>
 <div class="example">
+<i>Throw the box upwards</i>
 <div class="gravity-example" id="gravity-example"></div>
 </div>
 <div class="content">
 <p>Paging/snapping for photos.</p>
 </div>
 <div class="example">
+<i>Drag the photos horizontally</i>
 <div class="photos-example" id="photos-example"></div>
 </div>
 
@@ -114,7 +111,9 @@ The first panel's left edge is pinned to zero. This is motion constraint meaning
 <p>Scaling. This is using a vertical drag to do scaling. With more flexible gesture processing we could use the horizontal part of the gesture to scroll horizontally, too.</p>
 </div>
 <div class="example">
+<i>Drag the image upwards to grow it.</i>
 <div class="scaling-example" id="scaling-example"></div>
+</div>
 <div class="constraints">
 We manipulate the box's "y" variable for vertical drags.<br>
 <b>Constraints:</b><br>
@@ -137,11 +136,11 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
  <li>There's slip! If you drag from the middle of the box, you'll see that the part of the image you grabbed slips out from under your finger. That's because the manipulator is just operating on the box's y coordinate. If we wanted to avoid slip then we'd have to create a new variable when the finger goes down, relate it to y (i.e.: <span class="mono">fingery = box.y - 123 * scale</span>, based on the current scale and finger start position) and then manipulate <span class="mono">fingery</span> instead of <span class="mono">box.y</span>. This isn't very hard, but the current Manipulator code doesn't support it.</li>
 </ul>
 </div>
-</div>
 <div class="content">
 <p>iOS Control Center and Notification panel example; interruptible.</p>
 </div>
 <div class="example">
+    <i>Drag downwards from the top to show the notification drawer, drag upwards from the bottom to show the control center</i><br>
     <div class="ios-example" id="ios-example">
         <div class="box backdrop"></div>
         <div class="box control-center"></div>
@@ -155,6 +154,7 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <p>iOS app switcher; icons move faster than the content but a single pair of motion constraints are all that's needed because of being able to discover the relationships between variables by inspecting the simplex tableau.</p>
 </div>
 <div class="example">
+    <i>Drag horizontally on the "apps" or "icons"</i>
     <div class="app-switcher-example" id="app-switcher-example">
 
     </div>
@@ -163,6 +163,7 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <p>Window 7-style overscroll.</p>
 </div>
 <div class="example">
+    <i>Drag the image vertically to scroll</i>
     <div class="win7-overscroll-example" id="win7-overscroll-example">
         <div class="window box">
             <div class="clip box">
@@ -175,6 +176,7 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <p>Google Maps transition to details view.</p>
 </div>
 <div class="example">
+<i>Drag upwards on the blue info bar to see more information</i>
 <div class="container gmaps">
     <div class="form box">
         <div class="shadow box"></div>

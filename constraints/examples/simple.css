@@ -15,7 +15,15 @@
 
 .gravity-example {
     position: relative;
-    height: 250px;
+    margin: auto;
+    width: 300px;
+    height: 350px;
+}
+.gravity-example>.box {
+/*
+    border-radius: 100px;
+    background-color: red;
+    */
 }
 
 .pager-example {

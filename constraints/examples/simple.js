@@ -67,7 +67,8 @@ function makeScrollingExample(parentElement, bunching) {
         p.bottom = new c.Variable({ name: 'list-item-' + i + '-bottom' });
 
         // Make items 300px wide.
-        p.right = 300;
+        p.x = 5;
+        p.right = 295;
 
         // If we're bunching and this is the first item then let it get bigger
         // and smaller...
@@ -128,11 +129,11 @@ function makeGravityExample(parentElement) {
 
     var parentHeight = parentElement.offsetHeight;
 
-    var b = new Box('Drag Up');
+    var b = new Box('Heavy Box');
     b.y = new c.Variable({name: 'box-y'});
     b.bottom = new c.Variable({name: 'box-bottom'});
     b.x = 0; 
-    b.right = 200;
+    b.right = 300;
     
     context.addBox(b);
 
