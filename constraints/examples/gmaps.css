@@ -1,0 +1,72 @@
+.gmaps * { box-sizing: border-box; }
+.gmaps {
+    color: white;
+    text-align: left;
+    position: relative;
+    margin: auto;
+    width: 320px;
+    height: 480px;
+    font-family: 'Roboto', sans-serif;
+    background-image: url(img/gmaps-map.png);
+    overflow: hidden;
+}
+.gmaps>* { pointer-events: none; }
+.gmaps .box {
+    position: absolute;
+    top: 0; left: 0;
+    border-radius: none;
+    background-color: transparent;
+}
+.gmaps .photo {
+    background-image: url(img/gmaps-image.jpg);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+.gmaps .photo-dimming-layer {
+    background-image: linear-gradient(0deg, transparent, rgba(0, 0, 0, 0.7));
+}
+.gmaps .shadow {
+    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent);
+}
+.gmaps .infobar {
+    background-color: #1976d2;
+    overflow: hidden;
+    padding: 15px;
+}
+.gmaps .top-navbar {
+    background-image: linear-gradient(0deg, rgba(25, 118, 210, 0), #1976d2 15%, #1976d2);
+    padding: 15px 60px;
+    line-height: 25px;
+    font-weight: bold;
+}
+.gmaps .content {
+    overflow: hidden;
+    background-color: white;
+    color: black;
+}
+
+/* This is just style to make the content of the form look nice; it has nothing to do with
+   constraints or any of the things that really move. */
+.gmaps .time {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+
+.gmaps .section {
+    border-top: 1px solid #eee;
+    padding: 15px;
+}
+.gmaps .streetview, .gmaps .morephotos {
+    display: inline-block;
+    width: 48%;
+    height: 80px;
+    background-size: cover;
+    color: white;
+    line-height: 130px;
+    padding: 4px;
+}
+.gmaps .streetview { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-streetview.jpg); }
+.gmaps .morephotos { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-image2.jpg); }

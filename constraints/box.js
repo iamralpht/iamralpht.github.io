@@ -22,6 +22,13 @@ function Box(textContentOrElement) {
     this.right = 100;
     this.bottom = 100;
 
+    // If these are set then we'll propagate them to the DOM and use
+    // a transform to scale to the desired width. This is handy because
+    // changing the DOM width/height causes a full layout+repaint which
+    // isn't very incremental in WebKit/Blink.
+    this.domWidth = -1;
+    this.domHeight = -1;
+
     this._children = [];
 
     this.update();
@@ -55,6 +62,17 @@ Box.prototype.update = function(px, py) {
     w = roundOffset(w);
     h = roundOffset(h);
 
+    var xscale = 1;
+    var yscale = 1;
+
+    if (this.domWidth != -1) {
+        xscale = w / this.domWidth;
+        w = this.domWidth;
+    }
+    if (this.domHeight != -1) {
+        yscale = h / this.domHeight;
+        h = this.domHeight;
+    }
     // Be careful about updating width and height since it'll
     // trigger a browser layout.
     if (w != this._lastWidth) {
@@ -70,6 +88,9 @@ Box.prototype.update = function(px, py) {
     // Use transform to set the x/y since this is the common
     // case and it generally avoids a relayout.
     var transform = 'translate3D(' + x + 'px, ' + y + 'px, 0)';
+    if (xscale != 1 || yscale != 1) {
+        transform += ' scale(' + xscale + ', ' + yscale + ')';
+    }
     this._element.style.webkitTransform = transform;
     this._element.style.transform = transform;
 }

@@ -1,0 +1,18 @@
+.photos-example {
+    position: relative;
+    width: 320px;
+    height: 480px;
+    margin: auto;
+    background-color: black;
+    overflow: hidden;
+}
+
+.photos-example .box {
+    border-radius: 0;
+    box-shadow: none;
+    background-color: transparent;
+    background-size: contain;
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+

@@ -1,0 +1,25 @@
+body {
+    font-family: 'Source Sans Pro';
+    background-color: #404040;
+    color: white;
+    text-align: center;
+}
+.title {
+    padding: 15px;
+    font-size: 20px;
+}
+.explain {
+    color: black;
+    display: inline-block;
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background-color: white;
+    width: 80%;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: left;
+}
+.explain pre {
+    display: inline;
+    white-space: normal;
+}

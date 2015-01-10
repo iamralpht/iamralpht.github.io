@@ -17,6 +17,8 @@
     pointer-events: none;
     will-change: transform;
     box-sizing: border-box;
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
 }
 /* Debug colors...
 .box:nth-child(1) { background-color: red; }
@@ -59,28 +61,16 @@
 }
 
 .scaling-example .box {
-    background-image: url(../physics/stonehenge.jpg);
+    background-image: url(examples/img/184310605_c038be8db5_z.jpg);
     background-size: cover;
     background-position: center;
+    text-align: center;
+
+    font-size: 30px;
+    color: black;
+    text-shadow: 0 -1px 0px white;
 }
 
-.photos-example {
-    position: relative;
-    width: 320px;
-    height: 480px;
-    margin: auto;
-    background-color: black;
-    overflow: hidden;
-}
-
-.photos-example .box {
-    border-radius: 0;
-    box-shadow: none;
-    background-color: transparent;
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
-}
 
 .constraints {
     clear: both;
@@ -100,8 +90,9 @@ div.mono {
     padding: 10px;
 }
 </style>
-<link href="ios.css" rel="stylesheet"></link>
-<link href="win7overscroll.css" rel="stylesheet"></link>
+<link href="examples/photos.css" rel="stylesheet"></link>
+<link href="examples/ios.css" rel="stylesheet"></link>
+<link href="examples/win7overscroll.css" rel="stylesheet"></link>
 <link href="article.css" rel="stylesheet"></link>
 <script src="touch.js"></script>
 <script src="../physics/animate.js"></script>
@@ -256,9 +247,9 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 
 
 
-    <script src="test.js"></script>
-    <script src="photos.js"></script>
-    <script src="ios.js"></script>
-    <script src="win7overscroll.js"></script>
+    <script src="examples/test.js"></script>
+    <script src="examples/photos.js"></script>
+    <script src="examples/ios.js"></script>
+    <script src="examples/win7overscroll.js"></script>
 </body>
 </html>

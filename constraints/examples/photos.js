@@ -18,12 +18,12 @@ limitations under the License.
 // Photos example. Pan through horizontally to view all of the photos.
 
 var photosModel = [
-    'img/5086397621_3328b13a9c_z.jpg',
-    'img/5086991462_c7d175b27f_z.jpg',
-    'img/5086396751_fb4ca9804a_z.jpg',
-    'img/5086992260_c37d38a6d3_z.jpg',
-    'img/184310605_c038be8db5_z.jpg',
-    'img/184314076_0b8e58fb0d_z.jpg',
+    'examples/img/5086397621_3328b13a9c_z.jpg',
+    'examples/img/5086991462_c7d175b27f_z.jpg',
+    'examples/img/5086396751_fb4ca9804a_z.jpg',
+    'examples/img/5086992260_c37d38a6d3_z.jpg',
+    'examples/img/184310605_c038be8db5_z.jpg',
+    'examples/img/184314076_0b8e58fb0d_z.jpg',
 ];
 
 

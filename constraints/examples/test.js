@@ -192,6 +192,11 @@ function makeScalingExample(parentElement) {
     box.bottom = new c.Variable({name: 'bottom'});
     box.right = new c.Variable({name: 'right'});
 
+    // Set these DOM layout properties on Box so that it'll use a CSS
+    // transform to apply the scale.
+    box.domWidth = parentWidth;
+    box.domHeight = parentHeight;
+
     var width = c.minus(box.right, box.x);
     var height = c.minus(box.bottom, box.y);
 

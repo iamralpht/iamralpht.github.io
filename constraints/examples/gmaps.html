@@ -3,120 +3,28 @@
 <title>google maps progressive detail</title>
 <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
 <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+<link href="gmaps.css" rel="stylesheet"></link>
+<link href="example.css" rel="stylesheet"></link>
 <style>
-* { box-sizing: border-box; }
-body {
-    font-family: 'Source Sans Pro';
-    background-color: #404040;
-    color: white;
-    text-align: center;
-}
-.title {
-    padding: 15px;
-    font-size: 20px;
-}
-.container {
-    text-align: left;
-    position: relative;
-    margin: auto;
-    width: 320px;
-    height: 480px;
-    font-family: 'Roboto', sans-serif;
-    background-image: url(img/gmaps-map.png);
-    overflow: hidden;
-}
-.container>* { pointer-events: none; }
-.box {
-    position: absolute;
-    top: 0; left: 0;
-}
-.photo {
-    background-image: url(img/gmaps-image.jpg);
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    overflow: hidden;
-}
-.photo-dimming-layer {
-    background-image: linear-gradient(0deg, transparent, rgba(0, 0, 0, 0.7));
-}
-.shadow {
-    background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.35), transparent);
-}
-.infobar {
-    background-color: #1976d2;
-    overflow: hidden;
-    padding: 15px;
-}
-.top-navbar {
-    background-image: linear-gradient(0deg, rgba(25, 118, 210, 0), #1976d2 15%, #1976d2);
-    padding: 15px 60px;
-    line-height: 25px;
-    font-weight: bold;
-}
-.content {
-    overflow: hidden;
-    background-color: white;
-    color: black;
-}
-
-/* This is just style to make the content of the form look nice; it has nothing to do with
-   constraints or any of the things that really move. */
-.time {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-}
-
-.section {
-    border-top: 1px solid #eee;
-    padding: 15px;
-}
-.streetview, .morephotos {
-    display: inline-block;
-    width: 48%;
-    height: 80px;
-    background-size: cover;
-    color: white;
-    line-height: 130px;
-    padding: 4px;
-}
-.streetview { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-streetview.jpg); }
-.morephotos { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), transparent), url(img/gmaps-image2.jpg); }
-.explain {
-    color: black;
-    display: inline-block;
-    margin-top: 50px;
-    margin-bottom: 50px;
-    background-color: white;
-    width: 80%;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: left;
-}
-.explain pre {
-    display: inline;
-    white-space: normal;
-}
 </style>
-<script src="touch.js"></script>
-<script src="../physics/animate.js"></script>
-<script src="../physics/friction.js"></script>
-<script src="../physics/spring.js"></script>
-<script src="../physics/gravity.js"></script>
-<script src="c.js"></script>
-<script src="manipulator.js"></script>
-<script src="multieditsolver.js"></script>
-<script src="motioncontext.js"></script>
-<script src="motionconstraint.js"></script>
-<script src="box.js"></script>
+<script src="../touch.js"></script>
+<script src="../../physics/animate.js"></script>
+<script src="../../physics/friction.js"></script>
+<script src="../../physics/spring.js"></script>
+<script src="../../physics/gravity.js"></script>
+<script src="../c.js"></script>
+<script src="../manipulator.js"></script>
+<script src="../multieditsolver.js"></script>
+<script src="../motioncontext.js"></script>
+<script src="../motionconstraint.js"></script>
+<script src="../box.js"></script>
 <script src="gmaps.js"></script>
 </head>
 <body>
 <div class="title">
 Google Maps example&mdash;Drag the blue box upwards.
 </div>
-<div class="container">
+<div class="container gmaps">
     <div class="form box">
         <div class="shadow box"></div>
         <div class="photo box">
