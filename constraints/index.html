@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Towards declarative touch interactions</title>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<link href="ios.css" rel="stylesheet"></link>
+<link href="win7overscroll.css" rel="stylesheet"></link>
+<link href="article.css" rel="stylesheet"></link>
+<script src="touch.js"></script>
+<script src="../physics/animate.js"></script>
+<script src="../physics/friction.js"></script>
+<script src="../physics/spring.js"></script>
+<script src="../physics/gravity.js"></script>
+<script src="c.js"></script>
+<script src="manipulator.js"></script>
+<script src="multieditsolver.js"></script>
+<script src="motioncontext.js"></script>
+<script src="motionconstraint.js"></script>
+<script src="box.js"></script>
+</head>
+<body>
+<div class="content">
+<div class="title">Towards declarative touch interactions</div>
+<div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>January 2015</div>
+<p>This page outlines a system for concisely describing and implementing a class of touch interactions called Slalom. Currently most touch interactions are implemented by writing new code to handle every touch movement which computes various transforms and updates the view tree or DOM. This code is repetitive to write and is frequently inflexible, and the author needs a reasonable understanding of Newtonian physics to create something that feels "good" to use. As a result most apps use only the touch interactions provided by the operating system: scroll and tap.</p>
+<p>Many touch interactions involve dragging a visual object (and it following the touch point) and imparting momentum to it so that when released it keeps moving with some momentum. Additionally there are some constraints imposed on how and where an object can move. What if we could come up with a system where we just specify how something moves and what the constraints are?</p>
+<p>Slalom is a combination of the Cassowary linear constraints solver with a minimal physics engine which solves a class of touch interactions declaratively. It's broken into several components:</p>
+<ul>
+ <li><b>Linear constraints</b>&mdash;linear constraints are used to place objects relative to each other, and to restrict how they can move. Slalom uses the Cassowary linear constraint solver which is based on Danzig's Simplex algorithm (this is important later). Cassowary has found a niche in 2D layout recently (it's the solver used by Apple's AutoLayout and Grid Style Sheets). If we think of a touch interaction as a slot-car game, then the linear constraints let us define the track. For example, this is how we'd use linear constraints to position an image that's wider than its parent, allowing the image to scroll:<br>XXX CODE</li>
+ <li><b>Manipulator</b>&mdash;a manipulator listens for touch events and updates a Cassowary variable in response. When the touch gesture ends it knows how to use the momentum to create an animation. In our slot-car metaphor the manipulator is both the controller and car. To make our image draggable, we would create a manipulator for it like this:<br>XXX CODE<br>Notice how now we can drag the image, but it goes too far to either side.</li>
+ <li><b>Motion Constraints</b>&mdash;these place limits on how far an object can move, or where it can stop. They're similar to the linear constraints, except they're enforced by physics simulations (typically springs) so that when a variable being controlled by a manipulator violates a motion constraint it bounces or undertracks the finger. Motion constraints would be like a rubber band stretched across the track of our slot-car, or like jam on the track, or a speed bump. We can add motion constraints to our image example like this:<br>XXX CODE</li>
+</ul>
+<p>We just described full momentum scrolling with one manipulator and two motion constraints. It handles all of the tricky edge cases, like when you start dragging while the photo is already bouncing on one of the edges, or if you impart momentum while in the overdrag. In systems where there are multiple manipulators, Slalom identifies the correct manipulator that is causing a motion constraint violation and applies feedback to it.</p>
+<p>Here are some more examples with links to the source. In all cases there's significantly less code and the code is cleaner using Slalom than the imperative alternative.</p>
+</div>
+</body>
+</html>
