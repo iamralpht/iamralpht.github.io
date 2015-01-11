@@ -9,8 +9,9 @@ function makeScrollingExample(parentElement, bunching) {
     // changes.
     var scrollPosition = new c.Variable({name: 'scroll-position'});
 
+    var N = 10;
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < N; i++) {
         var p = new Box('List Item ' + (i+1));
         // Use cassowary to layout the items in a column. Names are for debugging only.
         p.y = new c.Variable({ name: 'list-item-' + i + '-y' });
@@ -20,22 +21,13 @@ function makeScrollingExample(parentElement, bunching) {
         p.x = 5;
         p.right = 295;
 
-        // If we're bunching and this is the first item then let it get bigger
-        // and smaller...
-        if (bunching && i == 0 && false) {
-            solver.add(eq(p.y, 0, weak));
-            solver.add(eq(p.bottom, scrollPosition, weak, 100));
-            solver.add(geq(p.bottom, c.plus(p.y, 40), medium));
-            solver.add(leq(p.bottom, c.plus(p.y, 80), medium));
-        } else {
-            // Make the items 40px tall.
-            solver.add(eq(p.bottom, c.plus(p.y, 40), medium));
-        }
+        // Make the items 40px tall.
+        solver.add(eq(p.bottom, c.plus(p.y, 40), medium));
 
         // Gap of 10 between items.
-        if (i > 0)
+        if (i > 0) // p.y = scrollPosition + i * 50
             solver.add(eq(p.y, c.plus(scrollPosition, i*50), weak, 100));
-        else
+        else // p.y = scrollPosition
             solver.add(eq(p.y, scrollPosition, weak, 100));
 
         // Bunching. Don't let items go off of the top or bottom.
@@ -47,7 +39,7 @@ function makeScrollingExample(parentElement, bunching) {
         }
 
         context.addBox(p);
-        p.element().style.zIndex = 10 - i;
+        p.element().style.zIndex = N - i;
         parentElement.appendChild(p.element());
     }
     // Add some constraints to the first and last item. The first item can't move
@@ -72,34 +64,3 @@ function makeScrollingExample(parentElement, bunching) {
 
 makeScrollingExample(document.getElementById('scrolling-example'));
 makeScrollingExample(document.getElementById('android-notifications'), true);
-
-function makeGravityExample(parentElement) {
-    var context = new MotionContext();
-    var solver = context.solver();
-
-    var parentHeight = parentElement.offsetHeight;
-
-    var b = new Box('Heavy Box');
-    b.y = new c.Variable({name: 'box-y'});
-    b.bottom = new c.Variable({name: 'box-bottom'});
-    b.x = 0; 
-    b.right = 300;
-    
-    context.addBox(b);
-
-    parentElement.appendChild(b.element());
-
-    solver.add(leq(b.bottom, parentHeight, weak));
-    solver.add(eq(b.y, c.plus(b.bottom, -50), medium));
-
-    context.addMotionConstraint(new MotionConstraint(b.bottom, '<=', parentHeight, { captive: true }));
-
-    var manip = new Manipulator(b.y, parentElement, 'y');
-    manip.createMotion = function(x, v) {
-        var motion = new Gravity(5000, 9999999);
-        motion.set(x, v);
-        return motion;
-    }
-    context.addManipulator(manip);
-}
-makeGravityExample(document.getElementById('gravity-example'));
