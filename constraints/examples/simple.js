@@ -1,6 +1,6 @@
 "use strict";
 
-function makeTwitterPanelsExample(parentElement) {
+function makeTwitterPanelsExample(parentElement, constrain) {
     var context = new MotionContext();
     var solver = context.solver();
 
@@ -34,6 +34,23 @@ function makeTwitterPanelsExample(parentElement) {
 
             // The panel must be to the right of the previous panel's left edge, plus 10.
             solver.add(geq(p.x, c.plus(panels[i-1].x, MIN_GAP), medium, 0));
+
+            // If we're supposed to constrain to either a panel being completely exposed
+            // or completely collapsed then we do that here.
+            if (constrain) {
+                // We constrain on the gap between this panel and the one that came before
+                // it. So first, create a variable that will be the gap to constrain on.
+                var gap = new c.Variable();
+
+                // gap = panel[i].x - panel[i-1].x
+                solver.add(eq(gap, c.minus(p.x, panels[i-1].x)));
+
+                // Use the OR operator for the motion constraint. Eiher the gap is MIN_GAP
+                // or it should be PANEL_WIDTH.
+                // This constraint is captive (it will be enforced even if we'd go through it)
+                // This constraint isn't active when dragging (overdragCoefficient: 0)
+                context.addMotionConstraint(new MotionConstraint(gap, '||', [MIN_GAP, PANEL_WIDTH], { overdragCoefficient: 0, captive: true }));
+            }
         }
         panels.push(p);
         context.addBox(p);
@@ -48,7 +65,8 @@ function makeTwitterPanelsExample(parentElement) {
     context.addManipulator(manip);
 }
 
-makeTwitterPanelsExample(document.getElementById('twitter-panels-example'));
+makeTwitterPanelsExample(document.getElementById('twitter-panels-example'), false);
+makeTwitterPanelsExample(document.getElementById('twitter-panels-example-constrain'), true);
 
 function makeScrollingExample(parentElement, bunching) {
     var parentHeight = parentElement.offsetHeight;
@@ -153,72 +171,3 @@ function makeGravityExample(parentElement) {
     context.addManipulator(manip);
 }
 makeGravityExample(document.getElementById('gravity-example'));
-
-function makeScalingExample(parentElement) {
-    var parentHeight = 480;
-    var parentWidth = 320;
-
-    var context = new MotionContext();
-    var solver = context.solver();
-
-    var scale = new c.Variable({name: 'scale'});
-
-    var box = new Box('');
-
-    box.x = new c.Variable({name: 'x'});
-    box.y = new c.Variable({name: 'y'});
-    box.bottom = new c.Variable({name: 'bottom'});
-    box.right = new c.Variable({name: 'right'});
-
-    // Set these DOM layout properties on Box so that it'll use a CSS
-    // transform to apply the scale.
-    box.domWidth = parentWidth;
-    box.domHeight = parentHeight;
-
-    var width = c.minus(box.right, box.x);
-    var height = c.minus(box.bottom, box.y);
-
-    // The width and height are related: we must keep the aspect ratio.
-    //
-    //   width = height * aspect
-    //
-    var aspect = parentWidth / parentHeight;
-    solver.add(eq(width, c.times(height, aspect), required));
-
-    // The height is controlled by the scale.
-    //
-    //  height = scale * 480 (parentHeight)
-    //
-    solver.add(eq(height, c.times(scale, parentHeight), medium));
-
-    // The bottom of the box is pinned to the bottom of the screen, like FB Paper.
-    //
-    //  bottom = 480 (parentHeight)
-    //
-    solver.add(eq(parentHeight, box.bottom, medium));
-
-    // The box is centered horizontally.
-    // 
-    //  centerX := x + width/2
-    //  centerX = 320/2 (parentWidth / 2)
-    //
-    var centerX = c.plus(box.x, c.times(width, 0.5));
-    solver.add(eq(centerX, parentWidth/2, medium));
-
-    // Make a variable for width so that we can create a motion constraint for it.
-    // Motion constraints should probably be able to understand expressions, too...
-    var widthV = new c.Variable({name: 'width'});
-    solver.add(eq(widthV, width, required));
-    solver.add(geq(width, 150, weak));
-
-    // Motion constraints on scale. We express the constraints on other variables.
-    // Use a physics model that doesn't overbounce.
-    context.addMotionConstraint(new MotionConstraint(widthV, '>=', 150, { physicsModel: MotionConstraint.criticallyDamped }));
-    context.addMotionConstraint(new MotionConstraint(box.y, '>=', 0, { physicsModel: MotionConstraint.criticallyDamped }));
-
-    parentElement.appendChild(box.element());
-    context.addBox(box);
-    context.addManipulator(new Manipulator(box.y, parentElement, 'y'));
-}
-makeScalingExample(document.getElementById('scaling-example'));
-

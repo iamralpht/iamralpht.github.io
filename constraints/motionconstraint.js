@@ -41,6 +41,23 @@ var mc = {
 
         return nearest - a;
     },
+    or: function(a, b, naturalEndPosition) {
+        // From ES6, not in Safari yet.
+        var MAX_SAFE_INTEGER = 9007199254740991;
+        // Like modulo, but just finds the nearest in the array b.
+        if (!Array.isArray(b)) return 0;
+        var distance = MAX_SAFE_INTEGER;
+        var nearest = naturalEndPosition;
+
+        for (var i = 0; i < b.length; i++) {
+            var dist = Math.abs(b[i] - naturalEndPosition);
+            if (dist > distance) continue;
+            distance = dist;
+            nearest = b[i];
+        }
+
+        return nearest - a;
+    }
 };
 
 function MotionConstraint(variable, op, value, options) {
@@ -54,6 +71,7 @@ function MotionConstraint(variable, op, value, options) {
         case '<': this.op = mc.l; break;
         case '>': this.op = mc.g; break;
         case '%': this.op = mc.modulo; break;
+        case '||': this.op = mc.or; break;
         }
     } else {
         this.op = op;
