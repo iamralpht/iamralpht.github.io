@@ -10,9 +10,15 @@ function makeScrollingExample(parentElement, bunching) {
     var scrollPosition = new c.Variable({name: 'scroll-position'});
 
     var N = 10;
+    // Remeber the first box and last box for motion constraints.
+    var firstBox, lastBox;
 
     for (var i = 0; i < N; i++) {
         var p = new Box('List Item ' + (i+1));
+
+        // Remember the first and last boxes.
+        if (!firstBox) firstBox = p;
+        lastBox = p;
         // Use cassowary to layout the items in a column. Names are for debugging only.
         p.y = new c.Variable({ name: 'list-item-' + i + '-y' });
         p.bottom = new c.Variable({ name: 'list-item-' + i + '-bottom' });
@@ -33,33 +39,41 @@ function makeScrollingExample(parentElement, bunching) {
         // Bunching. Don't let items go off of the top or bottom.
         if (bunching) {
             // XXX: We should express these bunches in terms of
-            //      the previous card, rather than as absolute offsets (i*4).
+            //      the previous card, rather than as absolute offsets (i*3).
+
+            // We cause the boxes to stack rather than completely overlap by
+            // specifying these constraints which keep them on the screen.
+
+            // p.y >= i * 3 weak // y should be greater than i * 3px, weakly.
             solver.add(geq(p.y, i*3, weak, 100));
+            // p.bottom <= parentHeight + i * 3 - 9 * 3
             solver.add(leq(p.bottom, parentHeight + i * 3 - 9*3, weak, 100));
         }
 
         context.addBox(p);
+        // Use z-index so that the boxes visually stack the way we want
+        // (which is actually opposite to DOM order).
         p.element().style.zIndex = N - i;
         parentElement.appendChild(p.element());
     }
+
+    // This prefers the list to be "scrolled" to the top.
+    if (!bunching) solver.add(leq(firstBox.y, 0, weak));
+
     // Add some constraints to the first and last item. The first item can't move
     // past the top. The last item can't move up beyond the bottom. These are
     // motion constraints enforced by springs.
 
-
-    var boxes = context.boxes();
-    var firstBox = boxes[0];
-    var lastBox = boxes[boxes.length - 1];
-    // This prefers the list to be "scrolled" to the top.
-    if (!bunching) solver.add(leq(firstBox.y, 0, weak));
-
+    // firstBox.y <= 0 with a critically damped spring.
     context.addMotionConstraint(
         new MotionConstraint(firstBox.y, '<=', 0, { physicsModel: MotionConstraint.criticallyDamped }));
+
+    // lastBox.bottom >= parentHeight with a critically damped spring.
     context.addMotionConstraint(
         new MotionConstraint(lastBox.bottom, '>=', parentHeight, { physicsModel: MotionConstraint.criticallyDamped }));
 
-    var manip = new Manipulator(scrollPosition, parentElement, 'y');
-    context.addManipulator(manip);
+    // Drags in "y" on the parentElement will adjust the variable scrollPosition.
+    context.addManipulator(new Manipulator(scrollPosition, parentElement, 'y'));
 }
 
 makeScrollingExample(document.getElementById('scrolling-example'));
