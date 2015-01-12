@@ -4,11 +4,11 @@ body {
     font-size: 22px;
 }
 .content {
-    padding: 40px 10%;
-    padding-bottom: 0;
+    margin: 40px 10%;
 }
 .constraints {
-    padding: 40px 10%;
+    padding: 20px 10%;
+    margin-bottom: 10px;
     background-color: #ededed;
 }
 .title {

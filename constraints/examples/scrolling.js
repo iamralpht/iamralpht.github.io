@@ -16,9 +16,6 @@ function makeScrollingExample(parentElement, bunching) {
     for (var i = 0; i < N; i++) {
         var p = new Box('List Item ' + (i+1));
 
-        // Remember the first and last boxes.
-        if (!firstBox) firstBox = p;
-        lastBox = p;
         // Use cassowary to layout the items in a column. Names are for debugging only.
         p.y = new c.Variable({ name: 'list-item-' + i + '-y' });
         p.bottom = new c.Variable({ name: 'list-item-' + i + '-bottom' });
@@ -38,16 +35,19 @@ function makeScrollingExample(parentElement, bunching) {
 
         // Bunching. Don't let items go off of the top or bottom.
         if (bunching) {
-            // XXX: We should express these bunches in terms of
-            //      the previous card, rather than as absolute offsets (i*3).
-
             // We cause the boxes to stack rather than completely overlap by
             // specifying these constraints which keep them on the screen.
 
-            // p.y >= i * 3 weak // y should be greater than i * 3px, weakly.
-            solver.add(geq(p.y, i*3, weak, 100));
-            // p.bottom <= parentHeight + i * 3 - 9 * 3
-            solver.add(leq(p.bottom, parentHeight + i * 3 - 9*3, weak, 100));
+
+            // box[i].y >= box[i-1].y + 3
+            if (lastBox) solver.add(geq(p.y, c.plus(lastBox.y, 3), medium));
+            // box[first].y >= 0
+            else solver.add(geq(p.y, 0, medium));
+
+            // box[i].y <= box[i+1].y - 3
+            if (lastBox) solver.add(leq(c.minus(lastBox.y, 3), p.y, medium));
+            // box[last].bottom <= parentHeight
+            if (i == N-1) solver.add(leq(lastBox.bottom, parentHeight, medium));
         }
 
         context.addBox(p);
@@ -55,6 +55,10 @@ function makeScrollingExample(parentElement, bunching) {
         // (which is actually opposite to DOM order).
         p.element().style.zIndex = N - i;
         parentElement.appendChild(p.element());
+
+        // Remember the first and last boxes.
+        if (!firstBox) firstBox = p;
+        lastBox = p;
     }
 
     // This prefers the list to be "scrolled" to the top.
