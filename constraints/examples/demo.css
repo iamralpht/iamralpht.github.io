@@ -1,0 +1,15 @@
+.demo-example {
+    position: relative;
+    margin: auto;
+    width: 180px;
+    height: 250px;
+    background-color: #808080;
+    overflow: hidden;
+}
+.demo-example>.box {
+    border-radius: 0px;
+    box-shadow: none;
+    background-image: url(img/5086992260_c37d38a6d3_z.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+}
