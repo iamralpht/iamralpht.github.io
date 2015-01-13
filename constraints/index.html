@@ -56,18 +56,18 @@ div.mono {
 <div class="content">
 <div class="title">Towards declarative touch interactions</div>
 <div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>January 2015</div>
-<p>This page outlines <b>Slalom</b>, a system with prototype implementation for concisely describing and implementing a class of touch interactions. It includes various examples to demonstrate the versatility of Slalom.</p>
+<p>This page outlines <b>Slalom</b>, a system with prototype implementation for concisely describing and implementing a class of touch interactions. Various examples demonstrate Slalom's versatility.</p>
 
-<p>Slalom grew out of my previous article which described <a href="http://iamralpht.github.io/physics">how to use physics simulations to build touch-driven user interfaces</a>. When writing the examples for that article, I observed that I was writing much of the same code for each example. Slalom extends the previous work by making it possible to describe how an object moves instead of writing code to manually move an object in response to touch input.</p>
+<p>Slalom grew out of my previous article which described <a href="http://iamralpht.github.io/physics">how to use physics simulations to build touch-driven user interfaces</a>. When writing the examples for that article, I observed that I was writing much of the same code across the examples. Slalom extends the previous work by making it possible to describe how an object moves instead of having to write code to manually move an object in response to touch input.</p>
 <p>Most touch interactions on today's tablets and smartphones are implemented by writing new code to handle every touch movement, which computes various transforms and updates the application's view tree or the browser's document object model (DOM). Such code is repetitive to write and is frequently inflexible, and the author needs a reasonable understanding of Newtonian physics to create something that feels good or natural to use. As a result, most apps use only the few touch interactions provided by the operating system: scroll and tap.</p>
-<p>Many touch interactions involve the user's dragging a visual object such as a panel, a photo, an icon, a window or any other structural element of the user interface (and the object's moving synchronously under the touch point) and imparting momentum to that object, so that when released it keeps moving with some momentum. The touch handler that you write will impose some constraints on how and where an object can move, such as constricting it to a single axis and clamping the distance it can travel. If you're implementing a complex interaction, then every time you iterate your idea and want to change something, you have to rewrite a lot of manual, very detailed code.</p>
+<p>Many touch interactions involve the user's dragging a visual object such as a panel, a photo, an icon, a window or any other structural element of the user interface (and the object's moving synchronously under the touch point) and imparting momentum to that object, such that when released the object keeps moving with some momentum. The touch handler that you write will impose some constraints on how and where an object can move, such as constricting it to a single axis and clamping the distance it can travel. If you're implementing a complex interaction, then every time you iterate your idea and want to change something, you have to rewrite a lot of manual, very detailed code.</p>
 <p>What if we came up with a system where we just specify <i>how something moves</i> and <i>what the constraints are</i>?</p>
 
 <h2>Slalom</h2>
 
 <p>Slalom combines the <a href="http://constraints.cs.washington.edu/cassowary/">Cassowary linear constraints solver</a> with a minimal physics engine to solve a class of touch interactions declaratively. It has the following components:</p>
 <ol>
-  <li><i>Linear Constraints</i> are used to place objects relative to each other and to restrict how they can move. Slalom uses the Cassowary linear constraint solver which has found a niche in 2D-layout recently (it's the solver used by Apple's AutoLayout and Grid Style Sheets). If we think of a touch interaction as a slot-car game, then the linear constraints let us define the track.<br><br>For example, this is how we'd use linear constraints to position an image that is wider than its parent view, whose size is often the size of the screen (in essence, you're making a small viewport onto a large photo, showing just a part of the image):
+  <li><i>Linear Constraints</i> are used to place objects relative to each other and to restrict how they can move. Slalom uses the Cassowary linear constraint solver which has found a niche in 2D-layout recently (it's the solver used by Apple's AutoLayout and Grid Style Sheets). If we think of a touch interaction as a slot-car game, then the linear constraints let us define the track on which the slot-cars will travel.<br><br>For example, this is how we'd use linear constraints to position an image that is wider than its parent view, whose size is often the size of the screen (in essence, you're making a small viewport onto a large photo, showing just a part of the image):
  <div class="example"><div class="demo-example" id="demo-example-1"></div></div>
  <div class="constraints">
   <div class="mono">scaledPhotoWidth = (parentHeight / photoHeight) * photoWidth</div>
@@ -75,10 +75,10 @@ div.mono {
   <div class="mono">photo.bottom = parentHeight</div>
   <div class="mono">photo.right = photo.x + scaledPhotoWidth</div>
  </div>
-  Note that we did not constrain the photo's x-coordinate. We want that to be unconstrained (or weakly constrained, using Cassowary's constraint priorities) so that we can manipulate it.
+  Note that we did not constrain the photo's x-coordinate. We want that to be unconstrained (or weakly constrained, using Cassowary's constraint priorities) so that we can manipulate the photo.
 The image doesn't move when you drag it because we haven't yet set up a manipulator...
  </li>
- <li>A <i>Manipulator</i> listens for touch events and updates a Cassowary variable in response. The manipulator knows how to use the momentum to create an animation when a touch gesture ends. In our slot-car metaphor, the manipulator is both the hand-held controller (with accelerator) and car.<br><br>To make our image draggable, we would create a manipulator for it like this:
+ <li>A <i>Manipulator</i> listens for touch events and updates a Cassowary variable in response. The manipulator knows how to use the momentum to create an animation when a touch gesture ends. In our slot-car metaphor, the manipulator is both the hand-held car controller (with accelerator) and car.<br><br>To make our image draggable, we would create a manipulator for it like this:
  <div class="example">
 <i>Drag the photo left and right</i><br>
  <div class="demo-example" id="demo-example-2"></div></div>
@@ -86,9 +86,9 @@ The image doesn't move when you drag it because we haven't yet set up a manipula
     <div class="mono">// Drags in x on the parentElement will change the photo's x coordinate.</div>
     <div class="mono">context.addManipulator(new Manipulator(photo.x, parentElement, 'x'))</div>
  </div>
-    By default, a manipulator puts momentum into a friction simulation, which is why, after you release the photo, it keeps moving while slowing down.
- Notice that we can drag the image now, but it can be scrolled too far to either side, beyond the edges of the viewport. To fix this, we need motion constraints...</li>
-<li><i>Motion Constraints</i> place limits on how far an object can move or where it can stop. Motion constraints are similar to linear constraints, except they're enforced by physics simulations (typically springs) so that when a variable being controlled by a manipulator violates a motion constraint the object bounces or undertracks the finger. Motion constraints would be like a rubberband stretched across our slot-car track, or like a speed bump.<br><br>We can add motion constraints to our image example like this:
+    With the above addition, you can drag the image. By default, a manipulator puts momentum into a friction simulation, which is why, after you release the photo, it keeps moving while slowing down.
+ Notice that you can scroll the photo too far to either side, however, beyond the edges of the viewport. To fix this, we need motion constraints...</li>
+<li><i>Motion Constraints</i> place limits on how far an object can move or where it can stop. Motion constraints are similar to linear constraints, except they're enforced by physics simulations (typically springs) so that when a variable being controlled by a manipulator violates a motion constraint the object bounces or undertracks the finger. Motion constraints would be like a rubberband stretched across our slot-car track or like a speed bump on the track.<br><br>We can add motion constraints to our image example like this:
  <div class="example">
 <i>Drag the photo left and right and release it</i><br><div class="demo-example" id="demo-example-3"></div></div>
  <div class="constraints">
@@ -101,7 +101,7 @@ The image doesn't move when you drag it because we haven't yet set up a manipula
  </div>
     I haven't yet written a parser for either the linear constraints or the motion constraints; that's why a motion constraint looks like a JavaScript call and not like an equation.
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/demo.js">Check out the source code for this example on GitHub.</a>
- Now we can drag and flick the image without it vanishing into the distance!</li>
+ Now you can drag and flick the image without its vanishing into the distance.</li>
  </li>
 </ol>
 <p>The above Slalom example describes full-momentum scrolling with just one manipulator and two motion constraints. It handles all of the tricky edge cases, such as when the user starts dragging while the photo is already bouncing on one of the edges, or when the user imparts momentum while in the overdrag. In systems where there are multiple manipulators, Slalom identifies the correct manipulator that is causing a motion constraint violation and applies feedback to it.</p>
@@ -109,6 +109,8 @@ The image doesn't move when you drag it because we haven't yet set up a manipula
 <h2>More examples</h2>
 
 <p>Here are some more examples with links to the source. All require significantly less code and the code is cleaner using Slalom than when using the imperative alternative.</p>
+
+<h3>Vertical scrolling lists</h3>
 </div>
 <div class="example">
 <i>Drag these lists vertically</i><br>
@@ -135,7 +137,8 @@ In the list variation on the right, we just prevent the boxes from leaving the p
 Now our panels stack with a padding of 3 pixels, and the first and last panels don't leave the parent. <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/scrolling.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>The next example reproduces the old Twitter for iPad Panels UI. The second variant introduces some of the non-default properties of Motion Constraints.</p>
+<h3>Twitter for iPad</h3>
+<p>The next example reproduces the old Twitter for iPad panels interface. The second variant introduces some of the non-default properties of motion constraints.</p>
 </div>
 <div class="example">
 <i>Drag the panels horizontally and release to impart velocity</i>
@@ -144,16 +147,16 @@ Now our panels stack with a padding of 3 pixels, and the first and last panels d
 <div class="cards-container" id="twitter-panels-example-constrain"></div>
 </div>
 <div class="constraints">
-<b>Constraints:</b><br>
-The left edge of each panel can't go past the left edge of the panel that came before, plus 10px.
+<b>Linear constraints</b><br>
+The left edge of each panel can't go past the left edge of the panel that came before, plus 10 pixels.
 <div class="mono">panel[i].x &gt; panel[i-1].x + 10</div>
 The left edge of each panel can't go past the right edge of the panel that came before.
 <div class="mono">panel[i].x &lt; panel[i-1].right</div>
-<b>Motion constraint:</b><br>
-The first panel's left edge is pinned to zero. This is motion constraint meaning that when violated it has a physical effect on the system. Here it applies a spring, but it could rebound or completely stop the motion.
+<b>Motion constraints</b><br>
+The first panel's left edge is constrained to the left edge, which is 0 pixels. This is a springy motion constraint. Here the motion constraint applies a spring, but you could easily make a motion constraint that makes the panel rebound or that completely stops the motion.
 <div class="mono">panel[first].left = 0 spring</div>
-<b>Second variation:</b><br>
-The second variation adds a motion constraint on the gap between two cards; either the gap is 10px or it's the full panel width, 250px. We also specify that the motion constraint shouldn't be enforced while dragging (overdragCoefficient: 0) and that this motion constraint's animation should keep running even when the constraint is satisfied, which is useful when using underdamped springs. This is the "captive" option.<br>
+<b>Variation (lower example)</b><br>
+The second variation adds a motion constraint on the gap between two cards: either the gap is 10 pixels or it's the full panel width, 250 pixels. We also specify that the motion constraint shouldn't be enforced while dragging (overdragCoefficient: 0) and that this motion constraint's animation should keep running even when the constraint is satisfied, which is handy when using underdamped springs. This is the "captive" option.<br><br>
 First, define the gap using a linear constraint:
 <div class="mono">gap = panel[i].x - panel[i-1].x</div>
 Then add a motion constraint on the gap using the "or" operator:
@@ -161,26 +164,28 @@ Then add a motion constraint on the gap using the "or" operator:
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/panels.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>The Manipulator doesn't have to use a friction simulation for the animation it creates after you let go of a drag. Here's an example using gravity instead:</p>
+<h3>Animation using gravity</h3>
+<p>A manipulator doesn't have to use a friction simulation for the animation it creates after you let go of a drag. Here's an example using gravity instead:</p>
 </div>
 <div class="example">
-<i>Throw the box upwards</i>
+<i>Toss the heavy box up</i>
 <div class="gravity-example" id="gravity-example"></div>
 </div>
 <div class="constraints">
-We only have one motion constraint here, which is that the bottom of the box can't go outside the parent; it's enforced by a slightly underdamped spring (the default) giving our heavy box a soft landing:
+We only have one motion constraint here, which is that the bottom of the box can't go outside the parent. It's enforced by a slightly underdamped spring (the default) giving our heavy box a soft landing:
 <div class="mono">box.bottom &gt;= parentHeight spring</div>
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/gravity.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>Another really useful operator for Motion Constraints is modulo, "%". Here we use a motion constraint that isn't enforced during dragging to ensure that our photo viewer animates to only show one photo.</p>
+<h3>Photo viewer</h3>
+<p>Another really useful operator for motion constraints is modulo, "%". Here we use a motion constraint that isn't enforced during dragging to ensure that our photo viewer animates to show only one photo. This actually uses a variation of modulo called "adjacent modulo" to prevent the user from flying past many photos with one big high-velocity flick.</p>
 </div>
 <div class="example">
 <i>Drag the photos horizontally</i>
 <div class="photos-example" id="photos-example"></div>
 </div>
 <div class="constraints">
-We have three motion constraints in this system. First, the first and last photos can't go away from the edge of the parent (otherwise you could scroll to before the first photo, or to after the last photo):
+We have three motion constraints in this system. The first and last photos can't go away from the edge of the parent (otherwise you could scroll to before the first photo or to after the last photo):
 <div class="mono">photo[first].x &lt;= 0 spring</div>
 <div class="mono">photo[last].x &gt;= parentWidth spring</div>
 Also, the scroll position must be a multiple of the photo width (plus padding):
@@ -188,16 +193,17 @@ Also, the scroll position must be a multiple of the photo width (plus padding):
 The scroll position is a variable that's added to every photo's x coordinate. <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/photos.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>We're not limited to just translating objects. If we add a Manipulator to the y-coordinate of a box, and constrain the bottom of the box then we can grow and shrink the box. Notice that we're expressing motion constraints on variables that are somehow related to scale but aren't the scale variable. We can do this because Slalom discovers the relationship between two variables by inspecting the Cassowary simplex tableau&mdash;this is a huge advantage over a numerical constraint solver where it would be harder to find how two variables relate to each other.</p>
-<p>Currently the Manipulator consumes all drag events; if it passed on unused drag deltas then we could add a second Manipulator to translate the box horizontally, creating something like Facebook's Paper UI.</p>
+<h3>Scaling like Facebook Paper</h3>
+<p>In Slalom, we're not limited to just translating objects. If we add a manipulator to the y-coordinate of a box and constrain the bottom of the box, then we can grow and shrink the box. Notice that we're expressing motion constraints on variables that are somehow related to scale but aren't the scale variable. We can do this because Slalom discovers the relationship between two variables by inspecting the Cassowary simplex tableau&mdash;this is a huge advantage over a numerical constraint solver where it would be harder to find how two variables relate to each other.</p>
+<p>Currently the manipulator consumes all drag events. If it passed on unused drag deltas then we could add a second manipulator to translate the box horizontally, creating something like Facebook's Paper UI.</p>
 </div>
 <div class="example">
-<i>Drag the image upwards to grow it.</i>
+<i>Drag the image upwards to grow it</i>
 <div class="scaling-example" id="scaling-example"></div>
 </div>
 <div class="constraints">
 We manipulate the box's y-coordinate variable for vertical drags.<br>
-<b>Constraints:</b><br>
+<b>Linear constraints</b><br>
 Constrain the aspect ratio of the box (aspect = parentWidth / parentHeight):
 <div class="mono">box.width = box.height * aspect</div>
 Relate the height to the scale:
@@ -206,23 +212,22 @@ Pin the box to the bottom of the screen:
 <div class="mono">box.bottom = parentHeight</div>
 Center the box horizontally:
 <div class="mono">(box.x + box.width/2) = parentWidth / 2</div>
-<b>Motion Constraints:</b><br>
-The box's width must be greater than 150px. We're really expressing a constraint on the minimum scale, but because we can get the coefficients out of Cassowary, we can write this in terms of the box's width.
+<b>Motion constraints</b><br>
+The box's width must be greater than 150 pixels. We're really expressing a constraint on the minimum scale, but because we can get the coefficients out of Cassowary, we can write this in terms of the box's width.
 <div class="mono">box.width &gt;= 150 spring</div>
 The box's top mustn't go above the top of the screen. Again, this is really a scale constraint (the scale can't be more than 1.0), but we're expressing it in terms of box.y because that's more natural.
 <div class="mono">box.y &gt;= 0 spring</div>
-<b>Notes:</b><br>
-<ul>
- <li>We can tweak the constraints to make the box go off the bottom when it gets to small instead of shrinking further and things like that. So we have a lot of flexibility with this kind of system.</li>
- <li>There's slip! If you drag from the middle of the box, you'll see that the part of the image you grabbed slips out from under your finger. That's because the manipulator is just operating on the box's y coordinate. If we wanted to avoid slip then we'd have to create a new variable when the finger goes down, relate it to y (i.e.: <span class="mono">fingery = box.y - 123 * scale</span>, based on the current scale and finger start position) and then manipulate <span class="mono">fingery</span> instead of <span class="mono">box.y</span>. This isn't very hard, but the current Manipulator code doesn't support it.</li>
-</ul>
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/scaling.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>This is an implementation of the iOS notification center and control center UIs. The notification center is actually very interesting because it uses a different physical model when coming down (positive gravity) than when going up (anti-gravity). It looks weird if it slows down while going upwards. I was able to do this by creating a custom Motion Constraint operator that changed its physics model depending on the end point...</p>
+<p>Note that we could tweak the constraints further. For instance, we could make the box go off the bottom when it gets too small instead of shrinking further. So we have a lot of flexibility with this kind of system.</p>
+<p>Also note that there's slip! If you drag from the middle of the box, you'll see that the part of the image you grabbed slips out from under your finger. That's because the manipulator is just operating on the box's y coordinate. If we wanted to avoid slip then we'd have to create a new variable when the finger goes down, relate it to y (that is, <span class="mono">fingery = box.y - 123 * scale</span>, based on the current scale and finger start position) and then manipulate <span class="mono">fingery</span> instead of <span class="mono">box.y</span>. This isn't very hard, but the current manipulator code doesn't support it.</p>
+
+<h3>iOS notification and control centers</h3>
+<p>This next example is an implementation of the iOS notification center and control center UIs. The notification center is actually very interesting because it uses a different physical model when coming down (positive gravity) than when going up (anti-gravity). It looks weird if it slows down while going upwards. I was able to do this by creating a custom motion constraint operator that changed its physics model depending on the end point. (For the purposes of this paper, I opted not to implement the arrow buttons within the UIs but it should be straightforward to do so, either outside Slalom or by extending Slalom.)</p>
 </div>
 <div class="example">
-    <i>Drag downwards from the top to show the notification drawer, drag upwards from the bottom to show the control center</i><br>
+    <i>Drag down from top to show notification drawer; drag up from bottom to show control center</i><br>
     <div class="ios-example" id="ios-example">
         <div class="box backdrop"></div>
         <div class="box control-center"></div>
@@ -236,8 +241,9 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/ios.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>The iOS application switcher. There are two Manipulators, one which controls the first app's x-coordinate, and one which controls the first icon's x-coordinate. The icons are offset by half the scroll offset of the apps, so dragging the icons moves the apps twice as fast. Even though we have two manipulators, we still only need two motion constraints.</p>
-<p>The real iOS app switcher applies some non-linear translation to the icons (based on velocity?) which I'm unable to represent with linear constraints.</p>
+<h3>iOS application switcher</h3>
+<p>This example demonstrates a way to make the iOS application switcher using Slalom. There are two manipulators: one which controls the first app's x-coordinate, and one which controls the first icon's x-coordinate. The icons are offset by half the scroll offset of the apps, so dragging the icons (small squares at bottom) moves the apps (large rectangles at top) twice as fast. Even though we have two manipulators, we still need only two motion constraints.</p>
+<p>The real iOS app switcher applies some non-linear translation to the icons (based on velocity?) which I am unable to represent with linear constraints.</p>
 </div>
 <div class="example">
     <i>Drag horizontally on the "apps" or "icons"</i>
@@ -247,7 +253,8 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/ios.js#L172">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>In Windows 7, Microsoft implemented touch overscroll by translating the whole window rather than just the content. We can use linear constraints to make this happen too, and we only need one motion constraint (the window should stay where it is) to bounce things back.</p>
+<h3>Windows overscroll</h3>
+<p>In Windows 7, Microsoft implemented touch overscroll by translating the whole window rather than just the content. We can use linear constraints to make this happen too, and we need only one motion constraint (the window should stay where it is) to bounce things back.</p>
 </div>
 <div class="example">
     <i>Drag the image vertically to scroll</i>
@@ -263,7 +270,8 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/win7overscroll.js">Check out the source code for this example on GitHub.</a>
 </div>
 <div class="content">
-<p>Google Maps details transition. This one was fairly straightforward to write the linear constraints for, and then more complex to write the Motion Constraints that prevent the UI stopping half-way open. The Motion Constraint is predicated on multiple variables, so I wrote a custom operator to handle it; I'd like to be able to express this more elegantly though, possibly with some kind of a <span class="mono">Range</span> type.</p>
+<h3>Google Maps details transition</h3>
+<p>This example implements the complex transitions that occur when the user drags upward within a Google Maps location view. The linear constraints are fairly straightforward, while the motion constraints that prevent the UI's stopping half-way open reflect the complexity of the transitions. The motion constraint is predicated on multiple variables, so I wrote a custom operator to handle it; I'd like to be able to express this more elegantly though, possibly with some kind of a <span class="mono">Range</span> type.</p>
 </div>
 <div class="example">
 <i>Drag upwards on the blue info bar to see more information</i>
@@ -305,21 +313,21 @@ The box's top mustn't go above the top of the screen. Again, this is really a sc
 <div class="content">
 <h2>Future directions</h2>
 
-<p>We can use Slalom to describe a wide variety of touch interactions. There's a lot left to do, however:</p>
+<p>We can use Slalom to describe a wide variety of touch interactions. There's a lot left to do, however, some involving further research:</p>
 <ul>
- <li>Non-linear constraints are needed for some interfaces (one example is the Chrome for Android tab switcher; the tabs move less when they're at the top) and these can't be expressed with Cassowary. For simple "external" variables with no dependencies it would be enough to provide a non-linear mapping function (and inverse function).</li>
- <li>The Manipulator only recognizes one gesture. I plan to extend the Manipulator or subdivide it so that it's possible to manipulate multiple variables with one gesture. This would allow the scaling example to become more like Facebook Paper.</li>
- <li>Various things need better explanation, like the captive flag on Motion Constraints (there's also probably a few variants on captive Motion Constraints...).</li>
- <li>No state or conditional constraints. To tackle more ambitious interactions we need a notion of state that enables/modifies constraints, similar to class names changing CSS properties. Grid Style Sheets handle some of this and manage to avoid feedback loops, so that's on my list to research.</li>
- <li>No transition support. Often you want to use a tap to change some value (for example, the iOS notification panel and control center should hide when you tap the chevron). It's also common to want to transition from a resting position to where a touch point (which is moving) will be.</li>
- <li>Port Slalom to one of the mobile platforms to ensure it integrates well.</li>
- <li>Define the syntax for constraints and Motion Constraints and write a parser for it. I want to do a native port first in case anything comes up.</li>
+ <li>Non-linear constraints are needed for some interfaces (one example is the Chrome for Android tab switcher&mdash;the tabs move less when they're at the top) and these can't be expressed with Cassowary. For simple "external" variables with no dependencies it would suffice to provide a non-linear mapping function (and inverse function).</li>
+ <li>Manipulators recognize only one gesture currently. I plan to extend the Manipulator class or subdivide it so that it's possible to manipulate multiple variables with one gesture. This would allow the above scaling example to become more like Facebook Paper.</li>
+ <li>Various parts of Slalom need better explanation, including the captive flag on the Motion Constraints class.</li>
+ <li>Currently there are no state or conditional constraints. To tackle more ambitious interactions, we need a notion of state that enables and modifies constraints, similar to how class names can be used to change CSS properties. Grid Style Sheets handle some of this and manage to avoid feedback loops.</li>
+ <li>Currently there is no transition support. Often you want to use a tap to change some value (for example, the iOS notification panel and control center should hide when you tap the arrow buttons). It's also common to want to transition from a resting position to where a touch point (which is moving) will be.</li>
+ <li>Slalom could be ported to one of the mobile platforms to ensure it integrates well.</li>
+ <li>A parser could be written for linear and motion constraints, once their syntax is defined. I want to do a native port first to identify any syntax or parser changes needed to support integration with a traditional toolkit.</li>
 </ul>
 </div>
 <div class="about">
 <div class="ralpht"></div>
 <div class="title">About the author</div>
-Ralph Thomas is a former high-school physics student who has spent the past 15 years focused on user interface implementation. A "full-stack" client engineer, Ralph has written high-performance mobile UIs from kernel input drivers, through OpenGL ES-based 2D graphics engines, physics engines and user interface toolkits up to full applications built on those foundations. Ralph has also contributed performance enhancements to the WebKit project. Follow Ralph on <a href="https://twitter.com/i_am_ralpht">Twitter</a> or send him <a href="mailto:ralpht@gmail.com">email</a>.
+Ralph Thomas is a former high-school physics student who has spent the past 15 years focused on user interface implementation. A "full-stack" client engineer, Ralph has written high-performance mobile UIs from kernel input drivers, through OpenGL ES-based 2D graphics engines, physics engines and user interface toolkits, up to full applications built on those foundations. Ralph has also contributed performance enhancements to the WebKit project. Follow Ralph on <a href="https://twitter.com/i_am_ralpht">Twitter</a> or send him <a href="mailto:ralpht@gmail.com">email</a>.
 </div>
 </div>
 <!-- examples code -->
