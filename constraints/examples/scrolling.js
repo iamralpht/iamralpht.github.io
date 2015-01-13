@@ -47,7 +47,7 @@ function makeScrollingExample(parentElement, bunching) {
             // box[i].y <= box[i+1].y - 3
             if (lastBox) solver.add(leq(c.minus(lastBox.y, 3), p.y, medium));
             // box[last].bottom <= parentHeight
-            if (i == N-1) solver.add(leq(lastBox.bottom, parentHeight, medium));
+            if (i == N-1) solver.add(leq(p.bottom, parentHeight, medium));
         }
 
         context.addBox(p);
