@@ -58,8 +58,8 @@ div.mono {
 <div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>January 2015</div>
 <p>This page outlines <b>Slalom</b>, a system with prototype implementation for concisely describing and implementing a class of touch interactions. Various examples demonstrate Slalom's versatility.</p>
 
-<p>Slalom grew out of my previous article which described <a href="http://iamralpht.github.io/physics">how to use physics simulations to build touch-driven user interfaces</a>. When writing the examples for that article, I observed that I was writing much of the same code across the examples. Slalom extends the previous work by making it possible to describe how an object moves instead of having to write code to manually move an object in response to touch input.</p>
-<p>Most touch interactions on today's tablets and smartphones are implemented by writing new code to handle every touch movement, which computes various transforms and updates the application's view tree or the browser's document object model (DOM). Such code is repetitive to write and is frequently inflexible, and the author needs a reasonable understanding of Newtonian physics to create something that feels good or natural to use. As a result, most apps use only the few touch interactions provided by the operating system: scroll and tap.</p>
+<p>Slalom grew out of my previous article on <a href="http://iamralpht.github.io/physics">how to use physics simulations to build touch-driven user interfaces</a>. When writing that, I observed that I was writing much of the same code across the examples and that this repetitive, often inflexible code plagues most touch device engineering.
+Most touch interactions on today's tablets and smartphones are implemented by writing new code to handle every touch movement, which computes various transforms and updates the application's view tree or the browser's document object model (DOM). The coder needs a reasonable understanding of Newtonian physics to create something that feels good or natural to use. As a result, most apps use only the few touch interactions provided by the operating system: scroll and tap.</p>
 <p>Many touch interactions involve the user's dragging a visual object such as a panel, a photo, an icon, a window or any other structural element of the user interface (and the object's moving synchronously under the touch point) and imparting momentum to that object, such that when released the object keeps moving with some momentum. The touch handler that you write will impose some constraints on how and where an object can move, such as constricting it to a single axis and clamping the distance it can travel. If you're implementing a complex interaction, then every time you iterate your idea and want to change something, you have to rewrite a lot of manual, very detailed code.</p>
 <p>What if we came up with a system where we just specify <i>how something moves</i> and <i>what the constraints are</i>?</p>
 
@@ -172,6 +172,7 @@ Then add a motion constraint on the gap using the "or" operator:
 <div class="gravity-example" id="gravity-example"></div>
 </div>
 <div class="constraints">
+<b>Motion constraints</b><br>
 We only have one motion constraint here, which is that the bottom of the box can't go outside the parent. It's enforced by a slightly underdamped spring (the default) giving our heavy box a soft landing:
 <div class="mono">box.bottom &gt;= parentHeight spring</div>
 <a href="https://github.com/iamralpht/iamralpht.github.io/blob/master/constraints/examples/gravity.js">Check out the source code for this example on GitHub.</a>
@@ -185,6 +186,7 @@ We only have one motion constraint here, which is that the bottom of the box can
 <div class="photos-example" id="photos-example"></div>
 </div>
 <div class="constraints">
+<b>Motion constraints</b><br>
 We have three motion constraints in this system. The first and last photos can't go away from the edge of the parent (otherwise you could scroll to before the first photo or to after the last photo):
 <div class="mono">photo[first].x &lt;= 0 spring</div>
 <div class="mono">photo[last].x &gt;= parentWidth spring</div>
