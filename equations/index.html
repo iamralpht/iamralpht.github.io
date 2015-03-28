@@ -1,0 +1,145 @@
+<html>
+<head>
+<title>Equations of motion</title>
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+<link href="article.css" rel="stylesheet"></link>
+<style>
+pre { font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="content">
+<div class="title">Equations of motion</div>
+<div class="subtitle">by <a href="mailto:ralpht@gmail.com">Ralph Thomas</a><br>March 2015</div>
+<p>Setup: UI physics engines like Gravitas are very simple, coming down to just a few equations that compute a position given a time delta. Gravitas models three kinds of physical motion: friction, constant acceleration (or gravity) and springs.</p>
+
+<p><b>Friction</b></p>
+<p>Friction is the simplest equation: the velocity gets smaller at a constant rate. The simplest way to describe friction is to think of a function that we call every frame that computes the new velocity then adds it to the position:</p>
+<pre>
+var velocity = 2; // 2px a frame
+var position = 0; // start at 0px
+var friction = 0.99; // lose 1% of velocity every frame
+
+function updatePosition() {
+    position = position + velocity;
+    velocity = velocity * friction;
+}
+</pre>
+<p>This is a simple implementation of motion under friction, but there are some problems:
+<ul>
+ <li>If we ever drop frames then our object will have juddery motion because our function doesn't consider the amount of time that passed since the previous frame.</li>
+ <li>We can't compute the position or velocity of an object at some point in the future without looping on updatePosition which is expensive and only accurate to a frame time.</li>
+</ul>
+First lets express the velocity as a function of time:
+<pre>
+// The velocity after 1s is v * drag, after 2s it's v * drag * drag,
+// after 3s it's v * drag * drag * drag.
+// It's the initialVelocity * friction ^ deltaTime, or in JavaScript:
+
+function velocity(initialVelocity, friction, deltaTime) {
+    return initialVelocity * Math.pow(friction, deltaTime);
+}
+</pre>
+We can integrate this to get the position as a function of time:
+<pre>
+function position(initialPosition, initialVelocity, friction, deltaTime) {
+    return initialPosition + initialVelocity * Math.pow(friction, deltaTime) / Math.log(friction) - initialVelocity / Math.log(friction);
+}
+</pre>
+And that's a complete, precise implementation of friction! Gravitas caches the natural log of friction, but that's all there is too it!</p>
+<p><b>Constant Acceleration (or Gravity)</b></p>
+<p>Constant Acceleration is another straightforward equation. If you ever studied Calculus at school then you will have covered this! Lets look at the equation for velocity again, and then integrate it:
+<pre>
+// The current velocity with respect to time is: v' = v + a*t.
+
+function velocity(initialVelocity, acceleration, deltaTime) {
+    return initialVelocity + acceleration * deltaTime;
+}
+
+// Integrating velocity gives us position as a function of time:
+//   x' = x + v*t + 0.5*a*t^2
+
+function position(initialPosition, initialVelocity, acceleration, deltaTime) {
+    return initialPosition + initialVelocity * deltaTime + 0.5 * acceleration * deltaTime * deltaTime;
+}
+</pre>
+That's constant acceleration -- one line!
+</p>
+<p><b>Springs: three cases</b></p>
+<p>Now we get to springs! Depending on the spring constant and damping there are three cases of springs: underdamped (the spring bounces around the end point before settling), critically damped (the spring has exactly enough damping to prevent any bouncing) and overdamped (the spring has more than enough damping to prevent bouncing). The spring implementation in Gravitas is based on Hooke's law:
+<pre>
+// F: force, k: spring constant, c: damping
+// x: position, v: velocity.
+F = -kx - cv
+</pre>
+This can be integrated as a second order differential equation. I had forgotten how to solve ODEs, so I looked the answer up in <a href="http://www.stewartcalculus.com/data/CALCULUS%20Concepts%20and%20Contexts/upfiles/3c3-AppsOf2ndOrders_Stu.pdf">this physics textbook</a> &mdash; the "Damped Vibrations" section is what we want. The textbook explains the equations fairly clearly, so rather than repeat that I'll show the JavaScript code that Gravitas uses to compute the position and velocity of a spring as a function of time.
+<pre>
+// This function takes the initial position, initial velocity, mass, spring constant and damping and
+// returns a functions to give the position and velocity as a function of time.
+//
+// Only the mass, spring constant and damping change whether the spring is underdamped, critically
+// damped or underdamped.
+
+// @param initial   the initial position
+// @param velocity  the initial velocity
+// @param c         the spring damping
+// @param m         the mass of the object (I normally use "1").
+// @param k         the spring constant
+
+function solveSpring(initial, velocity, c, m, k) {
+    // Solve the quadratic equation; root = (-c +/- sqrt(c^2 - 4mk)) / 2m.
+    var cmk = c * c - 4 * m * k;
+    if (cmk == 0) {
+        // The spring is critically damped.
+        // x = (c1 + c2*t) * e ^(-c/2m)*t
+        var r = -c / (2 * m);
+        var c1 = initial;
+        var c2 = velocity / (r * initial);
+        return {
+            x: function(t) { return (c1 + c2 * t) * Math.pow(Math.E, r * t); },
+            dx: function(t) { var pow = Math.pow(Math.E, r * t); return r * (c1 + c2 * t) * pow + c2 * pow; }
+        };
+    } else if (cmk > 0) {
+        // The spring is overdamped; no bounces.
+        // x = c1*e^(r1*t) + c2*e^(r2t)
+        // Need to find r1 and r2, the roots, then solve c1 and c2.
+        var r1 = (-c - Math.sqrt(cmk)) / (2 * m);
+        var r2 = (-c + Math.sqrt(cmk)) / (2 * m);
+        var c2 = (velocity - r1 * initial) / (r2 - r1);
+        var c1 = initial - c2;
+
+        return {
+            x: function(t) { return (c1 * Math.pow(Math.E, r1 * t) + c2 * Math.pow(Math.E, r2 * t)); },
+            dx: function(t) { return (c1 * r1 * Math.pow(Math.E, r1 * t) + c2 * r2 * Math.pow(Math.E, r2 * t)); }
+            };
+    } else {
+        // The spring is underdamped, it has imaginary roots.
+        // r = -(c / 2*m) +- w*i
+        // w = sqrt(4mk - c^2) / 2m
+        // x = (e^-(c/2m)t) * (c1 * cos(wt) + c2 * sin(wt))
+        var w = Math.sqrt(4*m*k - c*c) / (2 * m);
+        var r = -(c / 2*m);
+        var c1= initial;
+        var c2= (velocity - r * initial) / w;
+            
+        return {
+            x: function(t) { return Math.pow(Math.E, r * t) * (c1 * Math.cos(w * t) + c2 * Math.sin(w * t)); },
+            dx: function(t) {
+                var power =  Math.pow(Math.E, r * t);
+                var cos = Math.cos(w * t);
+                var sin = Math.sin(w * t);
+                return power * (c2 * w * cos - c1 * w * sin) + r * power * (c2 * sin + c1 * cos);
+            }
+        };
+    }
+}
+</pre>
+OK, so springs are way more complex than friction or constant acceleration, but the actual functions that solveSpring generates are still quite simple.</p>
+</div>
+<div class="about">
+<div class="ralpht"></div>
+<div class="title">About the author</div>
+Ralph Thomas is a former high-school physics student who has spent the past 15 years focused on user interface implementation. A "full-stack" client engineer, Ralph has written high-performance mobile UIs from kernel input drivers, through OpenGL ES-based 2D graphics engines, physics engines and user interface toolkits up to full applications built on those foundations. Ralph has also contributed performance enhancements to the WebKit project. Follow Ralph on <a href="https://twitter.com/i_am_ralpht">Twitter</a> or send him <a href="mailto:ralpht@gmail.com">email</a>.
+</div>
+</body>
+</html>
