@@ -272,6 +272,7 @@ function FloatingActionButton(title, image, items) {
 
     this._cursorPosition = 0;
     this._selected = 0;
+    this._cursorX = 0;
 
     this._layout();
 }
